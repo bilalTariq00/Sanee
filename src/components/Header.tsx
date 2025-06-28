@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import config from '@/config';
 import { useTranslation } from 'react-i18next';
 import { useNotificationSettings } from '@/contexts/NotificationContext'; // ✅ Import notification context
-
+import Swal from 'sweetalert2'; 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -60,7 +60,21 @@ export default function Header() {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
   };
-
+const handleSignOut = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You will be signed out!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#aaa',
+    confirmButtonText: 'Yes, sign out!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      navigate('/logout'); // ✅ Perform signout navigation
+    }
+  });
+};
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -142,9 +156,9 @@ export default function Header() {
                     <Link to="/notification-settings" className={`flex items-center px-4 py-2 ${isActiveRoute('/settings') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
                       <Settings className="h-4 w-4 mr-2" /> {t("settings")}
                     </Link>
-                    <Link to="/logout" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                    <div onClick={handleSignOut} className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
                       <LogOut className="h-4 w-4 mr-2" /> {t("sign_out")}
-                    </Link>
+                    </div>
                   </div>
                 </div>
               )}
