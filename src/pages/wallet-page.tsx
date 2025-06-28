@@ -80,13 +80,13 @@ export default function WalletPage() {
       case "in_review":
         return <Eye className="w-8 h-8" />
       case "pending":
-        return <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
+        return <img src='/riyal.svg' className="h-5 w-5 mr-1" />
       case "available":
         return <CheckCircle className="w-8 h-8" />
       case "withdrawn":
         return <Download className="w-8 h-8" />
       default:
-        return <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
+        return <img src='/riyal.svg' className="h-5 w-5 mr-1" />
     }
   }
 

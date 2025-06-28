@@ -60,7 +60,7 @@ export default function UserCard({ user, onUserClick }: UserCardProps) {
       <div className="mb-5">
         <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
           <span className="flex items-center">
-            <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />{user.hourlyRate}+ &nbsp;|&nbsp; {user.experience}
+            <img src='/riyal.svg' className="h-5 w-5 mr-1" />{user.hourlyRate}+ &nbsp;|&nbsp; {user.experience}
           </span>
           <span>{user.followers} {t("followers")}</span>
         </div>

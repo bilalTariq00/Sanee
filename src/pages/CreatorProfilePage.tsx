@@ -246,7 +246,7 @@ export default function CreatorProfilePage() {
                 </h3>
                 <p className="text-gray-600">{s.description}</p>
                 <div className="flex items-center text-gray-900">
-                 <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
+                 <img src='/riyal.svg' className="h-5 w-5 mr-1" />
                   <span className="text-xl font-semibold">{s.price}</span>
                   <span className="text-gray-500 ml-1">{s.unit}</span>
                 </div>
@@ -307,7 +307,7 @@ export default function CreatorProfilePage() {
                           {g.category?.name}
                         </span>
                         <div className="flex items-center text-green-600">
-                        <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
+                        <img src='/riyal.svg' className="h-5 w-5 mr-1" />
                           <span className="font-semibold">{g.price}</span>
                         </div>
                       </div>

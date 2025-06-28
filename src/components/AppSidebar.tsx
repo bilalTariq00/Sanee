@@ -64,7 +64,7 @@ export function AppSidebar() {
           {!isCollapsed && (
             <Link to="/" className=" ">
   
-              <img src='src/public/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
+              <img src='/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
             </Link>
           )}
         </div>
