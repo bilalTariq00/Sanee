@@ -253,14 +253,17 @@ export default function ProfilePage() {
               <div className="text-3xl font-bold">{stats.completed}</div>
               <div className="text-white/90">Projects Completed</div>
             </div>
+           <div>
+  <div className="text-3xl font-bold">{Number(stats.rating).toFixed(1)}</div>
+  <div className="text-white/90">Rating</div>
+</div>
+
             <div>
-              <div className="text-3xl font-bold">{stats.rating}</div>
-              <div className="text-white/90">Rating</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold">{stats.response}</div>
-              <div className="text-white/90">Response Rate</div>
-            </div>
+  <div className="inline-block rounded-full bg-green-500 text-white text-sm font-semibold px-3 py-3">
+    Available Now
+  </div>
+</div>
+
           </div>
         </div>
       </div>
