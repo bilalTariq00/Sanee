@@ -2,6 +2,7 @@ import type React from "react";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import Pusher from "pusher-js";
 import config from "@/config";
+import axios from "axios";
 
 // Extend the Window interface to include showToast
 declare global {
@@ -61,7 +62,26 @@ export function NotificationProvider({ children, user }: { children: React.React
     }
     setIsInitialized(true);
   }, []);
+  useEffect(() => {
+    if (!user) return;
 
+    const fetchInitialUnreadCount = async () => {
+      try {
+        const res = await axios.get(`${config.API_BASE_URL}/notifications/unread-count`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        const count = res.data?.data?.unread_count ?? 0;
+        console.log("📥 Initial unread count:", count);
+        setUnreadCount(count);
+      } catch (error) {
+        console.error("❌ Failed to fetch unread count", error);
+      }
+    };
+
+    fetchInitialUnreadCount();
+  }, [user]);
   // Initialize Web Audio API
   useEffect(() => {
     const initAudioContext = () => {
@@ -192,37 +212,51 @@ export function NotificationProvider({ children, user }: { children: React.React
   };
 
   // Pusher integration for real-time notifications
-  useEffect(() => {
-    if (!user) return;
+ useEffect(() => {
+  if (!user) {
+    console.warn("❌ No user provided to NotificationProvider");
+    return;
+  }
 
-    // Initialize Pusher (using hardcoded values)
-    const pusher = new Pusher("fb3d6f3052ad033ccb47", {  // Use hardcoded Pusher App Key
-      cluster: "ap2",  // Use hardcoded Pusher Cluster
-      authEndpoint: `${config.API_BASE_URL}/broadcasting/auth`,
-      auth: {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+  console.log("📡 Connecting to Pusher for user:", user.id);
+
+  const pusher = new Pusher("fb3d6f3052ad033ccb47", {
+    cluster: "ap2",
+    authEndpoint: `${config.API_BASE_URL}/broadcasting/auth`,
+    auth: {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-    });
+    },
+  });
 
-    // Subscribe to the user's notifications channel
-    const channel = pusher.subscribe(`private-notifications.${user.id}`);
+  const channelName = `private-notifications.${user.id}`;
+  const channel = pusher.subscribe(channelName);
 
-    channel.bind("notification.created", (data: { notification: any; unread_count: React.SetStateAction<number>; }) => {
-      setNotifications((prev) => [data.notification, ...prev]);
-      setUnreadCount(data.unread_count);
-      showToast(data.notification);
-    });
+  console.log("✅ Subscribed to", channelName);
 
-    pusher.connection.bind("connected", () => setIsConnected(true));
-    pusher.connection.bind("disconnected", () => setIsConnected(false));
+  channel.bind("notification.created", (data) => {
+    console.log("🔔 Notification received:", data);
+    setNotifications((prev) => [data.notification, ...prev]);
+    setUnreadCount(data.unread_count);
+    showToast(data.notification);
+  });
 
-    return () => {
-      pusher.unsubscribe(`private-notifications.${user.id}`);
-      pusher.disconnect();
-    };
-  }, [user]);
+  pusher.connection.bind("connected", () => {
+    console.log("✅ Pusher connected");
+    setIsConnected(true);
+  });
+
+  pusher.connection.bind("disconnected", () => {
+    console.log("⚠️ Pusher disconnected");
+    setIsConnected(false);
+  });
+
+  return () => {
+    pusher.unsubscribe(channelName);
+    pusher.disconnect();
+  };
+}, [user]);
 
   const showToast = (notification: { title: any; message: any; }) => {
     if (window.showToast) {

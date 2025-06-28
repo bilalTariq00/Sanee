@@ -1,4 +1,3 @@
-// Updated Header to navigate to /messages/:userId route
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Bell, Mail, Menu, Search, X, Settings, LogOut, Wallet, Globe2
@@ -8,12 +7,13 @@ import { useSidebar } from './ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import config from '@/config';
 import { useTranslation } from 'react-i18next';
+import { useNotificationSettings } from '@/contexts/NotificationContext'; // ✅ Import notification context
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notifications] = useState(3);
-  const [messages] = useState(2);
+  const { unreadCount: notificationCount } = useNotificationSettings(); // ✅ Real-time notifications
+  const messageCount = 0; // 🔁 TODO: Replace with real unread message count from context or API
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
@@ -44,7 +44,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+      if (profileRef.current && !(profileRef.current as any).contains(event.target)) {
         setIsProfileOpen(false);
       }
     };
@@ -67,7 +67,7 @@ export default function Header() {
         <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {isCollapsed && (
             <Link to="/" className="text-red-500 text-3xl font-bold tracking-tight">
-             <img src='src/public/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
+              <img src='src/public/sanee.png' className="h-16 w-fit" alt="Logo" />
             </Link>
           )}
 
@@ -76,9 +76,9 @@ export default function Header() {
               <input
                 type="text"
                 placeholder={t("search_placeholder")}
-                className={`w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500`}
+                className="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
-              <Search className={`absolute top-2.5 h-5 w-5 text-gray-400 ${isRTL ? 'left-3' : 'left-3'}`} />
+              <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
             </div>
           </nav>
 
@@ -98,18 +98,18 @@ export default function Header() {
               className="relative text-gray-700 hover:text-red-500"
             >
               <Mail className="h-6 w-6" />
-              {messages > 0 && (
+              {messageCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {messages}
+                  {messageCount}
                 </span>
               )}
             </button>
 
-            <button onClick={()=>navigate('/notifications')} className="relative text-gray-700 hover:text-red-500">
+            <button onClick={() => navigate('/notifications')} className="relative text-gray-700 hover:text-red-500">
               <Bell className="h-6 w-6" />
-              {notifications > 0 && (
+              {notificationCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                 {notifications}
+                  {notificationCount}
                 </span>
               )}
             </button>
@@ -124,9 +124,7 @@ export default function Header() {
               </button>
 
               {isProfileOpen && (
-                <div
-                  className={`absolute mt-2 w-52 bg-white rounded-xl shadow-lg py-2 border ${isRTL ? 'left-0' : 'right-0'}`}
-                >
+                <div className={`absolute mt-2 w-52 bg-white rounded-xl shadow-lg py-2 border ${isRTL ? 'left-0' : 'right-0'}`}>
                   <p className="text-gray-800 px-4 py-2 text-sm font-medium">{userName}</p>
                   <div className="divide-y text-sm">
                     <Link to="/profile" className={`block px-4 py-2 ${isActiveRoute('/profile') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
