@@ -132,7 +132,7 @@ export default function LoginForm() {
         </button>
       </div>
 
-      <SocialAuth />
+     
 
       <div className="text-sm text-center">
         <span className="text-gray-600">Don't have an account?</span>{' '}

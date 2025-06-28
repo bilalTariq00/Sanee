@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Mail, Menu, X, Settings, LogOut, Wallet, Globe2, Search } from 'lucide-react'; // Added Search icon import
+// Updated Header to navigate to /messages/:userId route
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Bell, Mail, Menu, Search, X, Settings, LogOut, Wallet, Globe2
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSidebar } from './ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import config from '@/config';
 import { useTranslation } from 'react-i18next';
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(0);  // Notifications count
-  const [messages, setMessages] = useState(0);  // Messages count
+  const [notifications] = useState(3);
+  const [messages] = useState(2);
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [language, setLanguage] = useState(() => {
     const savedLang = sessionStorage.getItem('lang') || 'en';
@@ -23,52 +23,34 @@ export default function Header() {
     return savedLang;
   });
 
+  const location = useLocation();
   const profileRef = useRef(null);
   const { user } = useAuth();
   const userName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || t('user');
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
-  const avatar = user?.image ? `${config.IMG_BASE_URL}/storage/${user.image}` : 'https://placehold.co/256x256?text=Avatar';
+  const avatar = user?.image
+    ? `${config.IMG_BASE_URL}/storage/${user.image}`
+    : 'https://placehold.co/256x256?text=Avatar';
 
-  // Initialize real-time updates using Echo
+  const isRTL = language === 'ar';
+
   useEffect(() => {
-    if (!user) return;
+    const dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.setAttribute('dir', dir);
+    sessionStorage.setItem('lang', language);
+    i18n.changeLanguage(language);
+  }, [language, i18n]);
 
-    const echo = new Echo({
-      broadcaster: "pusher",
-      key: "fb3d6f3052ad033ccb47",
-      cluster: "ap2",
-      forceTLS: true,
-      encrypted: true,
-      authEndpoint: `${config.API_BASE_URL}/broadcasting/auth`,
-      auth: {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      },
-      enabledTransports: ["ws", "wss"],
-    });
-
-    // Subscribe to Pusher channel for notifications and messages
-    const notificationChannel = echo.private(`notifications.${user.id}`);
-    const messageChannel = echo.private(`messages.${user.id}`);
-
-    // Listen for new notification
-    notificationChannel.listen(".notification.created", (data: any) => {
-      setNotifications(prev => prev + 1); // Increment notification count
-    });
-
-    // Listen for new message
-    messageChannel.listen(".message.received", (data: any) => {
-      setMessages(prev => prev + 1); // Increment message count
-    });
-
-    return () => {
-      echo.leave(`notifications.${user.id}`);
-      echo.leave(`messages.${user.id}`);
-      echo.disconnect();
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
     };
-  }, [user]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
@@ -82,25 +64,25 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex items-center justify-between h-16 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {isCollapsed && (
             <Link to="/" className="text-red-500 text-3xl font-bold tracking-tight">
               Sanee
             </Link>
           )}
 
-          <nav className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+          <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
             <div className="relative w-64">
               <input
                 type="text"
                 placeholder={t("search_placeholder")}
                 className={`w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500`}
               />
-              <Search className={`absolute top-2.5 h-5 w-5 text-gray-400`} />
+              <Search className={`absolute top-2.5 h-5 w-5 text-gray-400 ${isRTL ? 'left-3' : 'left-3'}`} />
             </div>
           </nav>
 
-          <div className={`hidden md:flex items-center ${language === 'ar' ? 'space-x-reverse space-x-5' : 'space-x-5'}`}>
+          <div className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-5' : 'space-x-5'}`}>
             <button
               onClick={toggleLanguage}
               className="text-gray-700 hover:text-red-500 flex items-center gap-2"
@@ -123,11 +105,11 @@ export default function Header() {
               )}
             </button>
 
-            <button onClick={() => navigate('/notifications')} className="relative text-gray-700 hover:text-red-500">
+            <button onClick={()=>navigate('/notifications')} className="relative text-gray-700 hover:text-red-500">
               <Bell className="h-6 w-6" />
               {notifications > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {notifications}
+                 {notifications}
                 </span>
               )}
             </button>
@@ -143,7 +125,7 @@ export default function Header() {
 
               {isProfileOpen && (
                 <div
-                  className={`absolute mt-2 w-52 bg-white rounded-xl shadow-lg py-2 border`}
+                  className={`absolute mt-2 w-52 bg-white rounded-xl shadow-lg py-2 border ${isRTL ? 'left-0' : 'right-0'}`}
                 >
                   <p className="text-gray-800 px-4 py-2 text-sm font-medium">{userName}</p>
                   <div className="divide-y text-sm">
