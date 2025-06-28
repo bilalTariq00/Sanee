@@ -41,7 +41,7 @@ const SearchBar = ({
   ]
 
   return (
-    <div className={`w-full max-w-4xl mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
+    <div className={`w-full max-w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
       {/* Search input */}
       <div className="relative mb-6">
         <Search
