@@ -89,14 +89,14 @@ export default function GigDetail() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Image Carousel */}
         <div className="lg:col-span-2">
           <ImageCarousel images={gig.images || []} />
         </div>
 
         {/* Gig Info */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <Card className="sticky top-4">
             <CardContent className="p-6">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">{gig.title}</h1>
@@ -124,7 +124,14 @@ export default function GigDetail() {
               </div>
 
               <Separator className="my-4" />
-
+<Button
+  size="sm"
+  variant="ghost"
+  onClick={() => navigate(`/profile/${gig.user?.uid}`)}
+  className="p-0 text-sm text-red-600 hover:underline"
+>
+  View Profile
+</Button>
               <div className="mb-6">
                 <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
                 <div className="text-gray-600 whitespace-pre-wrap break-words text-sm leading-relaxed">
