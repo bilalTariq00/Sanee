@@ -211,11 +211,13 @@ export default function ProfilePage() {
 
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-6">
-              <img
-                src={avatar || "/placeholder.svg"}
-                alt={fullName}
-                className="w-24 h-24 rounded-full border-4 border-white object-cover"
-              />
+             <img
+  src={avatar || "/placeholder.svg"}
+  alt={fullName}
+  className={`w-24 h-24 border-4 border-white object-cover ${
+    user.account_type === "buyer" ? "rounded-md" : "rounded-full"
+  }`}
+/>
               <div>
                 <h1 className="text-3xl font-bold capitalize">{fullName}</h1>
                 <div className="flex items-center mt-2">
