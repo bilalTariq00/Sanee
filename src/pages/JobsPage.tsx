@@ -167,7 +167,7 @@ export default function JobsPage() {
 
                     <div className="mt-4 flex flex-wrap gap-4 text-gray-500">
                       <div className="flex items-center">
-<img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+<img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
                         {job.budget}
                       </div>
                       <div className="flex items-center">

@@ -25,7 +25,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
       </div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h1 className="text-red-500 text-5xl font-bold text-center mb-2">Sanee</h1>
+        <img src='src/public/sanee.png' alt="Logo" className="h-24 mx-auto" /> 
         <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
           {title}
         </h2>

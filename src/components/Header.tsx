@@ -67,7 +67,7 @@ export default function Header() {
         <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
           {isCollapsed && (
             <Link to="/" className="text-red-500 text-3xl font-bold tracking-tight">
-              Sanee
+             <img src='src/public/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
             </Link>
           )}
 

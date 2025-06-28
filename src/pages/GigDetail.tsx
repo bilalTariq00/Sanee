@@ -118,7 +118,7 @@ export default function GigDetail() {
                 </div>
 
                 <div className="flex items-center gap-2 text-gray-600">
-                 <img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+                 <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
                   <span className="text-2xl font-bold text-red-600">{gig.price}</span>
                 </div>
               </div>

@@ -60,13 +60,11 @@ export function AppSidebar() {
     >
       <SidebarContent className="bg-white w-fit">
         {/* Logo */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
           {!isCollapsed && (
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center shadow">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <span className="text-xl font-semibold text-red-500">Sanee</span>
+            <Link to="/" className=" ">
+  
+              <img src='src/public/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
             </Link>
           )}
         </div>

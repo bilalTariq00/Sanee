@@ -32,7 +32,7 @@ export default function ProjectCard({
           <div className="flex items-center justify-between">
             <h3 className="font-semibold text-lg text-gray-900">{title}</h3>
             <span className="flex items-center text-green-600 text-sm font-medium">
-             <img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+             <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
               {budget}
             </span>
           </div>

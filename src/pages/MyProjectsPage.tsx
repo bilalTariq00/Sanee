@@ -168,7 +168,7 @@ export default function MyProjectsPage() {
                         </div>
                       ) : project.status === 'waiting_payment' ? (
                         <div className="flex items-center text-orange-600 bg-orange-50 px-3 py-1 rounded-full text-sm">
-                          <img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+                          <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
                           Waiting for payment
                         </div>
                       ) : (

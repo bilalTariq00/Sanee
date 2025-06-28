@@ -309,7 +309,7 @@ export default function OrganizationProfilePage() {
                         <h3 className="text-lg font-medium text-gray-900">{job.title}</h3>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center">
-                            <img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+                            <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
                             {job.budget}
                           </div>
                           <div className="flex items-center">
@@ -341,7 +341,7 @@ export default function OrganizationProfilePage() {
                         <h3 className="text-lg font-medium text-gray-900">{job.title}</h3>
                         <div className="mt-2 flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center">
-                            <img src='/dist/assets/riyal.svg' className="h-5 w-5 mr-1" />
+                            <img src='src/public/riyal.svg' className="h-5 w-5 mr-1" />
                             {job.budget}
                           </div>
                           <div>Completed {job.completedDate}</div>
