@@ -202,13 +202,13 @@ export default function BalancePage() {
             {/* Balance Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 ">
                   <CardTitle className="text-sm font-medium text-gray-600">Available for Withdrawal</CardTitle>
-                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <img src='/riyal.svg' className="h-5 w-5 mr-1" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
-                    ${walletData.wallet_summary?.available?.toLocaleString() || 0}
+                  <div className="text-3xl font-bold text-gray-900 flex items-center">
+                         <img src='/riyal.svg' className="h-5 w-5 mr-1" />{walletData.wallet_summary?.available?.toLocaleString() || 0}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Ready to withdraw</p>
                 </CardContent>
@@ -220,8 +220,8 @@ export default function BalancePage() {
                   <Clock className="h-4 w-4 text-orange-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
-                    $
+                  <div className="text-3xl font-bold text-gray-900 flex items-center">
+                         <img src='/riyal.svg' className="h-5 w-5 mr-1" />
                     {(
                       walletData.wallet_summary?.in_work +
                       walletData.wallet_summary?.in_review +
@@ -238,8 +238,8 @@ export default function BalancePage() {
                   <TrendingUp className="h-4 w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-gray-900">
-                    ${walletData.wallet_summary?.total_earnings?.toLocaleString() || 0}
+                  <div className="text-3xl font-bold text-gray-900 flex items-center">
+                         <img src='/riyal.svg' className="h-5 w-5 mr-1" />{walletData.wallet_summary?.total_earnings?.toLocaleString() || 0}
                   </div>
                   <p className="text-xs text-gray-500 mt-1">All time earnings</p>
                 </CardContent>
@@ -254,8 +254,8 @@ export default function BalancePage() {
                   <Download className="h-4 w-4 text-purple-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">
-                    ${walletData.wallet_summary?.withdrawn?.toLocaleString() || 0}
+                  <div className="text-2xl font-bold text-gray-900 flex items-center">
+                         <img src='/riyal.svg' className="h-5 w-5 mr-1" />{walletData.wallet_summary?.withdrawn?.toLocaleString() || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -266,8 +266,8 @@ export default function BalancePage() {
                   <TrendingUp className="h-4 w-4 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-600">
-                    ${walletData.wallet_summary?.total_commission?.toLocaleString() || 0}
+                  <div className="text-2xl font-bold text-red-600 flex items-center">
+                         <img src='/riyal.svg' className="h-5 w-5 mr-1" />{walletData.wallet_summary?.total_commission?.toLocaleString() || 0}
                   </div>
                 </CardContent>
               </Card>
@@ -338,7 +338,7 @@ export default function BalancePage() {
                               </div>
                               <div className="text-right">
                                 <div
-                                  className={`font-semibold text-lg ${
+                                  className={`font-semibold text-lg flex items-center ${
                                     tabType === "available"
                                       ? "text-green-600"
                                       : tabType === "withdrawn"
@@ -346,11 +346,11 @@ export default function BalancePage() {
                                         : "text-gray-900"
                                   }`}
                                 >
-                                  {tabType === "withdrawn" ? "-" : ""}${transaction.amount?.toLocaleString()}
+                                  {tabType === "withdrawn" ? "-" : ""}     <img src='/riyal.svg' className="h-5 w-5 mr-1" />{transaction.amount?.toLocaleString()}
                                 </div>
                                 {transaction.commission_amount && (
-                                  <div className="text-sm text-red-500">
-                                    Commission: ${transaction.commission_amount}
+                                  <div className="text-sm text-red-500 flex items-center">
+                                    Commission:      <img src='/riyal.svg' className="h-3 w-3 mr-1" />{transaction.commission_amount}
                                   </div>
                                 )}
                                 {getStatusBadge(tabType)}
@@ -397,22 +397,22 @@ export default function BalancePage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-                    <div className="flex justify-between">
+                    <div className="flex ">
                       <span className="text-gray-500">Commission Rate:</span>
                       <span className="font-medium">{walletData.config.commission_rate}%</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex ">
                       <span className="text-gray-500">Available Days:</span>
                       <span className="font-medium">{walletData.config.available_days} days</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex ">
                       <span className="text-gray-500">Currency:</span>
                       <span className="font-medium">{walletData.config.currency}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Withdrawal Limits:</span>
-                      <span className="font-medium">
-                        ${walletData.config.min_withdrawal} - ${walletData.config.max_withdrawal}
+                    <div className="flex ">
+                      <span className="text-gray-500 whitespace-nowrap">Withdrawal Limits:</span>
+                      <span className="font-medium flex items-center space-x-1">
+                           <div className="flex items-center mr-2">  <img src='/riyal.svg' className="h-3 w-3 mr-1" />{walletData.config.min_withdrawal} </div>-   <div className="flex items-center">   <img src='/riyal.svg' className="h-3 w-3 mr-1" />{walletData.config.max_withdrawal}</div>
                       </span>
                     </div>
                   </div>
