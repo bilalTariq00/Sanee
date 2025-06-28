@@ -71,16 +71,16 @@ export default function Header() {
             </Link>
           )}
 
-          {/* <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
-            <div className="relative w-64">
+          <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+            {/* <div className="relative w-64">
               <input
                 type="text"
                 placeholder={t("search_placeholder")}
                 className="w-full py-2 pl-10 pr-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
               <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
-            </div> 
-          </nav> */}
+            </div> */}
+          </nav>
 
           <div className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-5' : 'space-x-5'}`}>
             <button
