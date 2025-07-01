@@ -33,8 +33,7 @@ const SearchBar = ({
 
   // Base filters
   const filters = [
-    { id: "all", label: t("filter_all") || "All" },
-    { id: "people", label: t("filter_people") || "People" },
+   { id: "gigs", label: t("all_gigs") || "Gigs" },
     ...(userType === "seller"
       ? [{ id: "seller", label: t("filter_seller") || "Sellers" }]
       : [{ id: "buyer", label: t("filter_buyer") || "Buyers" }]),

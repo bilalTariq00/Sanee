@@ -183,6 +183,7 @@ const handleSignOut = () => {
             <Link to="/jobs" className={`block px-3 py-2 rounded-md ${isActiveRoute('/jobs') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}>
               {t("jobs")}
             </Link>
+            
             <button
               onClick={() => user?.uid && navigate(`/messages/${user.uid}`)}
               className={`w-full text-left block px-3 py-2 rounded-md ${isActiveRoute('/messages') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}

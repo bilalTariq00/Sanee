@@ -19,7 +19,7 @@ import axios from "axios"
 import config from "@/config"
 import { useAuth } from "@/contexts/AuthContext"
 import { useNotificationSettingsSafe } from "@/hooks/useNotificationSettingsSafe"
-
+import { useTranslation } from "react-i18next";
 interface NotificationType {
   id: string
   name: string
@@ -38,6 +38,7 @@ interface Notification {
 
 export default function NotificationsPage() {
   const { user } = useAuth()
+  const { t } = useTranslation();
   const navigate = useNavigate()
   const { playNotificationSound, settings } = useNotificationSettingsSafe()
 
@@ -255,130 +256,88 @@ export default function NotificationsPage() {
   const hasUnreadNotifications = notificationsArray.some((n) => !n.is_read)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
-                <ArrowLeft className="w-5 h-5 mr-2" /> Back
-              </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <Bell className="w-6 h-6 mr-2 text-red-500" />
-                  Notifications
-                  {unreadCount > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded-full">{unreadCount}</span>
-                  )}
-                </h1>
-                <p className="text-gray-600 mt-1">Stay updated with your latest activities</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={testNotificationSound}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <TestTube className="w-4 h-4 mr-2" />
-                Test Sound
-              </button>
-
-              <button
-                onClick={() => navigate("/notification-settings")}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </button>
-
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-              </button>
-
-              {hasUnreadNotifications && (
-                <button
-                  onClick={markAllAsRead}
-                  disabled={loadingAction === "mark-all"}
-                  className="flex items-center px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
-                >
-                  <CheckCheck className="w-4 h-4 mr-2" />
-                  {loadingAction === "mark-all" ? "Marking..." : "Mark All Read"}
-                </button>
-              )}
+  <div className="min-h-screen bg-gray-50">
+    {/* Header */}
+    <div className="bg-white shadow-sm border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
+              <ArrowLeft className="w-5 h-5 mr-2" /> {t("notifications.back")}
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                <Bell className="w-6 h-6 mr-2 text-red-500" />
+                {t("notifications.title")}
+                {unreadCount > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded-full">{unreadCount}</span>
+                )}
+              </h1>
+              <p className="text-gray-600 mt-1">{t("notifications.subtitle")}</p>
             </div>
           </div>
 
-          {/* Filters */}
-          {showFilters && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <div className="flex flex-wrap items-center gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select
-                    value={selectedType}
-                    onChange={(e) => setSelectedType(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  >
-                    <option value="">All Types</option>
-                    {notificationTypes.map((type) => (
-                      <option key={type.id} value={type.name}>
-                        {type.description || type.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          <div className="flex items-center space-x-3">
+            <button onClick={testNotificationSound} className="...">
+              <TestTube className="..." />
+              {t("notifications.test_sound")}
+            </button>
 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="unread-only"
-                    checked={showOnlyUnread}
-                    onChange={(e) => setShowOnlyUnread(e.target.checked)}
-                    className="mr-2 text-red-500 focus:ring-red-500"
-                  />
-                  <label htmlFor="unread-only" className="text-sm font-medium text-gray-700">
-                    Show only unread
-                  </label>
-                </div>
+            <button onClick={() => navigate("/notification-settings")} className="...">
+              <Settings className="..." />
+              {t("notifications.settings")}
+            </button>
 
-                <button
-                  onClick={() => {
-                    setSelectedType("")
-                    setShowOnlyUnread(false)
-                  }}
-                  className="text-sm text-red-500 hover:text-red-600"
-                >
-                  Clear filters
-                </button>
-              </div>
-            </div>
-          )}
+            <button onClick={() => setShowFilters(!showFilters)} className="...">
+              <Filter className="..." />
+              {t("notifications.filters")}
+            </button>
+
+            {hasUnreadNotifications && (
+              <button
+                onClick={markAllAsRead}
+                disabled={loadingAction === "mark-all"}
+                className="..."
+              >
+                <CheckCheck className="..." />
+                {loadingAction === "mark-all"
+                  ? t("notifications.marking_all")
+                  : t("notifications.mark_all_read")}
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-gray-500">Loading notifications...</div>
+        {/* Filters */}
+        {showFilters && (
+          <div className="...">
+            <label className="...">{t("notifications.type")}</label>
+            ...
+            <label htmlFor="unread-only" className="...">
+              {t("notifications.show_only_unread")}
+            </label>
+            ...
+            <button className="...">{t("notifications.clear_filters")}</button>
           </div>
-        ) : notificationsArray.length === 0 ? (
-          <div className="text-center py-12">
-            <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
-            <p className="text-gray-500">
-              {selectedType || showOnlyUnread
-                ? "No notifications match your current filters."
-                : "You're all caught up! No new notifications."}
-            </p>
-          </div>
-        ) : (
+        )}
+      </div>
+    </div>
+
+    {/* Content */}
+    <main className="...">
+      {loading ? (
+        <div className="...">{t("notifications.loading")}</div>
+      ) : notificationsArray.length === 0 ? (
+        <div className="...">
+          <Bell className="..." />
+          <h3 className="...">{t("notifications.no_notifications")}</h3>
+          <p className="...">
+            {selectedType || showOnlyUnread
+              ? t("notifications.no_filtered")
+              : t("notifications.no_new")}
+          </p>
+        </div>
+      )  : (
           <div className="space-y-4">
             {notificationsArray.map((notification) => (
               <div

@@ -40,7 +40,7 @@ export default function CourseCard({
           className="w-full h-48 object-cover"
         />
         <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-sm">
-          <span className="font-medium text-red-500">${price}</span>
+          <span className="font-medium text-red-500 flex items-center"> <img src='/riyal.svg' className="h-3 w-3 mr-1" />{price}</span>
         </div>
       </div>
 

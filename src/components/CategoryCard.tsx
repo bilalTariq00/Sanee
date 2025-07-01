@@ -1,6 +1,7 @@
 import React from 'react';
 import { Camera, Video, Mic, Palette, Code, Music, BadgeCheck, Film, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type CategoryProps = {
   title: string;
@@ -22,6 +23,7 @@ const iconMap = {
 
 export default function CategoryCard({ title, count, icon }: CategoryProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const Icon = iconMap[icon as keyof typeof iconMap];
 
   const handleClick = () => {
@@ -29,7 +31,7 @@ export default function CategoryCard({ title, count, icon }: CategoryProps) {
   };
 
   return (
-    <div 
+    <div
       onClick={handleClick}
       className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 cursor-pointer border border-gray-100"
     >
@@ -39,8 +41,10 @@ export default function CategoryCard({ title, count, icon }: CategoryProps) {
             <Icon className="h-6 w-6 text-red-500" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-500">{count} creators</p>
+            <h3 className="font-semibold text-gray-900">{t(`categoriee.${title}`)}</h3>
+            <p className="text-sm text-gray-500">
+              {count} {t('categoriee.creators')}
+            </p>
           </div>
         </div>
         <button className="text-red-500 hover:text-red-600">

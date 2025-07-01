@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import axios from "axios";
 import config from "@/config";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface PortfolioForm {
   id?: number;
@@ -23,7 +24,8 @@ export default function EditProfilePage() {
   const auth = token ? { Authorization: `Bearer ${token}` } : {};
 
   const [loading, setLoading] = useState(true);
-
+const { t, i18n } = useTranslation();
+const isRTL = i18n.dir() === "rtl";
   // Profile fields
   const [firstName, setFirstName] = useState("");
   const [Uid, setUid] = useState("");
@@ -150,191 +152,192 @@ export default function EditProfilePage() {
     ]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        Loading…
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" /> Back
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">Edit Profile</h1>
-        </div>
+    <div className="min-h-screen flex items-center justify-center text-gray-600">
+      {t("edit_profile.loading")}
+    </div>
+  );
+}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Info */}
-          <section className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-            <div className="space-y-4">
+return (
+  <div className="min-h-screen bg-gray-50">
+    <main className="max-w-3xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-gray-600 hover:text-gray-900"
+        >
+          {isRTL ? (
+            <ArrowRight className="h-5 w-5 ml-2" />
+          ) : (
+            <ArrowLeft className="h-5 w-5 mr-2" />
+          )}
+          {t("edit_profile.back")}
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900">{t("edit_profile.title")}</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Info */}
+        <section className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4">{t("edit_profile.basic_info")}</h2>
+          <div className="space-y-4">
+            <input
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.first_name")}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <input
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.last_name")}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+            <input
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.username")}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.headline")}
+              value={headline}
+              onChange={(e) => setHeadline(e.target.value)}
+            />
+            <textarea
+              rows={3}
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.summary")}
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+            />
+            <input
+              className="w-full p-3 border rounded-lg"
+              placeholder={t("edit_profile.country")}
+              type="number"
+              value={countryId}
+              onChange={(e) => setCountryId(Number(e.target.value) || "")}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            />
+          </div>
+        </section>
+
+        {/* Password */}
+        <section className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4">{t("edit_profile.password_section")}</h2>
+          <input
+            className="w-full p-3 border rounded-lg mb-4"
+            type="password"
+            placeholder={t("edit_profile.current_password")}
+            value={currentPw}
+            onChange={(e) => setCurrentPw(e.target.value)}
+          />
+          <input
+            className="w-full p-3 border rounded-lg mb-4"
+            type="password"
+            placeholder={t("edit_profile.new_password")}
+            value={newPw}
+            onChange={(e) => setNewPw(e.target.value)}
+          />
+          <input
+            className="w-full p-3 border rounded-lg"
+            type="password"
+            placeholder={t("edit_profile.confirm_password")}
+            value={confirmPw}
+            onChange={(e) => setConfirmPw(e.target.value)}
+          />
+        </section>
+
+        {/* Portfolios */}
+        <section className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4">{t("edit_profile.portfolio_section")}</h2>
+          {portfolios.map((p, i) => (
+            <div key={i} className="border rounded-lg p-4 mb-4 space-y-2">
               <input
-                className="w-full p-3 border rounded-lg"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <input
-                className="w-full p-3 border rounded-lg"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <input
-                className="w-full p-3 border rounded-lg"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <input
-                className="w-full p-3 border rounded-lg"
-                placeholder="Headline"
-                value={headline}
-                onChange={(e) => setHeadline(e.target.value)}
-              />
-              <textarea
-                rows={3}
-                className="w-full p-3 border rounded-lg"
-                placeholder="Summary"
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-              />
-              <input
-                className="w-full p-3 border rounded-lg"
-                placeholder="Country ID"
-                type="number"
-                value={countryId}
+                className="w-full p-2 border rounded"
+                placeholder={t("edit_profile.portfolio_title")}
+                value={p.title}
                 onChange={(e) =>
-                  setCountryId(Number(e.target.value) || "")
+                  setPortfolios((arr) => {
+                    arr[i].title = e.target.value;
+                    return [...arr];
+                  })
                 }
               />
+              <input
+                className="w-full p-2 border rounded"
+                placeholder={t("edit_profile.portfolio_link")}
+                value={p.link}
+                onChange={(e) =>
+                  setPortfolios((arr) => {
+                    arr[i].link = e.target.value;
+                    return [...arr];
+                  })
+                }
+              />
+              <textarea
+                className="w-full p-2 border rounded"
+                rows={2}
+                placeholder={t("edit_profile.portfolio_description")}
+                value={p.description}
+                onChange={(e) =>
+                  setPortfolios((arr) => {
+                    arr[i].description = e.target.value;
+                    return [...arr];
+                  })
+                }
+              />
+              {p.existing_url && !p.image && (
+                <img
+                  src={
+                    p.existing_url.startsWith("http")
+                      ? p.existing_url
+                      : `${config.IMG_BASE_URL}/${p.existing_url}`
+                  }
+                  alt=""
+                  className="w-full h-40 object-cover rounded"
+                />
+              )}
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) =>
-                  setImageFile(e.target.files?.[0] || null)
+                  setPortfolios((arr) => {
+                    arr[i].image = e.target.files?.[0] || null;
+                    return [...arr];
+                  })
                 }
               />
             </div>
-          </section>
+          ))}
+          <button
+            type="button"
+            onClick={addPortfolio}
+            className="flex items-center px-4 py-2 bg-gray-100 rounded-lg"
+          >
+            <Plus className="h-5 w-5 mr-2" />
+            {t("edit_profile.add_portfolio")}
+          </button>
+        </section>
 
-          {/* Password */}
-          <section className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Change Password</h2>
-            <input
-              className="w-full p-3 border rounded-lg mb-4"
-              type="password"
-              placeholder="Current Password"
-              value={currentPw}
-              onChange={(e) => setCurrentPw(e.target.value)}
-            />
-            <input
-              className="w-full p-3 border rounded-lg mb-4"
-              type="password"
-              placeholder="New Password"
-              value={newPw}
-              onChange={(e) => setNewPw(e.target.value)}
-            />
-            <input
-              className="w-full p-3 border rounded-lg"
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPw}
-              onChange={(e) => setConfirmPw(e.target.value)}
-            />
-          </section>
-
-          {/* Portfolios */}
-          <section className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Portfolios</h2>
-            {portfolios.map((p, i) => (
-              <div key={i} className="border rounded-lg p-4 mb-4 space-y-2">
-                <input
-                  className="w-full p-2 border rounded"
-                  placeholder="Title"
-                  value={p.title}
-                  onChange={(e) =>
-                    setPortfolios((arr) => {
-                      arr[i].title = e.target.value;
-                      return [...arr];
-                    })
-                  }
-                />
-                <input
-                  className="w-full p-2 border rounded"
-                  placeholder="Link"
-                  value={p.link}
-                  onChange={(e) =>
-                    setPortfolios((arr) => {
-                      arr[i].link = e.target.value;
-                      return [...arr];
-                    })
-                  }
-                />
-                <textarea
-                  className="w-full p-2 border rounded"
-                  rows={2}
-                  placeholder="Description"
-                  value={p.description}
-                  onChange={(e) =>
-                    setPortfolios((arr) => {
-                      arr[i].description = e.target.value;
-                      return [...arr];
-                    })
-                  }
-                />
-                {p.existing_url && !p.image && (
-                  <img
-                    src={
-                      p.existing_url.startsWith("http")
-                        ? p.existing_url
-                        : `${config.IMG_BASE_URL}/${p.existing_url}`
-                    }
-                    alt=""
-                    className="w-full h-40 object-cover rounded"
-                  />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setPortfolios((arr) => {
-                      arr[i].image = e.target.files?.[0] || null;
-                      return [...arr];
-                    })
-                  }
-                />
-              </div>
-            ))}
-
-            <button
-              type="button"
-              onClick={addPortfolio}
-              className="flex items-center px-4 py-2 bg-gray-100 rounded-lg"
-            >
-              <Plus className="h-5 w-5 mr-2" /> Add Portfolio
-            </button>
-          </section>
-
-          {/* Save */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
-      </main>
-    </div>
-  );
+        {/* Save */}
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            {t("edit_profile.save_changes")}
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+);
 }

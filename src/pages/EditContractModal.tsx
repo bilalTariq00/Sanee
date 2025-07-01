@@ -1,5 +1,3 @@
-// Updated EditContractModal using ShadCN UI Dialog
-
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -12,8 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 function EditContractModal({ show, onClose, contract, onSave }) {
+  const { t } = useTranslation();
   const [price, setPrice] = useState("");
 
   useEffect(() => {
@@ -22,7 +22,7 @@ function EditContractModal({ show, onClose, contract, onSave }) {
 
   const handleSave = () => {
     if (!price || isNaN(price) || parseFloat(price) <= 0) {
-      toast("Please enter a valid price.");
+      toast(t("edit_contract.invalid_price"));
       return;
     }
     onSave({ id: contract.id, price: parseFloat(price) });
@@ -32,27 +32,27 @@ function EditContractModal({ show, onClose, contract, onSave }) {
     <Dialog open={show} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Contract</DialogTitle>
+          <DialogTitle>{t("edit_contract.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-2 py-2">
-          <Label htmlFor="price">Price</Label>
+          <Label htmlFor="price">{t("edit_contract.price_label")}</Label>
           <Input
             id="price"
             type="number"
             value={price}
             min={1}
             onChange={(e) => setPrice(e.target.value)}
-            placeholder="Enter new price"
+            placeholder={t("edit_contract.price_placeholder")}
           />
         </div>
 
         <DialogFooter>
           <Button variant="secondary" onClick={onClose}>
-            Cancel
+            {t("edit_contract.cancel")}
           </Button>
           <Button onClick={handleSave}>
-            Save
+            {t("edit_contract.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

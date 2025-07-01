@@ -20,10 +20,13 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";
+
 
 const EditJob = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -149,151 +152,152 @@ const EditJob = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Edit Job</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label>Title</Label>
-              <Input name="title" value={formData.title} onChange={handleChange} required />
-            </div>
+  <div className="max-w-4xl mx-auto py-6 px-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("edit_job.title")}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label>{t("edit_job.title_label")}</Label>
+            <Input name="title" value={formData.title} onChange={handleChange} required />
+          </div>
 
-            <div>
-              <Label>Description</Label>
-              <Textarea name="description" value={formData.description} onChange={handleChange} rows={4} required />
-            </div>
+          <div>
+            <Label>{t("edit_job.description_label")}</Label>
+            <Textarea name="description" value={formData.description} onChange={handleChange} rows={4} required />
+          </div>
 
-            <div>
-              <Label>Budget (USD)</Label>
-              <Input type="number" name="budget" value={formData.budget} onChange={handleChange} required />
-            </div>
+          <div>
+            <Label>{t("edit_job.budget_label")}</Label>
+            <Input type="number" name="budget" value={formData.budget} onChange={handleChange} required />
+          </div>
 
+          <div>
+            <Label>{t("edit_job.category_label")}</Label>
+            <select
+              name="category_id"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              value={formData.category_id}
+              onChange={handleChange}
+            >
+              <option value="">{t("edit_job.category_placeholder")}</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {subcategories.length > 0 && (
             <div>
-              <Label>Category</Label>
+              <Label>{t("edit_job.subcategory_label")}</Label>
               <select
-                name="category_id"
+                name="sub_category_id"
                 className="w-full border rounded-md px-3 py-2 text-sm"
-                value={formData.category_id}
+                value={formData.sub_category_id}
                 onChange={handleChange}
               >
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                <option value="">{t("edit_job.subcategory_placeholder")}</option>
+                {subcategories.map(sub => (
+                  <option key={sub.id} value={sub.id}>{sub.name}</option>
                 ))}
               </select>
             </div>
+          )}
 
-            {subcategories.length > 0 && (
-              <div>
-                <Label>Subcategory</Label>
-                <select
-                  name="sub_category_id"
-                  className="w-full border rounded-md px-3 py-2 text-sm"
-                  value={formData.sub_category_id}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Subcategory</option>
-                  {subcategories.map(sub => (
-                    <option key={sub.id} value={sub.id}>{sub.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {skillsList.length > 0 && (
-              <div>
-                <Label>Skills</Label>
-                <Select
-                  isMulti
-                  name="skills"
-                  options={skillsList}
-                  value={selectedSkills}
-                  onChange={setSelectedSkills}
-                  className="react-select-container"
-                  classNamePrefix="select"
-                />
-              </div>
-            )}
-
+          {skillsList.length > 0 && (
             <div>
-              <Label>Experience Level</Label>
-              <select
-                name="experience_level"
-                className="w-full border rounded-md px-3 py-2 text-sm"
-                value={formData.experience_level}
-                onChange={handleChange}
-              >
-                <option value="entry">Entry</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="expert">Expert</option>
-              </select>
-            </div>
-
-            <div>
-              <Label>Visibility</Label>
-              <select
-                name="visibility"
-                className="w-full border rounded-md px-3 py-2 text-sm"
-                value={formData.visibility}
-                onChange={handleChange}
-              >
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-              </select>
-            </div>
-
-            <div>
-              <Label>Location Type</Label>
-              <select
-                name="location_type"
-                className="w-full border rounded-md px-3 py-2 text-sm"
-                value={formData.location_type}
-                onChange={handleChange}
-              >
-                <option value="remote">Remote</option>
-                <option value="onsite">Onsite</option>
-              </select>
-            </div>
-
-            {formData.attachments && formData.attachments.length > 0 && (
-              <div>
-                <Label>Existing Attachments</Label>
-                <ul className="list-disc pl-6">
-                  {formData.attachments.map((file, index) => (
-                    <li key={index}>
-                      <a
-                        href={`${config.IMG_BASE_URL}/storage/${file}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        View Attachment {index + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div>
-              <Label>Replace Attachments</Label>
-              <Input
-                type="file"
-                name="attachments"
-                multiple
-                onChange={(e) => setFormData({ ...formData, new_attachments: e.target.files })}
+              <Label>{t("edit_job.skills_label")}</Label>
+              <Select
+                isMulti
+                name="skills"
+                options={skillsList}
+                value={selectedSkills}
+                onChange={setSelectedSkills}
+                className="react-select-container"
+                classNamePrefix="select"
+                placeholder={t("edit_job.skills_placeholder")}
               />
             </div>
+          )}
 
-            <Button type="submit">Update Job</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
+          <div>
+            <Label>{t("edit_job.experience_label")}</Label>
+            <select
+              name="experience_level"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              value={formData.experience_level}
+              onChange={handleChange}
+            >
+              <option value="entry">{t("edit_job.entry")}</option>
+              <option value="intermediate">{t("edit_job.intermediate")}</option>
+              <option value="expert">{t("edit_job.expert")}</option>
+            </select>
+          </div>
+
+          <div>
+            <Label>{t("edit_job.visibility_label")}</Label>
+            <select
+              name="visibility"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              value={formData.visibility}
+              onChange={handleChange}
+            >
+              <option value="public">{t("edit_job.public")}</option>
+              <option value="private">{t("edit_job.private")}</option>
+            </select>
+          </div>
+
+          <div>
+            <Label>{t("edit_job.location_label")}</Label>
+            <select
+              name="location_type"
+              className="w-full border rounded-md px-3 py-2 text-sm"
+              value={formData.location_type}
+              onChange={handleChange}
+            >
+              <option value="remote">{t("edit_job.remote")}</option>
+              <option value="onsite">{t("edit_job.onsite")}</option>
+            </select>
+          </div>
+
+          {formData.attachments && formData.attachments.length > 0 && (
+            <div>
+              <Label>{t("edit_job.attachments_old")}</Label>
+              <ul className="list-disc pl-6">
+                {formData.attachments.map((file, index) => (
+                  <li key={index}>
+                    <a
+                      href={`${config.IMG_BASE_URL}/storage/${file}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      {t("edit_job.view_attachment", { index: index + 1 })}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div>
+            <Label>{t("edit_job.attachments_new")}</Label>
+            <Input
+              type="file"
+              name="attachments"
+              multiple
+              onChange={(e) => setFormData({ ...formData, new_attachments: e.target.files })}
+            />
+          </div>
+
+          <Button type="submit">{t("edit_job.update_button")}</Button>
+        </form>
+      </CardContent>
+    </Card>
+  </div>
+);
 };
 
 export default EditJob;

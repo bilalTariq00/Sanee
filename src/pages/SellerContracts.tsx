@@ -8,12 +8,14 @@ import SubmitWorkModal from "@/components/SubmitWorkModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 function SellerContracts() {
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [selectedContractId, setSelectedContractId] = useState(null);
+const { t } = useTranslation();
 
     const openSubmitModal = (id) => {
         setSelectedContractId(id);
@@ -105,99 +107,103 @@ function SellerContracts() {
     };
 
     return (
-        <>
-        <h2 className="text-2xl font-semibold mb-4 text-red-700">My Contracts</h2>
-        <Card className="border-none shadow-none pt-4">
-            <CardContent>
-                {loading ? (
-                    <p className="text-gray-500">Loading contracts...</p>
-                ) : contracts.length === 0 ? (
-                    <p className="text-gray-500">No contracts found.</p>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {contracts.map((c) => (
-                            <Card key={c.id} className="bg-white border border-red-200 shadow-sm">
-                                <CardHeader>
-                                    <CardTitle className="text-base font-semibold text-red-700">
-                                        {c.gig?.title || "Untitled Gig"}
-                                    </CardTitle>
-                                    <div className="text-sm text-gray-500">
-                                        Buyer: {c.buyer?.first_name} {c.buyer?.last_name}
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-2 text-sm text-gray-700">
-                                    <div><strong>Price:</strong> ${c.price}</div>
-                                    <div><strong>Status:</strong> {renderBadge(c.status)}</div>
-                                    <div><strong>Start:</strong> {c.started_at ? new Date(c.started_at).toLocaleDateString() : "-"}</div>
-                                    <div><strong>End:</strong> {c.completed_at ? new Date(c.completed_at).toLocaleDateString() : "-"}</div>
-                                    <div>
-                                        <strong>Payment:</strong>{" "}
-                                        {c.payment?.status === 'confirmed' && (
-                                            <Badge className="bg-green-100 text-green-700 border border-green-200">Paid</Badge>
-                                        )}
-                                        {c.payment?.status === 'pending' && (
-                                            <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">Pending</Badge>
-                                        )}
-                                        {c.payment?.status === 'rejected' && (
-                                            <Badge className="bg-red-100 text-red-700 border border-red-200">Rejected</Badge>
-                                        )}
-                                        {!c.payment && <Badge className="bg-gray-100 text-gray-500 border border-gray-300">No Payment</Badge>}
-                                    </div>
-                                    <div className="pt-2 space-y-2">
-                                        {c.status === "pending" && (
-                                            <>
-                                                {c.payment?.status === "pending" && (
-                                                    <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">Waiting for payment</Badge>
-                                                )}
-                                                {c.payment?.status === "rejected" && (
-                                                    <Badge className="bg-red-200 text-red-800 border border-red-300">Client failed to pay</Badge>
-                                                )}
-                                                {!c.payment || c.payment?.status === "confirmed" ? (
-                                                    <Button
-                                                        size="sm"
-                                                        className="bg-red-600 hover:bg-red-700 text-white"
-                                                        onClick={() => handleAction(c.id, "in_progress")}
-                                                    >
-                                                        Start
-                                                    </Button>
-                                                ) : null}
-                                            </>
-                                        )}
-                                        {c.status === "in_progress" && (
-                                            <Button
-                                                size="sm"
-                                                className="bg-red-600 hover:bg-red-700 text-white"
-                                                onClick={() => openSubmitModal(c.id)}
-                                            >
-                                                Submit Work
-                                            </Button>
-                                        )}
-                                        {(c.status === "completed" || c.status === "finished") && !c.reviewed_by_seller && (
-                                            <Button
-                                                size="sm"
-                                                className="bg-red-500 hover:bg-red-600 text-white"
-                                                onClick={() => window.location.href = `/review/${c.seller_id}`}
-                                            >
-                                                Review Buyer
-                                            </Button>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </CardContent>
+  <>
+    <h2 className="text-2xl font-semibold mb-4 text-red-700">{t("seller_contracts.title")}</h2>
+    <Card className="border-none shadow-none pt-4">
+      <CardContent>
+        {loading ? (
+          <p className="text-gray-500">{t("seller_contracts.loading")}</p>
+        ) : contracts.length === 0 ? (
+          <p className="text-gray-500">{t("seller_contracts.no_contracts")}</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {contracts.map((c) => (
+              <Card key={c.id} className="bg-white border border-red-200 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-base font-semibold text-red-700">
+                    {c.gig?.title || t("seller_contracts.untitled_gig")}
+                  </CardTitle>
+                  <div className="text-sm text-gray-500">
+                    {t("seller_contracts.buyer")}: {c.buyer?.first_name} {c.buyer?.last_name}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm text-gray-700">
+                  <div><strong>{t("seller_contracts.price")}:</strong> ${c.price}</div>
+                  <div><strong>{t("seller_contracts.status")}:</strong> {renderBadge(c.status)}</div>
+                  <div><strong>{t("seller_contracts.start")}:</strong> {c.started_at ? new Date(c.started_at).toLocaleDateString() : "-"}</div>
+                  <div><strong>{t("seller_contracts.end")}:</strong> {c.completed_at ? new Date(c.completed_at).toLocaleDateString() : "-"}</div>
+                  <div>
+                    <strong>{t("seller_contracts.payment")}:</strong>{" "}
+                    {c.payment?.status === 'confirmed' && (
+                      <Badge className="bg-green-100 text-green-700 border border-green-200">{t("seller_contracts.paid")}</Badge>
+                    )}
+                    {c.payment?.status === 'pending' && (
+                      <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">{t("seller_contracts.pending")}</Badge>
+                    )}
+                    {c.payment?.status === 'rejected' && (
+                      <Badge className="bg-red-100 text-red-700 border border-red-200">{t("seller_contracts.rejected")}</Badge>
+                    )}
+                    {!c.payment && <Badge className="bg-gray-100 text-gray-500 border border-gray-300">{t("seller_contracts.no_payment")}</Badge>}
+                  </div>
 
-            <SubmitWorkModal
-                show={showSubmitModal}
-                onClose={() => setShowSubmitModal(false)}
-                contractId={selectedContractId}
-                onSubmitted={fetchContracts}
-            />
-        </Card>
-        </>
-    );
+                  <div className="pt-2 space-y-2">
+                    {c.status === "pending" && (
+                      <>
+                        {c.payment?.status === "pending" && (
+                          <Badge className="bg-yellow-100 text-yellow-800 border border-yellow-300">{t("seller_contracts.waiting_payment")}</Badge>
+                        )}
+                        {c.payment?.status === "rejected" && (
+                          <Badge className="bg-red-200 text-red-800 border border-red-300">{t("seller_contracts.client_failed")}</Badge>
+                        )}
+                        {!c.payment || c.payment?.status === "confirmed" ? (
+                          <Button
+                            size="sm"
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            onClick={() => handleAction(c.id, "in_progress")}
+                          >
+                            {t("seller_contracts.start_button")}
+                          </Button>
+                        ) : null}
+                      </>
+                    )}
+
+                    {c.status === "in_progress" && (
+                      <Button
+                        size="sm"
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        onClick={() => openSubmitModal(c.id)}
+                      >
+                        {t("seller_contracts.submit_work")}
+                      </Button>
+                    )}
+
+                    {(c.status === "completed" || c.status === "finished") && !c.reviewed_by_seller && (
+                      <Button
+                        size="sm"
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                        onClick={() => window.location.href = `/review/${c.seller_id}`}
+                      >
+                        {t("seller_contracts.review_buyer")}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </CardContent>
+
+      <SubmitWorkModal
+        show={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        contractId={selectedContractId}
+        onSubmitted={fetchContracts}
+      />
+    </Card>
+  </>
+);
+
 }
 
 export default SellerContracts;

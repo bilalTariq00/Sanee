@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "react-i18next";
 
 function ManageGigs() {
   const [gigs, setGigs] = useState([]);
@@ -17,7 +18,7 @@ function ManageGigs() {
   useEffect(() => {
     fetchGigs();
   }, []);
-
+const { t } = useTranslation();
   const fetchGigs = async () => {
     const token = localStorage.getItem("token");
     const res = await axios.get(`${config.API_BASE_URL}/seller/gigs`, {
@@ -37,67 +38,68 @@ function ManageGigs() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10 bg-white min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-red-600">Manage Your Gigs</h1>
-        <Link to="/create-gig">
-          <Button className="bg-red-600 hover:bg-red-700 text-white">
-            + Create New Gig
-          </Button>
-        </Link>
-      </div>
+  <main className="max-w-5xl mx-auto px-4 py-10 bg-white min-h-screen">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+      <h1 className="text-3xl font-bold text-red-600">{t('manage_gigs.title')}</h1>
+      <Link to="/create-gig">
+        <Button className="bg-red-600 hover:bg-red-700 text-white">
+          {t('manage_gigs.create_button')}
+        </Button>
+      </Link>
+    </div>
 
-      <Separator className="mb-6 bg-red-200" />
+    <Separator className="mb-6 bg-red-200" />
 
-      {gigs.length === 0 ? (
-        <p className="text-gray-500 text-center">
-          No gigs found. Create your first gig now!
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {gigs.map((gig) => (
-            <Card
-              key={gig.id}
-              className="bg-white border border-red-200 hover:shadow-lg transition-shadow"
-            >
-              <CardHeader className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-                <div>
-                  <CardTitle className="text-lg font-semibold text-red-700">
-                    {gig.title}
-                  </CardTitle>
-                  <span className="text-sm text-gray-500">
-                    Status: {gig.status}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <Link to={`/edit-gig/${gig.id}`}>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-red-500 text-red-600 hover:bg-red-50"
-                    >
-                      Edit
-                    </Button>
-                  </Link>
+    {gigs.length === 0 ? (
+      <p className="text-gray-500 text-center">{t('manage_gigs.no_gigs')}</p>
+    ) : (
+      <div className="space-y-4">
+        {gigs.map((gig) => (
+          <Card
+            key={gig.id}
+            className="bg-white border border-red-200 hover:shadow-lg transition-shadow"
+          >
+            <CardHeader className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+              <div>
+                <CardTitle className="text-lg font-semibold text-red-700">
+                  {gig.title}
+                </CardTitle>
+                <span className="text-sm text-gray-500">
+                  {t('manage_gigs.status')}: {gig.status}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Link to={`/edit-gig/${gig.id}`}>
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
-                    className="bg-red-600 hover:bg-red-700"
-                    onClick={() => handleDelete(gig.id)}
+                    className="border-red-500 text-red-600 hover:bg-red-50"
                   >
-                    Delete
+                    {t('manage_gigs.edit')}
                   </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500">Gig ID: {gig.id}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-    </main>
-  );
+                </Link>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700"
+                  onClick={() => handleDelete(gig.id)}
+                >
+                  {t('manage_gigs.delete')}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                {t('manage_gigs.gig_id')}: {gig.id}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )}
+  </main>
+);
+
 }
 
 export default ManageGigs;

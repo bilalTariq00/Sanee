@@ -8,11 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/User";
 import { useTranslation } from "react-i18next";
-
+import { useNavigate } from "react-router-dom";
 interface UserProfileDialogProps {
   user: User | null;
   isOpen: boolean;
   onClose: () => void;
+   gotoChat: (e: React.MouseEvent) => void;
 }
 
 const fallbackAvatar =
@@ -20,11 +21,11 @@ const fallbackAvatar =
 
 export default function UserProfileDialog({
   user,
+  gotoChat,
   isOpen,
   onClose,
 }: UserProfileDialogProps) {
   const { t } = useTranslation();
-
   if (!user) return null;
 
   return (
@@ -155,7 +156,7 @@ export default function UserProfileDialog({
 
         {/* -------- Contact -------- */}
         <div className="flex space-x-3 pt-6 border-t">
-          <Button className="flex-1 bg-red-500 text-white hover:bg-gray-800">
+          <Button className="flex-1 bg-red-500 text-white hover:bg-gray-800" onClick={gotoChat}>
             {t("get_in_touch")}
           </Button>
           <Button variant="outline" className="flex-1">

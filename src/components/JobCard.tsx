@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock, CheckCircle, MoreVertical, HourglassIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type JobStatus = 'waiting' | 'in_progress' | 'completed';
 
@@ -15,32 +16,32 @@ interface JobCardProps {
 }
 
 export default function JobCard({ id, title, company, companyId, image, status, assignee }: JobCardProps) {
+    const { t } = useTranslation();
   const getStatusDisplay = (status: JobStatus) => {
     switch (status) {
       case 'waiting':
         return {
-          text: 'Waiting for applicants',
+          text: t('job_card.waiting'),
           icon: HourglassIcon,
           color: 'text-yellow-600',
           bgColor: 'bg-yellow-50'
         };
       case 'in_progress':
         return {
-          text: 'In Works',
+          text: t('job_card.in_progress'),
           icon: Clock,
           color: 'text-blue-600',
           bgColor: 'bg-blue-50'
         };
       case 'completed':
         return {
-          text: 'Complete',
+          text: t('job_card.completed'),
           icon: CheckCircle,
           color: 'text-green-600',
           bgColor: 'bg-green-50'
         };
     }
   };
-
   const statusDisplay = getStatusDisplay(status);
   const StatusIcon = statusDisplay.icon;
 
@@ -63,12 +64,12 @@ export default function JobCard({ id, title, company, companyId, image, status, 
                     to={`/organization/${companyId}`}
                     className="text-sm text-red-500 hover:text-red-600"
                   >
-                    View Organization
+                     {t('job_card.view_org')}
                   </Link>
                 )}
               </div>
               {assignee && (
-                <p className="text-sm text-gray-600 mt-1">By {assignee}</p>
+                <p className="text-sm text-gray-600 mt-1">  {t('job_card.by_assignee')} {assignee}</p>
               )}
             </div>
             <button className="text-gray-400 hover:text-gray-600">
@@ -86,13 +87,13 @@ export default function JobCard({ id, title, company, companyId, image, status, 
                 to={`/job/${id}/applicants`}
                 className="text-red-500 hover:text-red-600 text-sm font-medium"
               >
-                Click to Expand and View Progress
+                {t('job_card.expand_progress')}
               </Link>
             ) : (
               <button
                 className="text-red-500 hover:text-red-600 text-sm font-medium"
               >
-                Click to {status === 'completed' ? 'Expand, View Results & Rate' : 'Expand and View Progress'}
+               {t('job_card.click_to')} {status === 'completed' ? t('job_card.expand_rate') : t('job_card.expand_progress')}
               </button>
             )}
           </div>

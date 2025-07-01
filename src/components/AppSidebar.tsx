@@ -7,6 +7,10 @@ import {
   Paperclip,
   Laptop,
   User,
+  FileIcon,
+  FileX2Icon,
+  Wallet,
+  WorkflowIcon,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,7 +47,7 @@ export function AppSidebar() {
   const navigationItems = [
     { title: t('discover'), url: '/', icon: Navigation },
     { title: t('profile'), url: `/profile/${user?.uid}`, icon: User },
-    { title: t('jobs'), url: '/jobs', icon: Workflow },
+    
   ];
 
   const isActive = (path) =>
@@ -122,10 +126,11 @@ export function AppSidebar() {
               {user?.account_type === 'seller' && (
                 <>
                   {[
-                    { path: '/create-gig', label: t('create_gig') },
-                    { path: '/manage-gigs', label: t('manage_gig') },
-                    { path: '/seller/contracts', label: t('seller_contract') },
-                     { path: '/wallet', label: t('Wallet') },
+                    { path: '/create-gig', label: t('create_gig'),icon: FileIcon },
+                    { path: '/manage-gigs', label: t('manage_gig'),icon: FileX2Icon },
+                    { path: '/seller/contracts', label: t('seller_contract') ,icon: Workflow},
+                     { path: '/wallet', label: t('Wallet'),icon: Wallet },
+                     { label: t('jobs'), path: '/jobs', icon: WorkflowIcon },
                   ].map(({ path, label }) => (
                     <SidebarMenuItem key={path}>
                       <SidebarMenuButton asChild>
@@ -135,7 +140,7 @@ export function AppSidebar() {
                             isCollapsed ? 'justify-center' : ''
                           }`}
                         >
-                          <span className="h-5 w-5">🛠️</span>
+                          <span className="h-5 w-5">{icon}</span>
                           {!isCollapsed && <span className="font-medium">{label}</span>}
                         </Link>
                       </SidebarMenuButton>

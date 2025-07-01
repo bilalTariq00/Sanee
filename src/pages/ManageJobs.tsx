@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 import JobPaymentModal from "@/components/JobPaymentModal";
 import config from "../config";
 import { Edit, LayoutGrid, List, Trash } from "lucide-react";
@@ -28,6 +29,7 @@ const ManageJobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchJobs();
@@ -72,136 +74,141 @@ const ManageJobs = () => {
   };
 
   return (
-    <div className="p-4 bg-white min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-red-700">My Jobs</h2>
-        <div className="flex gap-2">
-          <Link to="/post-job">
-            <Button className="bg-red-600 hover:bg-red-700 text-white">
-              + Post New Job
-            </Button>
-          </Link>
+  <div className="p-4 bg-white min-h-screen">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-2xl font-bold text-red-700">{t("manage_job.title")}</h2>
+      <div className="flex gap-2">
+        <Link to="/post-job">
+          <Button className="bg-red-600 hover:bg-red-700 text-white">
+            {t("manage_job.create_button")}
+          </Button>
+        </Link>
 
-          <Button
-            variant={view === "list" ? "secondary" : "ghost"}
-            onClick={() => setView("list")}
-          >
-            <List />
-          </Button>
-          <Button
-            variant={view === "grid" ? "secondary" : "ghost"}
-            onClick={() => setView("grid")}
-          >
-            <LayoutGrid />
-          </Button>
-        </div>
+        <Button
+          variant={view === "list" ? "secondary" : "ghost"}
+          onClick={() => setView("list")}
+        >
+          <List />
+        </Button>
+        <Button
+          variant={view === "grid" ? "secondary" : "ghost"}
+          onClick={() => setView("grid")}
+        >
+          <LayoutGrid />
+        </Button>
       </div>
-
-      {view === "list" ? (
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-red-100 text-red-800">
-              <TableHead>Title</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Budget</TableHead>
-              <TableHead>Experience</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {jobs.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell className="font-medium text-red-700">{job.title}</TableCell>
-                <TableCell>{job.status}</TableCell>
-                <TableCell>${job.budget}</TableCell>
-                <TableCell>{job.experience_level}</TableCell>
-                <TableCell className="flex flex-wrap gap-1">
-                  <Link to={`/edit-job/${job.id}`}>
-                    <Button size="sm" variant="outline">
-                      <Edit className="mr-1" /> Edit
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(job.id)}
-                  >
-                    <Trash className="mr-1" /> Delete
-                  </Button>
-                  <Link to={`/job/${job.id}/proposals`}>
-                    <Button size="sm" variant="secondary">
-                      💼 Proposals
-                    </Button>
-                  </Link>
-                  <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white" onClick={() => openPaymentModal(job)}>
-                    💰 Pay
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {jobs.map((job) => (
-            <Card key={job.id} className="border border-red-200 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg text-red-700">{job.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm space-y-1">
-                <p className="text-gray-600">
-                  {job.description?.substring(0, 100)}...
-                </p>
-                <p>
-                  <strong>Status:</strong> {job.status}
-                </p>
-                <p>
-                  <strong>Budget:</strong> ${job.budget}
-                </p>
-                <p>
-                  <strong>Experience:</strong> {job.experience_level}
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Link to={`/edit-job/${job.id}`}>
-                    <Button size="sm" variant="outline">
-                      <Edit className="mr-1" /> Edit
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(job.id)}
-                  >
-                    <Trash className="mr-1" /> Delete
-                  </Button>
-                  <Link to={`/job/${job.id}/proposals`}>
-                    <Button size="sm" variant="secondary">
-                      💼 Proposals
-                    </Button>
-                  </Link>
-                  <Button
-                    size="sm"
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                    onClick={() => openPaymentModal(job)}
-                  >
-                    💰 Pay
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {showPaymentModal && selectedJob && (
-        <JobPaymentModal
-          job={selectedJob}
-          onClose={closePaymentModal}
-          onConfirm={handleCheckoutRedirect}
-        />
-      )}
     </div>
-  );
+
+    {view === "list" ? (
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-red-100 text-red-800">
+            <TableHead>{t("manage_job.title_label")}</TableHead>
+            <TableHead>{t("manage_job.status")}</TableHead>
+            <TableHead>{t("manage_job.budget")}</TableHead>
+            <TableHead>{t("manage_job.experience")}</TableHead>
+            <TableHead>{t("manage_job.actions")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {jobs.map((job) => (
+            <TableRow key={job.id}>
+              <TableCell className="font-medium text-red-700">{job.title}</TableCell>
+              <TableCell>{job.status}</TableCell>
+              <TableCell>${job.budget}</TableCell>
+              <TableCell>{job.experience_level}</TableCell>
+              <TableCell className="flex flex-wrap gap-1">
+                <Link to={`/edit-job/${job.id}`}>
+                  <Button size="sm" variant="outline">
+                    <Edit className="mr-1" /> {t("manage_job.edit")}
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(job.id)}
+                >
+                  <Trash className="mr-1" /> {t("manage_job.delete")}
+                </Button>
+                <Link to={`/job/${job.id}/proposals`}>
+                  <Button size="sm" variant="secondary">
+                    💼 {t("manage_job.proposals")}
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => openPaymentModal(job)}
+                >
+                  💰 {t("manage_job.pay")}
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {jobs.map((job) => (
+          <Card key={job.id} className="border border-red-200 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg text-red-700">{job.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-1">
+              <p className="text-gray-600">
+                {job.description?.substring(0, 100)}...
+              </p>
+              <p>
+                <strong>{t("manage_job.status")}:</strong> {job.status}
+              </p>
+              <p>
+                <strong>{t("manage_job.budget")}:</strong> ${job.budget}
+              </p>
+              <p>
+                <strong>{t("manage_job.experience")}:</strong> {job.experience_level}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Link to={`/edit-job/${job.id}`}>
+                  <Button size="sm" variant="outline">
+                    <Edit className="mr-1" /> {t("manage_job.edit")}
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(job.id)}
+                >
+                  <Trash className="mr-1" /> {t("manage_job.delete")}
+                </Button>
+                <Link to={`/job/${job.id}/proposals`}>
+                  <Button size="sm" variant="secondary">
+                    💼 {t("manage_job.proposals")}
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => openPaymentModal(job)}
+                >
+                  💰 {t("manage_job.pay")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )}
+
+    {showPaymentModal && selectedJob && (
+      <JobPaymentModal
+        gig={selectedJob}
+        onClose={closePaymentModal}
+        onConfirm={handleCheckoutRedirect}
+      />
+    )}
+  </div>
+);
+
 };
 
 export default ManageJobs;

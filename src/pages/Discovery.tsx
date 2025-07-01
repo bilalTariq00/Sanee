@@ -9,6 +9,8 @@ import type { User } from "@/types/User"
 import { useDiscover } from "@/hooks/useDiscover"
 import axios from "axios"
 import config from "@/config"
+import AllGigs from "./AllGigs"
+import { useNavigate } from "react-router-dom"
 
 interface Category {
   id: string
@@ -18,6 +20,7 @@ interface Category {
 export default function Discover() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === "ar"
+  const navigate = useNavigate()
 
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<string>("all")
@@ -25,7 +28,7 @@ export default function Discover() {
   const [selected, setSelected] = useState<User | null>(null)
   const [open, setOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
-
+const [selectedId, setSelectedId] = useState<string | null>(null)
   // Define userType - you can make this dynamic based on your app logic
   const [userType] = useState<"buyer" | "seller">("seller")
 
@@ -66,7 +69,16 @@ export default function Discover() {
         : `category:${filter}`
 
   const { users, loading, error, totalPages } = useDiscover(adjustedFilter, search, page)
-
+  const displayUsers = users.filter(u =>
+  userType === "seller"  ? u.badge === "Gig"
+: userType === "buyer" ? u.badge === "Job"
+: true
+)
+const goToChat = (e: React.MouseEvent) => {
+  e.stopPropagation();
+  if (!selectedId) return;                   // guard in case it's still null
+  navigate(`/messages/${selectedId}`);
+};
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "text-right" : "text-left"}`}>
       <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -89,7 +101,26 @@ export default function Discover() {
           categories={categories}
           isRTL={isRTL}
         />
+{filter === "gigs" ? (
+  <AllGigs />
+) : (
+  <>
+    {loading && (
+          <div className="flex justify-center items-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+          </div>
+        )}
 
+        {error && (
+          <div className="text-center py-16">
+            <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
+            <p className="text-red-500">{error}</p>
+            <p className="text-gray-500 text-sm mt-2">API Endpoint: {config.API_BASE_URL}/discover</p>
+          </div>
+        )}
+
+  </>
+)}
         {loading && (
           <div className="flex justify-center items-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
@@ -107,15 +138,16 @@ export default function Discover() {
         {!loading && !error && users.length > 0 && (
           <>
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? "rtl" : ""}`}>
-              {users.map((u) => (
+              {displayUsers.map((u) => (
                 <UserCard
-                  key={u.id}
-                  user={u}
-                  onUserClick={(x) => {
-                    setSelected(x)
-                    setOpen(true)
-                  }}
-                />
+                      key={u.id}
+                      user={u}
+                      onUserClick={() => {
+                        setSelected(u)
+                        setSelectedId(u.uid)  // store uid here
+                        setOpen(true)
+                      }}
+                    />
               ))}
             </div>
 
@@ -152,7 +184,16 @@ export default function Discover() {
         )}
       </main>
 
-      <UserProfileDialog user={selected} isOpen={open} onClose={() => setOpen(false)} />
+    <UserProfileDialog
+        user={selected}
+        isOpen={open}
+        onClose={() => {
+          setOpen(false)
+          setSelected(null)
+          setSelectedId(null)
+        }}
+        gotoChat={goToChat}  // pass the corrected handler
+      />
     </div>
   )
 }

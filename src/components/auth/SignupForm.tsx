@@ -79,7 +79,7 @@ export default function SignupForm() {
       return;
     }
 
-    if (account_type === 'seller' && !govCertificate) {
+    if (account_type === 'buyer' && !govCertificate) {
       setCertificateError('Freelancer Certificate is required for seller accounts');
       return;
     }

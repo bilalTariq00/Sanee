@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 function JobProposals() {
   const { id } = useParams();
@@ -30,6 +31,7 @@ function JobProposals() {
   const [selectedGig, setSelectedGig] = useState(null);
   const [paymentMessage, setPaymentMessage] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+const { t } = useTranslation();
 
   useEffect(() => {
     fetchProposals();
@@ -102,156 +104,161 @@ function JobProposals() {
       },
     });
   };
+if (loading)
+  return <p className="text-center mt-6">{t("proposals.loading")}</p>;
 
-  if (loading) return <p className="text-center mt-6">Loading proposals...</p>;
+return (
+  <div className="max-w-6xl mx-auto px-4 py-6 bg-white text-red-800">
+    <h2 className="text-3xl font-bold mb-6 border-b-2 border-red-600 pb-2 text-center">
+      🧾 {t("proposals.title", { id })}
+    </h2>
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-6 bg-white text-red-800">
-      <h2 className="text-3xl font-bold mb-6 border-b-2 border-red-600 pb-2 text-center">
-        🧾 Proposals for Job #{id}
-      </h2>
+    {proposals.length === 0 ? (
+      <div className="text-center py-6 text-gray-500">
+        {t("proposals.none")}
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {proposals.map((proposal) => (
+          <Card key={proposal.id} className="border-red-600 shadow-md hover:shadow-lg">
+            <CardHeader className="bg-red-600 text-white rounded-t px-4 py-2">
+              <CardTitle>
+                {`${proposal.seller?.first_name || ""} ${proposal.seller?.last_name || ""}`.trim() || t("proposals.seller")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm p-4">
+              <p><strong>{t("proposals.gig")}:</strong> {proposal.gig?.title}</p>
+              <p><strong>{t("proposals.price")}:</strong> ${proposal.price}</p>
+              <p><strong>{t("proposals.after_commission")}:</strong> ${(proposal.price * 0.9).toFixed(2)}</p>
+              <p><strong>{t("proposals.duration")}:</strong> {proposal.duration}</p>
+              <p><strong>{t("proposals.deadline")}:</strong> {proposal.deadline}</p>
+              <p>
+                <strong>{t("proposals.status")}:</strong>{" "}
+                <span className={`font-semibold ${
+                  proposal.status === "pending"
+                    ? "text-yellow-600"
+                    : proposal.status === "accepted"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}>
+                  {t(`proposals.status_${proposal.status}`)}
+                </span>
+              </p>
+              <p>
+                <strong>{t("proposals.cover")}:</strong>{" "}
+                {proposal.cover_letter.length > 80
+                  ? proposal.cover_letter.slice(0, 80) + "..."
+                  : proposal.cover_letter}
+              </p>
 
-      {proposals.length === 0 ? (
-        <div className="text-center py-6 text-gray-500">
-          No proposals submitted yet.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {proposals.map((proposal) => (
-            <Card key={proposal.id} className="border-red-600 shadow-md hover:shadow-lg">
-              <CardHeader className="bg-red-600 text-white rounded-t px-4 py-2">
-                <CardTitle>
-                  {`${proposal.seller?.first_name || ""} ${proposal.seller?.last_name || ""}`.trim() || "Seller"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm p-4">
-                <p><strong>Gig:</strong> {proposal.gig?.title}</p>
-                <p><strong>Price:</strong> ${proposal.price}</p>
-                <p><strong>After Commission:</strong> ${(proposal.price * 0.9).toFixed(2)}</p>
-                <p><strong>Duration:</strong> {proposal.duration}</p>
-                <p><strong>Deadline:</strong> {proposal.deadline}</p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className={`font-semibold ${
-                    proposal.status === "pending"
-                      ? "text-yellow-600"
-                      : proposal.status === "accepted"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}>
-                    {proposal.status.toUpperCase()}
-                  </span>
-                </p>
-                <p>
-                  <strong>Cover:</strong>{" "}
-                  {proposal.cover_letter.length > 80
-                    ? proposal.cover_letter.slice(0, 80) + "..."
-                    : proposal.cover_letter}
-                </p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  className="border-red-600 text-red-600"
+                  onClick={() => {
+                    setSelectedProposal(proposal);
+                    setOpenDialog(true);
+                  }}
+                >
+                  {t("proposals.view")}
+                </Button>
 
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    className="border-red-600 text-red-600"
-                    onClick={() => {
-                      setSelectedProposal(proposal);
-                      setOpenDialog(true);
-                    }}
-                  >
-                    View Proposal
+                {proposal.status === "pending" && (
+                  <>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleReject(proposal.id)}
+                    >
+                      {t("proposals.reject")}
+                    </Button>
+                    <Button
+                      variant="default"
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                      onClick={() =>
+                        handlePaymentStart(proposal.gig, proposal.cover_letter, proposal)
+                      }
+                    >
+                      💰 {t("proposals.make_payment")}
+                    </Button>
+                  </>
+                )}
+
+                {proposal.status === "accepted" && (
+                  <Button disabled className="opacity-70">
+                    📃 {t("proposals.contract_started")}
                   </Button>
-
-                  {proposal.status === "pending" && (
-                    <>
-                      <Button
-                        variant="destructive"
-                        onClick={() => handleReject(proposal.id)}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        variant="default"
-                        className="bg-red-600 hover:bg-red-700 text-white"
-                        onClick={() =>
-                          handlePaymentStart(proposal.gig, proposal.cover_letter, proposal)
-                        }
-                      >
-                        💰 Make Payment
-                      </Button>
-                    </>
-                  )}
-
-                  {proposal.status === "accepted" && (
-                    <Button disabled className="opacity-70">📃 Contract Started</Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {selectedProposal && (
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogContent className="max-w-2xl bg-white text-red-800 border-red-600">
-            <DialogHeader>
-              <DialogTitle>Full Proposal Details</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2 text-sm">
-              <p><strong>Seller:</strong> {`${selectedProposal.seller?.first_name || ''} ${selectedProposal.seller?.last_name || ''}`}</p>
-              <p><strong>Gig:</strong> {selectedProposal.gig?.title}</p>
-              <p><strong>Price:</strong> ${selectedProposal.price}</p>
-              <p><strong>After Commission:</strong> ${(selectedProposal.price * 0.9).toFixed(2)}</p>
-              <p><strong>Duration:</strong> {selectedProposal.duration}</p>
-              <p><strong>Deadline:</strong> {selectedProposal.deadline}</p>
-              <p><strong>Status:</strong> {selectedProposal.status}</p>
-              <p><strong>Cover Letter:</strong></p>
-              <div className="border p-3 bg-red-100 rounded text-red-900">
-                {selectedProposal.cover_letter}
+                )}
               </div>
-              {selectedProposal.attachments?.length > 0 && (
-                <div>
-                  <strong>Attachments:</strong>
-                  <ul className="list-disc pl-5">
-                    {selectedProposal.attachments.map((file, idx) => (
-                      <li key={idx}>
-                        <a
-                          href={`${config.IMG_BASE_URL}/storage/${file}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          Download File {idx + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )}
+
+    {selectedProposal && (
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="max-w-2xl bg-white text-red-800 border-red-600">
+          <DialogHeader>
+            <DialogTitle>{t("proposals.full_details")}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 text-sm">
+            <p><strong>{t("proposals.seller")}:</strong> {`${selectedProposal.seller?.first_name || ''} ${selectedProposal.seller?.last_name || ''}`}</p>
+            <p><strong>{t("proposals.gig")}:</strong> {selectedProposal.gig?.title}</p>
+            <p><strong>{t("proposals.price")}:</strong> ${selectedProposal.price}</p>
+            <p><strong>{t("proposals.after_commission")}:</strong> ${(selectedProposal.price * 0.9).toFixed(2)}</p>
+            <p><strong>{t("proposals.duration")}:</strong> {selectedProposal.duration}</p>
+            <p><strong>{t("proposals.deadline")}:</strong> {selectedProposal.deadline}</p>
+            <p><strong>{t("proposals.status")}:</strong> {t(`proposals.status_${selectedProposal.status}`)}</p>
+            <p><strong>{t("proposals.cover_letter")}:</strong></p>
+            <div className="border p-3 bg-red-100 rounded text-red-900">
+              {selectedProposal.cover_letter}
             </div>
-            <DialogFooter>
-              <Button variant="secondary" onClick={() =>
+            {selectedProposal.attachments?.length > 0 && (
+              <div>
+                <strong>{t("proposals.attachments")}:</strong>
+                <ul className="list-disc pl-5">
+                  {selectedProposal.attachments.map((file, idx) => (
+                    <li key={idx}>
+                      <a
+                        href={`${config.IMG_BASE_URL}/storage/${file}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        {t("proposals.download_file", { index: idx + 1 })}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() =>
                 handlePaymentStart(selectedProposal.gig, selectedProposal.cover_letter, selectedProposal)
-              }>
-                💰 Make Payment
-              </Button>
-              <Button onClick={() => setOpenDialog(false)}>Close</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+              }
+            >
+              💰 {t("proposals.make_payment")}
+            </Button>
+            <Button onClick={() => setOpenDialog(false)}>{t("proposals.close")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )}
 
-      {showPaymentModal && selectedGig && (
-        <JobPaymentModal
-          gig={selectedGig}
-          onClose={() => setShowPaymentModal(false)}
-          onConfirm={handleCheckoutRedirect}
-          defaultMessage={paymentMessage}
-          defaultPrice={selectedProposal?.price}
-        />
-      )}
-    </div>
-  );
+    {showPaymentModal && selectedGig && (
+      <JobPaymentModal
+        gig={selectedGig}
+        onClose={() => setShowPaymentModal(false)}
+        onConfirm={handleCheckoutRedirect}
+        defaultMessage={paymentMessage}
+        defaultPrice={selectedProposal?.price}
+      />
+    )}
+  </div>
+);
+
 }
-
 export default JobProposals;

@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { useTranslation } from "react-i18next";
 function SubmitWorkModal({ show, onClose, contractId, onSubmitted }) {
+  const { t } = useTranslation();
   const [note, setNote] = useState("");
   const [files, setFiles] = useState([]);
 
@@ -43,12 +44,16 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }) {
         }
       );
 
-      Swal.fire("Submitted!", "Work submitted successfully!", "success");
+      Swal.fire( t("submit_modal.success_title"),
+        t("submit_modal.success_message"),
+        "success");
       onClose();
       if (onSubmitted) onSubmitted();
     } catch (err) {
       console.error("Submit failed:", err);
-      Swal.fire("Error", "Something went wrong!", "error");
+      Swal.fire( t("submit_modal.error_title"),
+        t("submit_modal.error_message"),
+        "error");
     }
   };
 
@@ -56,25 +61,25 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }) {
     <Dialog open={show} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Submit Work</DialogTitle>
+          <DialogTitle>{t("submit_modal.title")}</DialogTitle>
           <DialogDescription>
-            Please add a message or upload files to share your completed work with the buyer.
+           {t("submit_modal.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="note">Message (optional)</Label>
+            <Label htmlFor="note">{t("submit_modal.message_label")}</Label>
             <Textarea
               id="note"
-              placeholder="Write a note to the buyer..."
+              placeholder={t("submit_modal.message_placeholder")}
               value={note}
               onChange={(e) => setNote(e.target.value)}
             />
           </div>
 
           <div>
-            <Label htmlFor="attachments">Attachments (optional)</Label>
+            <Label htmlFor="attachments">{t("submit_modal.attachments_label")}</Label>
             <Input
               id="attachments"
               type="file"
@@ -82,14 +87,14 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }) {
               onChange={handleFileChange}
             />
             <p className="text-sm text-muted-foreground">
-              You can upload multiple files. Max 2MB each.
+                {t("submit_modal.attachment_hint")}
             </p>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="success" onClick={handleSubmit}>Submit Work</Button>
+          <Button variant="outline" onClick={onClose}>{t("submit_modal.cancel")}</Button>
+          <Button variant="success" onClick={handleSubmit}>{t("submit_modal.submit")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

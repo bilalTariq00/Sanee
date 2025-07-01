@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import config from "../config";
 import SortableImageItem from "@/components/SortableImageItem";
 import ReactSelect from "react-select";
+import { useTranslation } from "react-i18next";
 
 import {
   DndContext,
@@ -47,6 +48,7 @@ function EditGig() {
   const [skillsList, setSkillsList] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [allImages, setAllImages] = useState([]);
+const { t } = useTranslation();
 
   useEffect(() => {
     fetchGig();
@@ -192,36 +194,37 @@ function EditGig() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow space-y-6">
-        <h2 className="text-2xl font-bold text-gray-900">Edit Gig</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t("edit_gig.title")}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <Label>Title</Label>
+            <Label>{t("edit_gig.title_label")}</Label>
             <Input
               name="title"
               value={form.title}
               onChange={handleChange}
-              placeholder="Title"
+              placeholder={t("edit_gig.title_placeholder")}
               className="focus:ring-2 focus:ring-red-500"
             />
           </div>
           <div>
-            <Label>Description</Label>
+            <Label>{t("edit_gig.description_label")}</Label>
             <Textarea
               name="description"
               value={form.description}
               onChange={handleChange}
-              placeholder="Description"
+             placeholder={t("edit_gig.description_placeholder")}
               className="focus:ring-2 focus:ring-red-500"
             />
           </div>
           <div>
-            <Label>Category</Label>
+           <Label>{t("edit_gig.category_label")}</Label>
             <Select
               value={form.category_id}
               onValueChange={(value) => handleSelectChange("category_id", value)}
+              
             >
               <SelectTrigger className="w-full border focus:ring-2 focus:ring-red-500">
-                <SelectValue placeholder="Select Category" />
+                <SelectValue placeholder={t("edit_gig.category_placeholder")} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -232,13 +235,13 @@ function EditGig() {
           </div>
           {subcategories.length > 0 && (
             <div>
-              <Label>Subcategory</Label>
+             <Label>{t("edit_gig.subcategory_label")}</Label>
               <Select
                 value={form.subcategory_id}
                 onValueChange={(value) => handleSelectChange("subcategory_id", value)}
               >
                 <SelectTrigger className="w-full border focus:ring-2 focus:ring-red-500">
-                  <SelectValue placeholder="Select Subcategory" />
+                  <SelectValue placeholder={t("edit_gig.subcategory_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {subcategories.map((sub) => (
@@ -250,53 +253,53 @@ function EditGig() {
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label>Delivery Time (Days)</Label>
+             <Label>{t("edit_gig.delivery_label")}</Label>
               <Input
                 name="delivery_time"
                 type="number"
                 value={form.delivery_time}
                 onChange={handleChange}
-                placeholder="Delivery Days"
+                placeholder={t("edit_gig.delivery_placeholder")}
                 className="focus:ring-2 focus:ring-red-500"
               />
             </div>
             <div>
-              <Label>Price (USD)</Label>
+              <Label>{t("edit_gig.price_label")}</Label>
               <Input
                 name="price"
                 type="number"
                 value={form.price}
                 onChange={handleChange}
-                placeholder="Price"
+               placeholder={t("edit_gig.price_placeholder")}
                 className="focus:ring-2 focus:ring-red-500"
               />
             </div>
           </div>
           <div>
-            <Label>Tags</Label>
+            <Label>{t("edit_gig.tags_label")}</Label>
             <Input
               name="tags"
               value={form.tags}
               onChange={handleChange}
-              placeholder="Tags (comma separated)"
+              placeholder={t("edit_gig.tags_placeholder")}
               className="focus:ring-2 focus:ring-red-500"
             />
           </div>
           {skillsList.length > 0 && (
             <div>
-              <Label>Skills</Label>
+              <Label>{t("edit_gig.skills_label")}</Label>
               <ReactSelect
                 isMulti
                 name="skills"
                 options={skillsList}
                 value={selectedSkills}
                 onChange={setSelectedSkills}
-                placeholder="Select relevant skills"
+                placeholder={t("edit_gig.skills_placeholder")}
               />
             </div>
           )}
           <div>
-            <Label>Images</Label>
+            <Label>{t("edit_gig.images_label")}</Label>
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={allImages.map((img) => img.id)} strategy={verticalListSortingStrategy}>
                 <div className="flex flex-wrap gap-4">
@@ -321,7 +324,7 @@ function EditGig() {
             />
           </div>
           <Button type="submit" className="bg-red-500 hover:bg-red-600 text-white">
-            Update Gig
+            {t("edit_gig.update_button")}
           </Button>
         </form>
       </div>
