@@ -639,8 +639,34 @@ review_page : {
   error_submission: "Failed to submit review",
   seller: "seller",
   buyer: "buyer"
-}
-
+},
+profile_pages: {
+    jss_breakdown: "Breakdown",
+    jss_score: "Score",
+    finished_projects: "Finished Projects",
+    completed_projects: "Completed Projects",
+    total_completed_projects: "Total Completed Projects",
+    reviews_received: "Reviews Received",
+    average_rating: "Average Rating",
+    review_percentage: "Review Percentage",
+    available_now: "Available Now",
+    projects_completed: "Projects Completed",
+    rating: "Rating",
+    my_wallet: "My Wallet",
+    edit_profile: "Edit Profile",
+    no_reviews_title: "No Reviews Yet",
+    no_reviews_subtitle: "You don't have any reviews yet.",
+    review_from_buyer: "Review from Buyer",
+    review_from_seller: "Review from Seller",
+    view_details: "View Details",
+    loading_gigs: "Loading gigs...",
+    no_gigs_listed: "No gigs listed.",
+    no_jobs_posted: "No jobs posted.",
+    loading_jobs: "Loading jobs...",
+    no_portfolio_items: "No portfolio items.",
+    reviews_title: "Reviews",
+    reviews_subtitle: "See what others have said about you."
+  },
 
 
 
@@ -1286,7 +1312,34 @@ review_page :{
   error_submission: "فشل في إرسال المراجعة",
   seller: "الصانِع",
   buyer: "راعي المشروع"
-}
+},
+profile_pages: {
+      jss_breakdown: "تفاصيل درجة النجاح في الوظائف",
+      jss_score: "درجة النجاح في الوظائف",
+      finished_projects: "المشاريع المنتهية",
+      completed_projects: "المشاريع المكتملة",
+      total_completed_projects: "إجمالي المشاريع المكتملة",
+      reviews_received: "المراجعات المستلمة",
+      average_rating: "التقييم المتوسط",
+      review_percentage: "نسبة المراجعات",
+      available_now: "متاح الآن",
+      projects_completed: "المشاريع المكتملة",
+      rating: "التقييم",
+      my_wallet: "محفظتي",
+      edit_profile: "تعديل الملف الشخصي",
+      no_reviews_title: "لا توجد مراجعات بعد",
+      no_reviews_subtitle: "لا توجد لديك أي مراجعات حتى الآن.",
+      review_from_buyer: "مراجعة من المشتري",
+      review_from_seller: "مراجعة من البائع",
+      view_details: "عرض التفاصيل",
+      loading_gigs: "جارٍ تحميل العروض...",
+      no_gigs_listed: "لا توجد عروض مدرجة.",
+      no_jobs_posted: "لا توجد وظائف منشورة.",
+      loading_jobs: "جارٍ تحميل الوظائف...",
+      no_portfolio_items: "لا توجد عناصر في محفظتك.",
+      reviews_title: "المراجعات",
+      reviews_subtitle: "اطلع على ما قاله الآخرون عنك."
+    }
 
 
 

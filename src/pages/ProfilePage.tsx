@@ -73,6 +73,26 @@ interface UserWithStatus {
   // …any other fields you already have
 }
 
+interface JSSData {
+  score: number;
+  level: string;
+  color: string;
+  breakdown: {
+    jss_score: number;
+    finished_projects: number;
+    completed_projects: number;
+    total_completed_projects: number;
+    reviews_received: number;
+    average_rating: number;
+    review_percentage: number;
+    rating_distribution: Record<string, number>;
+    calculation_breakdown: {
+      rating_score: number;
+      review_score: number;
+    }
+  }
+}
+
 export default function ProfilePage() {
   /* routing / auth */
   const { uid: uidParam } = useParams<{ uid?: string }>()
@@ -83,6 +103,7 @@ export default function ProfilePage() {
   /* local state */
   const [user, setUser] = useState<any>(null)
   const [loadingProfile, setLoadingProfile] = useState(true)
+   const [jssData, setJssData] = useState<JSSData | null>(null)
 
   const [gigs, setGigs] = useState<Gig[]>([])
   const [loadingGigs, setLoadingGigs] = useState(false)
@@ -118,6 +139,24 @@ const { t } = useTranslation();
         setLoadingProfile(false)
       }
     })()
+  }, [uid])
+
+  /* Fetch JSS Data */
+useEffect(() => {
+    if (!uid) return
+
+    const fetchJssData = async () => {
+      try {
+        const res = await axios.get(`${config.API_BASE_URL}/users/${uid}/jss`)
+        const jssData = res.data?.data?.jss
+        setJssData(jssData)
+      } catch (error) {
+        console.error("Failed to fetch JSS data:", error)
+        setJssData(null)
+      }
+    }
+
+    fetchJssData()
   }, [uid])
 
   /* fetch gigs (seller) */
@@ -171,8 +210,9 @@ useEffect(() => {
 
     const fetchStatus = async () => {
       try {
-        const res = await axios.get(`${config.API_BASE_URL}/api/users/${uid}/status`);
+        const res = await axios.get(`${config.API_BASE_URL}/users/${uid}/status`);
         const statusData = res.data?.data;
+          console.log(statusData); // Check the response from the API
         setProfileStatus(statusData);
       } catch (error) {
         console.error("Failed to fetch user status:", error);
@@ -245,71 +285,115 @@ useEffect(() => {
       : (["services", "portfolio", "reviews"] as const)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* header */}
-      <div className="bg-red-500 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <button onClick={() => navigate(-1)} className="flex items-center text-white/90 hover:text-white mb-6">
-          <ArrowLeft className="w-5 h-5 mr-2" /> {t('profile_page.back')}
-        </button>
+  <div className="min-h-screen bg-gray-50">
+  {/* header */}
+  <div className="bg-red-500 text-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-white/90 hover:text-white mb-6"
+      >
+        <ArrowLeft className="w-5 h-5 mr-2" /> {t('profile_page.back')}
+      </button>
 
-        <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-6">
-            <img
-              src={avatar || "/placeholder.svg"}
-              alt={fullName}
-              className={`w-24 h-24 border-4 border-white object-cover ${
-                user.account_type === "buyer" ? "rounded-md" : "rounded-full"
-              }`}
-            />
-            <div>
-              <h1 className="text-3xl font-bold capitalize">{fullName}</h1>
-              <div className="flex items-center mt-2">
-                <MapPin className="h-5 w-5 mr-1" /> {location}
-              </div>
-              <p className="mt-4 max-w-2xl">{bio}</p>
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-6">
+          <img
+            src={avatar || "/placeholder.svg"}
+            alt={fullName}
+            className={`w-24 h-24 border-4 border-white object-cover ${
+              user.account_type === "buyer" ? "rounded-md" : "rounded-full"
+            }`}
+          />
+          <div>
+            <h1 className="text-3xl font-bold capitalize">{fullName}</h1>
+            <div className="flex items-center mt-2">
+              <MapPin className="h-5 w-5 mr-1" /> {location}
             </div>
-          </div>
+            <p className="mt-4 max-w-2xl">{bio}</p>
+            {/* Profile status display */}
+              {/* JSS Score */}
+                {jssData && (
+                  <div
+                    className="flex items-center mt-4 p-2 rounded-lg text-white font-semibold"
+                    style={{ backgroundColor: jssData.color }}
+                  >
+                    <span className="w-6 h-6 rounded-full flex justify-center items-center">
+                      <Star className="w-6 h-6 text-white" />
+                    </span>
+                    <span className="ml-2 text-white text-xl">{jssData.level}</span>
+                    <span className="ml-2 text-white text-xl">({jssData.score})</span>
+                  </div>
+                )}
 
-          <div className="flex items-center space-x-4">
-            {currentUser && user.account_type === "seller" && (
-              <button
-                onClick={() => navigate("/wallet")}
-                className="bg-white text-red-500 px-6 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center"
-              >
-                <Wallet className="w-4 h-4 mr-2" />
-                {t('profile_page.my_wallet')}
-              </button>
-            )}
+                {/* Show JSS Breakdown */}
+                 {/* {jssData?.breakdown ? (
+      <>
+        <li>{t('profile_pages.jss_score')}: {jssData.breakdown.jss_score}</li>
+        <li>{t('profile_pages.finished_projects')}: {jssData.breakdown.finished_projects}</li>
+        <li>{t('profile_pages.completed_projects')}: {jssData.breakdown.completed_projects}</li>
+        <li>{t('profile_pages.total_completed_projects')}: {jssData.breakdown.total_completed_projects}</li>
+        <li>{t('profile_pages.reviews_received')}: {jssData.breakdown.reviews_received}</li>
+        <li>{t('profile_pages.average_rating')}: {jssData.breakdown.average_rating}</li>
+        <li>{t('profile_pages.review_percentage')}: {jssData.breakdown.review_percentage}%</li>
+      </>
+    ) : (
+      <li>{t('profile_pages.loading_data')}</li> // Show loading or error message if breakdown is null
+    )} */}
 
-            {currentUser && (
-              <button
-                onClick={() => navigate("/profile/edit")}
-                className="bg-white text-red-500 px-6 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors"
-              >
-                {t('profile_page.edit_profile')}
-              </button>
-            )}
           </div>
         </div>
+        
+        <div className="flex items-center space-x-4">
+          {currentUser && user.account_type === "seller" && (
+            <button
+              onClick={() => navigate("/wallet")}
+              className="bg-white text-red-500 px-6 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center"
+            >
+              <Wallet className="w-4 h-4 mr-2" />
+              {t('profile_page.my_wallet')}
+            </button>
+          )}
 
-        <div className="flex items-center space-x-12 mt-8">
-          <div>
-            <div className="text-3xl font-bold">{stats.completed}</div>
-            <div className="text-white/90">{t('profile_page.projects_completed')}</div>
-          </div>
-          <div>
-            <div className="text-3xl font-bold">{Number(stats.rating).toFixed(1)}</div>
-            <div className="text-white/90">{t('profile_page.rating')}</div>
-          </div>
-          <div>
-            <div className="inline-block rounded-full bg-green-500 text-white text-sm font-semibold px-3 py-3">
-              {t('profile_page.available_now')}
-            </div>
+          {currentUser && (
+            <button
+              onClick={() => navigate("/profile/edit")}
+              className="bg-white text-red-500 px-6 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors"
+            >
+              {t('profile_page.edit_profile')}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-12 mt-8">
+        <div>
+          <div className="text-3xl font-bold">{jssData.breakdown.total_completed_projects}</div>
+          <div className="text-white/90">{t('profile_page.projects_completed')}</div>
+        </div>
+        <div>
+          <div className="text-3xl font-bold">{Number(stats.rating).toFixed(1)}</div>
+          <div className="text-white/90">{t('profile_page.rating')}</div>
+        </div>
+        <div>
+          <div className="inline-block rounded-full bg-green-500 text-white text-sm font-semibold px-3 py-2">
+            {profileStatus && (
+              <div
+                className="flex items-center  bg-transparent"
+              >
+                <span className="w-6 h-6 rounded-full flex justify-center items-center">
+                  {profileStatus.icon}
+                </span>
+                <span className="ml-2 text-white text-xl flex items-center">{profileStatus.status}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
+  </div>
+
+
 
 
       {/* tabs */}

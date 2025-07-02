@@ -83,6 +83,8 @@ export default function AllGigs() {
 
       {/* Views */}
       {view === "list" ? (
+
+
         <div className="space-y-4">
           {gigs.map((gig) => {
             const imageUrl = gig.images?.[0]?.image_path
@@ -96,7 +98,7 @@ export default function AllGigs() {
                   <div>
                     <h3 className="font-semibold">{gig.title}</h3>
                     <p className="text-sm text-muted-foreground">{gig.category?.name}</p>
-                    <Badge className="mt-1 bg-red-500">${gig.price}</Badge>
+                    <Badge className="mt-1 bg-red-500 flex"> <img src='/riyal-dark.svg' className="h-3 w-3 mr-1" />{gig.price}</Badge>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -130,7 +132,7 @@ export default function AllGigs() {
                   <p className="text-sm text-muted-foreground">{gig.category?.name}</p>
                 </CardHeader>
                 <CardContent className="flex items-center justify-between">
-                  <Badge className="bg-red-500">${gig.price}</Badge>
+                  <Badge className="bg-red-500"><img src='/riyal-dark.svg' className="h-3 w-3 mr-1" />{gig.price}</Badge>
                   <div className="flex gap-2">
                     <Link to={`/profile/${gig.user?.uid}`}>
                       <Button variant="outline" size="sm" className="bg-red-500 text-white">
