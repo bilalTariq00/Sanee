@@ -368,7 +368,7 @@ useEffect(() => {
 
       <div className="flex items-center space-x-12 mt-8">
         <div>
-          <div className="text-3xl font-bold">{jssData.breakdown.total_completed_projects}</div>
+          <div className="text-3xl font-bold">{jssData?.breakdown.total_completed_projects}</div>
           <div className="text-white/90">{t('profile_page.projects_completed')}</div>
         </div>
         <div>
