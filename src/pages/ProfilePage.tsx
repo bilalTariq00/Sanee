@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { ArrowLeft, MapPin, Star, Wallet } from "lucide-react"
 import axios from "axios"
 import config from "@/config"
 import { useAuth } from "@/contexts/AuthContext"
 import { useTranslation } from "react-i18next"
+import { Button } from "@/components/ui/button"
 
 interface Gig {
   id: string
@@ -46,6 +47,31 @@ interface Review {
   }
   created_at: string
 }
+interface ProfileStatus {
+  status: string;
+  color: string;
+  icon: string;
+  last_activity_at: string;
+  is_online: boolean;
+  is_away: boolean;
+  is_busy: boolean;
+  is_disconnected: boolean;
+}
+
+interface UserWithStatus {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image?: string;
+  country?: { name: string };
+  summary?: string;
+  headline?: string;
+  account_type: "seller" | "buyer";
+  completed_projects?: number;
+  response_rate?: number;
+  profile_status: ProfileStatus;
+  // …any other fields you already have
+}
 
 export default function ProfilePage() {
   /* routing / auth */
@@ -67,6 +93,7 @@ export default function ProfilePage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [statss, setStats] = useState([])
   const [loadingReviews, setLoadingReviews] = useState(false)
+   const [profileStatus, setProfileStatus] = useState<ProfileStatus | null>(null);  // New state for profile status
 const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<"services" | "jobs" | "portfolio" | "reviews">("services")
@@ -139,7 +166,22 @@ const { t } = useTranslation();
 
     fetchJobs()
   }, [uid, user?.account_type, activeTab])
+useEffect(() => {
+    if (!uid) return;
 
+    const fetchStatus = async () => {
+      try {
+        const res = await axios.get(`${config.API_BASE_URL}/api/users/${uid}/status`);
+        const statusData = res.data?.data;
+        setProfileStatus(statusData);
+      } catch (error) {
+        console.error("Failed to fetch user status:", error);
+        setProfileStatus(null);
+      }
+    };
+
+    fetchStatus();
+  }, [uid]);
   /* fetch reviews - FIXED to use review_type */
   useEffect(() => {
     if (!uid) return
@@ -311,6 +353,13 @@ const { t } = useTranslation();
             <div className="text-xs text-gray-400 mt-1">
               {t('profile_page.delivery_days', { count: g.delivery_time })}
             </div>
+            <div>
+            <Link to={`/gig/${g.gig_uid}`}>
+                                  <Button size="sm" className="bg-red-500 text-white">
+                                    {t("view_details")}
+                                  </Button>
+                                </Link>
+            </div>
           </div>
         ))
       ) : (
@@ -344,11 +393,19 @@ const { t } = useTranslation();
                       Skills: <span className="text-gray-700">{j.skills.join(", ")}</span>
                     </div>
                   )}
+                  <div className="flex justify-between">
                   {j.created_at && (
                     <div className="text-xs text-gray-400">
                       Posted on: {new Date(j.created_at).toLocaleDateString()}
                     </div>
                   )}
+                   <Link
+                                          to={`/jobs/${j.id}`}
+                                          className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                        >
+                                          {t('view_details')}
+                                        </Link>
+                                        </div>
                 </div>
               ))
             ) : (
@@ -495,6 +552,7 @@ const { t } = useTranslation();
                   ? t("profile_page.review_from_buyer")
                   : t("profile_page.review_from_seller")}
               </div>
+              
             </div>
           </div>
         </div>

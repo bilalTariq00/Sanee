@@ -1,7 +1,7 @@
 // src/config.ts
 const config = {
-    API_BASE_URL: "https://lotus-reached-expenditure-sonic.trycloudflare.com/api",
-    IMG_BASE_URL: "https://lotus-reached-expenditure-sonic.trycloudflare.com",
+    API_BASE_URL: "https://confidential-wp-hostel-supplemental.trycloudflare.com/api",
+    IMG_BASE_URL: "https://confidential-wp-hostel-supplemental.trycloudflare.com",
     menuItems: {
         buyer: [
             { label: 'All Gigs', path: '/' },

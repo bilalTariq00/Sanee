@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LogOut,
   Navigation,
@@ -12,7 +12,7 @@ import {
   Wallet,
   WorkflowIcon,
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Sidebar,
@@ -27,12 +27,20 @@ import {
 } from '@/components/ui/sidebar';
 import config from '@/config';
 import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
+
 
 export function AppSidebar() {
+   const navigate = useNavigate();
   const { t } = useTranslation();
   const { state } = useSidebar();
   const { user } = useAuth();
   const location = useLocation();
+  const [userStatus, setUserStatus] = useState({
+    status: 'available',
+    icon: '🟢',
+    color: '#28a745',
+  });
 
   const isCollapsed = state === 'collapsed';
   const currentPath = location.pathname;
@@ -47,13 +55,45 @@ export function AppSidebar() {
   const navigationItems = [
     { title: t('discover'), url: '/', icon: Navigation },
     { title: t('profile'), url: `/profile/${user?.uid}`, icon: User },
-    
   ];
-
+const handleSignOut = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You will be signed out!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#aaa',
+    confirmButtonText: 'Yes, sign out!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      navigate('/logout'); // ✅ Perform signout navigation
+    }
+  });
+};
   const isActive = (path) =>
     path.startsWith('/profile')
       ? currentPath.startsWith('/profile')
       : currentPath === path;
+
+  // Fetch user status on component mount
+  useEffect(() => {
+    const fetchUserStatus = async () => {
+      try {
+        const response = await fetch(`/api/users/${user?.uid}/status`);
+        const data = await response.json();
+        if (data.success) {
+          setUserStatus(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching user status:', error);
+      }
+    };
+
+    if (user?.uid) {
+      fetchUserStatus();
+    }
+  }, [user]);
 
   return (
     <Sidebar
@@ -67,7 +107,6 @@ export function AppSidebar() {
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           {!isCollapsed && (
             <Link to="/" className=" ">
-  
               <img src='/sanee.png' className="text-xl font-semibold text-red-500 h-16 w-fit"/>
             </Link>
           )}
@@ -89,6 +128,8 @@ export function AppSidebar() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 truncate">{userName}</p>
                   <p className="text-sm text-gray-500 truncate">Frontend Developer</p>
+                  <div className="flex items-center gap-2 mt-2">
+                  </div>
                 </div>
               )}
             </div>
@@ -121,17 +162,16 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-
               {/* Seller Routes */}
               {user?.account_type === 'seller' && (
                 <>
                   {[
-                    { path: '/create-gig', label: t('create_gig'),icon: FileIcon },
-                    { path: '/manage-gigs', label: t('manage_gig'),icon: FileX2Icon },
-                    { path: '/seller/contracts', label: t('seller_contract') ,icon: Workflow},
-                     { path: '/wallet', label: t('Wallet'),icon: Wallet },
-                     { label: t('jobs'), path: '/jobs', icon: WorkflowIcon },
-                  ].map(({ path, label }) => (
+                    { path: '/create-gig', label: t('create_gig'), icon: FileIcon },
+                    { path: '/manage-gigs', label: t('manage_gig'), icon: FileX2Icon },
+                    { path: '/seller/contracts', label: t('seller_contract'), icon: Workflow },
+                    { path: '/wallet', label: t('Wallet'), icon: Wallet },
+                    { label: t('jobs'), path: '/jobs', icon: WorkflowIcon },
+                  ].map(({ path, label, icon }) => (
                     <SidebarMenuItem key={path}>
                       <SidebarMenuButton asChild>
                         <Link
@@ -140,7 +180,7 @@ export function AppSidebar() {
                             isCollapsed ? 'justify-center' : ''
                           }`}
                         >
-                          <span className="h-5 w-5">{icon}</span>
+                          <icon className="h-5 w-5" />
                           {!isCollapsed && <span className="font-medium">{label}</span>}
                         </Link>
                       </SidebarMenuButton>
@@ -148,7 +188,6 @@ export function AppSidebar() {
                   ))}
                 </>
               )}
-
               {/* Buyer Routes */}
               {user?.account_type === 'buyer' && (
                 <>
@@ -198,7 +237,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <button className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-700 hover:bg-red-50 hover:text-red-600 w-full text-left ${isCollapsed ? 'justify-center' : ''}`}>
+                  <button onClick={handleSignOut} className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-700 hover:bg-red-50 hover:text-red-600 w-full text-left ${isCollapsed ? 'justify-center' : ''}`}>
                     <LogOut className="h-5 w-5" />
                     {!isCollapsed && <span className="font-medium">{t('sign_out')}</span>}
                   </button>
