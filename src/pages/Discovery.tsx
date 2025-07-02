@@ -1,38 +1,40 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useTranslation } from "react-i18next"
-import SearchBar from "@/components/SearchBar"
-import UserCard from "@/components/UserCard"
-import UserProfileDialog from "@/components/UserProfileDialog"
-import type { User } from "@/types/User"
-import { useDiscover } from "@/hooks/useDiscover"
-import axios from "axios"
-import config from "@/config"
-import AllGigs from "./AllGigs"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import SearchBar from "@/components/SearchBar";
+import UserCard from "@/components/UserCard";
+import UserProfileDialog from "@/components/UserProfileDialog";
+import type { User } from "@/types/User";
+import { useDiscover } from "@/hooks/useDiscover";
+import axios from "axios";
+import config from "@/config";
+import AllGigs from "./AllGigs";
+import { useNavigate } from "react-router-dom";
 
 interface Category {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 export default function Discover() {
-  const { t, i18n } = useTranslation()
-  const isRTL = i18n.language === "ar"
-  const navigate = useNavigate()
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
+  const navigate = useNavigate();
 
-  const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState<string>("all")
-  const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState<User | null>(null)
-  const [open, setOpen] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
-const [selectedId, setSelectedId] = useState<string | null>(null)
-  // Define userType - you can make this dynamic based on your app logic
-  const [userType] = useState<"buyer" | "seller">("seller")
+  const [user, setUser] = useState<any>(null);
+  const [jssData, setJssData] = useState<any>(null); // State to store JSS data
+  const [projects, setProjects] = useState<any[]>([]); // State to store projects
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<User | null>(null);
+  const [open, setOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [userType] = useState<"buyer" | "seller">("seller");
 
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
   // Fetch categories using your existing config
   useEffect(() => {
@@ -42,22 +44,22 @@ const [selectedId, setSelectedId] = useState<string | null>(null)
       })
       .then((res) => setCategories(res.data))
       .catch((err) => {
-        console.error("Failed to fetch categories:", err)
+        console.error("Failed to fetch categories:", err);
         // Set some default categories if API fails
         setCategories([
           { id: "1", name: "Web Development" },
           { id: "2", name: "Audio" },
           { id: "3", name: "Video" },
           { id: "4", name: "Graphic Design" },
-        ])
-      })
-  }, [token])
+        ]);
+      });
+  }, [token]);
 
   useEffect(() => {
-    const dir = isRTL ? "rtl" : "ltr"
-    document.documentElement.setAttribute("dir", dir)
-    document.documentElement.setAttribute("lang", i18n.language)
-  }, [i18n.language, isRTL])
+    const dir = isRTL ? "rtl" : "ltr";
+    document.documentElement.setAttribute("dir", dir);
+    document.documentElement.setAttribute("lang", i18n.language);
+  }, [i18n.language, isRTL]);
 
   const adjustedFilter =
     filter === "people"
@@ -65,20 +67,46 @@ const [selectedId, setSelectedId] = useState<string | null>(null)
         ? "buyerpeople"
         : "sellerpeople"
       : filter === "all" || filter === "seller" || filter === "buyer"
-        ? filter
-        : `category:${filter}`
+      ? filter
+      : `category:${filter}`;
 
-  const { users, loading, error, totalPages } = useDiscover(adjustedFilter, search, page)
-  const displayUsers = users.filter(u =>
-  userType === "seller"  ? u.badge === "Gig"
-: userType === "buyer" ? u.badge === "Job"
-: true
-)
-const goToChat = (e: React.MouseEvent) => {
-  e.stopPropagation();
-  if (!selectedId) return;                   // guard in case it's still null
-  navigate(`/messages/${selectedId}`);
-};
+  const { users, loading, error, totalPages } = useDiscover(adjustedFilter, search, page);
+  const displayUsers = users.filter(
+    (u) =>
+      userType === "seller"
+        ? u.badge === "Gig"
+        : userType === "buyer"
+        ? u.badge === "Job"
+        : true
+  );
+
+  const goToChat = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!selectedId) return; // guard in case it's still null
+    navigate(`/messages/${selectedId}`);
+  };
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const fetchJssData = async () => {
+      try {
+        const response = await axios.get(`${config.API_BASE_URL}/users/${user?.uid}/jss`);
+        const jssData = response.data?.data?.jss;
+        setJssData(jssData);
+
+        // Assuming JSS data has a list of projects
+        const projects = jssData?.projects || []; // Modify based on actual API response structure
+        setProjects(projects);
+      } catch (error) {
+        console.error("Error fetching JSS data", error);
+        setJssData(null);
+      }
+    };
+
+    fetchJssData();
+  }, [user]);
+
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? "text-right" : "text-left"}`}>
       <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -89,50 +117,37 @@ const goToChat = (e: React.MouseEvent) => {
         <SearchBar
           searchTerm={search}
           onSearchChange={(v) => {
-            setSearch(v)
-            setPage(1)
+            setSearch(v);
+            setPage(1);
           }}
           activeFilter={filter}
           onFilterChange={(f) => {
-            setFilter(f)
-            setPage(1)
+            setFilter(f);
+            setPage(1);
           }}
           userType={userType}
           categories={categories}
           isRTL={isRTL}
         />
-{filter === "gigs" ? (
-  <AllGigs />
-) : (
-  <>
-    {loading && (
-          <div className="flex justify-center items-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-          </div>
-        )}
 
-        {error && (
-          <div className="text-center py-16">
-            <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
-            <p className="text-red-500">{error}</p>
-            <p className="text-gray-500 text-sm mt-2">API Endpoint: {config.API_BASE_URL}/discover</p>
-          </div>
-        )}
+        {filter === "gigs" ? (
+          <AllGigs />
+        ) : (
+          <>
+            {loading && (
+              <div className="flex justify-center items-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
+              </div>
+            )}
 
-  </>
-)}
-        {loading && (
-          <div className="flex justify-center items-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-16">
-            <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
-            <p className="text-red-500">{error}</p>
-            <p className="text-gray-500 text-sm mt-2">API Endpoint: {config.API_BASE_URL}/discover</p>
-          </div>
+            {error && (
+              <div className="text-center py-16">
+                <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
+                <p className="text-red-500">{error}</p>
+                <p className="text-gray-500 text-sm mt-2">API Endpoint: {config.API_BASE_URL}/discover</p>
+              </div>
+            )}
+          </>
         )}
 
         {!loading && !error && users.length > 0 && (
@@ -140,14 +155,15 @@ const goToChat = (e: React.MouseEvent) => {
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? "rtl" : ""}`}>
               {displayUsers.map((u) => (
                 <UserCard
-                      key={u.id}
-                      user={u}
-                      onUserClick={() => {
-                        setSelected(u)
-                        setSelectedId(u.uid)  // store uid here
-                        setOpen(true)
-                      }}
-                    />
+                  key={u.id}
+                  user={u}
+                  onUserClick={() => {
+                    setSelected(u);
+                    setSelectedId(u.uid); // store uid here
+                    setOpen(true);
+                  }}
+                   userType={userType} // Pass the userType prop here
+                />
               ))}
             </div>
 
@@ -184,16 +200,32 @@ const goToChat = (e: React.MouseEvent) => {
         )}
       </main>
 
-    <UserProfileDialog
+      {/* Display Projects */}
+      {jssData && jssData.projects  (
+        <div>
+          <h3 className="text-2xl font-semibold">Projects</h3>
+          <ul className="mt-4 space-y-4">
+            {projects.map((project: any, index: number) => (
+              <li key={index} className="bg-white p-4 rounded-lg shadow-md">
+                <h4 className="text-lg font-bold">{project.title}</h4>
+                <p>{project.description}</p>
+                {/* Display other project details here */}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) }
+
+      <UserProfileDialog
         user={selected}
         isOpen={open}
         onClose={() => {
-          setOpen(false)
-          setSelected(null)
-          setSelectedId(null)
+          setOpen(false);
+          setSelected(null);
+          setSelectedId(null);
         }}
-        gotoChat={goToChat}  // pass the corrected handler
+        gotoChat={goToChat} // pass the corrected handler
       />
     </div>
-  )
+  );
 }

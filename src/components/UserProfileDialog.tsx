@@ -1,23 +1,24 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { User } from "@/types/User";
+"use client";
+
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { User } from "@/types/User";
+import axios from "axios";
+import config from "@/config";
+
+const fallbackAvatar =
+  "https://ui-avatars.com/api/?name=Unknown&background=ECECEC&color=555&size=128";
+
 interface UserProfileDialogProps {
   user: User | null;
   isOpen: boolean;
   onClose: () => void;
-   gotoChat: (e: React.MouseEvent) => void;
+  gotoChat: (e: React.MouseEvent) => void;
 }
-
-const fallbackAvatar =
-  "https://ui-avatars.com/api/?name=Unknown&background=ECECEC&color=555&size=128";
 
 export default function UserProfileDialog({
   user,
@@ -26,6 +27,36 @@ export default function UserProfileDialog({
   onClose,
 }: UserProfileDialogProps) {
   const { t } = useTranslation();
+
+  // States for handling projects and rating
+  const [userRating, setUserRating] = useState<number | null>(null);
+  const [totalCompletedProjects, setTotalCompletedProjects] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
+  const [ratingError, setRatingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`${config.API_BASE_URL}/users/${user.uid}/jss`);
+        
+        // Extracting the data from the API response
+        const rating = response.data?.data?.summary?.average_rating;
+        const completedProjects = response.data?.data?.projects_stats?.total_completed_projects;
+        
+        setUserRating(rating);
+        setTotalCompletedProjects(completedProjects);
+      } catch (error) {
+        setRatingError("Failed to load rating or project data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user?.uid]);
+
   if (!user) return null;
 
   return (
@@ -51,11 +82,11 @@ export default function UserProfileDialog({
                 {user.name ?? t("unknown")}
               </h2>
 
-              {user.rating !== undefined && (
+              {userRating !== undefined && (
                 <div className="flex items-center space-x-2">
                   <span className="text-yellow-500 text-xl">★</span>
                   <span className="text-xl font-semibold">
-                    {user.rating.toFixed(1)}
+                    {userRating ? userRating.toFixed(1) : "N/A"}
                   </span>
                 </div>
               )}
@@ -65,7 +96,11 @@ export default function UserProfileDialog({
               <p className="text-gray-600 mb-2">{user.location}</p>
             )}
 
-            {user.badge && <Badge className="mb-4">{user.badge}</Badge>}
+            {totalCompletedProjects !== null && (
+              <Badge className="mb-4">
+                {totalCompletedProjects} {t("projects")}
+              </Badge>
+            )}
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
               {user.hourlyRate !== undefined && (
