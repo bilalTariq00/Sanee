@@ -300,7 +300,7 @@ useEffect(() => {
         <div className="flex items-start space-x-6">
           <img
             src={avatar || "https://placehold.co/256x256?text=Avatar"}
-            alt={fullName}
+            alt="https://placehold.co/256x256?text=Avatar"
             className={`w-24 h-24 border-4 border-white object-cover ${
               user.account_type === "buyer" ? "rounded-md" : "rounded-full"
             }`}
