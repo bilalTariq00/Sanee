@@ -115,10 +115,11 @@ function BuyerContracts() {
                 <p className="text-sm text-gray-500">{t("seller")}: {c.seller?.first_name} {c.seller?.last_name}</p>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-gray-700">
-                <p><strong>{t("price")}:</strong> ${c.price}</p>
+                <p className="flex items-center"><strong>{t("price")}:</strong> <img src='/riyal.svg' className="h-3 w-3 mr-1" />{c.price}</p>
                 <div><strong>{t("status")}:</strong> {renderBadge(c.status)}</div>
                 <p><strong>{t("start")}:</strong> {c.started_at ? new Date(c.started_at).toLocaleDateString() : "-"}</p>
                 <p><strong>{t("end")}:</strong> {c.completed_at ? new Date(c.completed_at).toLocaleDateString() : "-"}</p>
+                 <p><strong>{t("days")}:</strong> {c.gig.delivery_time ? `${c.gig.delivery_time} ${t("days")}` : "-"}</p>
                 <div>
                   <strong>{t("payment")}:</strong>{" "}
                   {c.payment?.status === "confirmed" && (
