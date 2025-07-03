@@ -299,7 +299,7 @@ useEffect(() => {
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-6">
           <img
-            src={avatar || "/placeholder.svg"}
+            src={avatar || "https://placehold.co/256x256?text=Avatar"}
             alt={fullName}
             className={`w-24 h-24 border-4 border-white object-cover ${
               user.account_type === "buyer" ? "rounded-md" : "rounded-full"
@@ -313,18 +313,7 @@ useEffect(() => {
             <p className="mt-4 max-w-2xl">{bio}</p>
             {/* Profile status display */}
               {/* JSS Score */}
-                {jssData && (
-                  <div
-                    className="flex items-center mt-4 p-2 rounded-lg text-white font-semibold"
-                    style={{ backgroundColor: jssData.color }}
-                  >
-                    <span className="w-6 h-6 rounded-full flex justify-center items-center">
-                      <Star className="w-6 h-6 text-white" />
-                    </span>
-                    <span className="ml-2 text-white text-xl">{jssData.level}</span>
-                    <span className="ml-2 text-white text-xl">({jssData.score})</span>
-                  </div>
-                )}
+                
 
                 {/* Show JSS Breakdown */}
                  {/* {jssData?.breakdown ? (
@@ -367,6 +356,18 @@ useEffect(() => {
       </div>
 
       <div className="flex items-center space-x-12 mt-8">
+        {jssData && (
+                  <div
+                    className="flex items-center mt-4 p-2 rounded-lg text-white font-semibold"
+                    style={{ backgroundColor: jssData.color }}
+                  >
+                    <span className="w-6 h-6 rounded-full flex justify-center items-center">
+                      <Star className="w-6 h-6 text-white" />
+                    </span>
+                    <span className="ml-2 text-white text-xl">{jssData.level}</span>
+                    <span className="ml-2 text-white text-xl">({jssData.score})</span>
+                  </div>
+                )}
         <div>
           <div className="text-3xl font-bold">{jssData?.breakdown.total_completed_projects}</div>
           <div className="text-white/90">{t('profile_page.projects_completed')}</div>
@@ -543,7 +544,7 @@ useEffect(() => {
             )}
           </div>
         )}
-       {activeTab === "jobs" && user.account_type === "buyer" && (
+       {/* {activeTab === "jobs" && user.account_type === "buyer" && (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     {loadingJobs ? (
       <p className="text-gray-500">{t("profile_page.loading_jobs")}</p>
@@ -586,18 +587,18 @@ useEffect(() => {
         </div>
       ))
     ) : (
-      <p className="text-gray-500">{t("profile_page.no_jobs_posted")}</p>
+      <p className="text-gray-500">{t("profile_pages.no_jobs_posted")}</p>
     )}
   </div>
-)}
+)} */}
 
 
         {/* Reviews */}
        {activeTab === "reviews" && (
   <div className="space-y-6">
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("profile_page.reviews_title")}</h2>
-      <p className="text-gray-600">{t("profile_page.reviews_subtitle")}</p>
+      <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("profile_pages.reviews_title")}</h2>
+      <p className="text-gray-600">{t("profile_pages.reviews_subtitle")}</p>
     </div>
 
     {Array.isArray(reviews) && reviews.length > 0 ? (
@@ -633,8 +634,8 @@ useEffect(() => {
               {rv.comment && <p className="mt-2 text-gray-600">{rv.comment}</p>}
               <div className="mt-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded inline-block">
                 {rv.type === "seller_to_buyer"
-                  ? t("profile_page.review_from_buyer")
-                  : t("profile_page.review_from_seller")}
+                  ? t("profile_pages.review_from_buyer")
+                  : t("profile_pages.review_from_seller")}
               </div>
               
             </div>
@@ -644,8 +645,8 @@ useEffect(() => {
     ) : (
       <div className="bg-white rounded-lg shadow-sm p-8 text-center">
         <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">{t("profile_page.no_reviews_title")}</h3>
-        <p className="text-gray-500">{t("profile_page.no_reviews_subtitle")}</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">{t("profile_pages.no_reviews_title")}</h3>
+        <p className="text-gray-500">{t("profile_pages.no_reviews_subtitle")}</p>
       </div>
     )}
   </div>

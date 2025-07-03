@@ -490,6 +490,7 @@ notifications: {
   delete: "Delete notification"
 },
 profile_page: {
+  delivery_days: "Delivery Days",
   back: "Back",
   my_wallet: "My Wallet",
   edit_profile: "Edit Profile",
@@ -641,6 +642,7 @@ review_page : {
   buyer: "buyer"
 },
 profile_pages: {
+    
     jss_breakdown: "Breakdown",
     jss_score: "Score",
     finished_projects: "Finished Projects",
