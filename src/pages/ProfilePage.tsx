@@ -258,7 +258,7 @@ useEffect(() => {
 
     fetchReviews()
   }, [uid, user])
-
+const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   /* early exits */
   if (!uid) return <div className="min-h-screen flex items-center justify-center text-red-500">No user id provided</div>
 
@@ -298,13 +298,18 @@ useEffect(() => {
 
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-6">
-          <img
-            src={avatar || "https://placehold.co/256x256?text=Avatar"}
-            alt="https://placehold.co/256x256?text=Avatar"
-            className={`w-24 h-24 border-4 border-white object-cover ${
-              user.account_type === "buyer" ? "rounded-md" : "rounded-full"
-            }`}
-          />
+         <img
+  src={avatar || DEFAULT_AVATAR}
+  alt={fullName}
+  className={`w-24 h-24 border-4 border-white object-cover ${
+    user.account_type === "buyer" ? "rounded-md" : "rounded-full"
+  }`}
+  onError={e => {
+    // avoid recursion if placeholder also errors
+    e.currentTarget.onerror = null;
+    e.currentTarget.src = DEFAULT_AVATAR;
+  }}
+/>
           <div>
             <h1 className="text-3xl font-bold capitalize">{fullName}</h1>
             <div className="flex items-center mt-2">
