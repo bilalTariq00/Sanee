@@ -66,6 +66,7 @@ export default function UserCard({ user, onUserClick, userType }: UserCardProps)
       {/* Header Section */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-4">
+          
           <img
             src={user.avatar}
             alt={user.name}

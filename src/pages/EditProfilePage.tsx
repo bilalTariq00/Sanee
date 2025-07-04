@@ -221,11 +221,14 @@ return (
               value={countryId}
               onChange={(e) => setCountryId(Number(e.target.value) || "")}
             />
+            <div className="flex flex-col space-y-4">
+            <label htmlFor="" className="font-bold">Update your image</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             />
+            </div>
           </div>
         </section>
 

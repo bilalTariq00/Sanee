@@ -78,14 +78,14 @@ const handleSignOut = () => {
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex items-center justify-between h-16 ${isRTL ? 'flex-end' : ''}`}>
           {isCollapsed && (
             <Link to="/" className="text-red-500 text-3xl font-bold tracking-tight">
               <img src='/sanee.png' className="h-16 w-fit" alt="Logo" />
             </Link>
           )}
 
-          <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
+         <nav className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
             {/* <div className="relative w-64">
               <input
                 type="text"

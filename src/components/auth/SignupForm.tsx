@@ -79,8 +79,9 @@ export default function SignupForm() {
       return;
     }
 
-    if (account_type === 'buyer' && !govCertificate) {
-      setCertificateError('Freelancer Certificate is required for seller accounts');
+        // require certificate only for sellers
+    if (account_type === 'seller' && !govCertificate) {
+      setCertificateError('Government Certificate is required for seller accounts.');
       return;
     }
 
@@ -172,47 +173,49 @@ export default function SignupForm() {
         {imageError && (<div className="mt-1 flex items-center text-sm text-red-600"><AlertCircle className="h-4 w-4 mr-1" />{imageError}</div>)}
       </div>
 
-     <div>
-  <label className="block text-sm font-medium text-gray-700">
-    Government Certificate <span className="text-red-500">*</span>
-  </label>
-  <div
-    className={`border-2 border-dashed rounded-md p-4 cursor-pointer hover:border-red-500 transition-colors ${
-      certificateError ? 'border-red-500 bg-red-50' : 'border-gray-300'
-    }`}
-    onClick={() => certInputRef.current?.click()}
-  >
-    <input
-      type="file"
-      name="gov_certificate"
-      ref={certInputRef}
-      className="hidden"
-     accept=".pdf"
-      onChange={handleFileChange}
-    />
-    <div className="flex items-center justify-center">
-      {govCertificate ? (
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Upload className="h-5 w-5 text-gray-400" />
-          <span>{govCertificate.name}</span>
-        </div>
-      ) : (
-        <div className="text-center">
-          <Upload className="mx-auto h-8 w-8 text-gray-400" />
-          <p className="mt-1 text-sm text-gray-500">
-            Upload your Government Certificate (PDF or image, max 5MB)
-          </p>
-        </div>
-      )}
+   {formData.account_type === 'seller' && (
+  <div>
+    <label className="block text-sm font-medium text-gray-700">
+      Government Certificate <span className="text-red-500">*</span>
+    </label>
+    <div
+      className={`border-2 border-dashed rounded-md p-4 cursor-pointer hover:border-red-500 transition-colors ${
+        certificateError ? 'border-red-500 bg-red-50' : 'border-gray-300'
+      }`}
+      onClick={() => certInputRef.current?.click()}
+    >
+      <input
+        type="file"
+        name="gov_certificate"
+        ref={certInputRef}
+        className="hidden"
+        accept=".pdf,image/*"
+        onChange={handleFileChange}
+      />
+      <div className="flex items-center justify-center">
+        {govCertificate ? (
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Upload className="h-5 w-5 text-gray-400" />
+            <span>{govCertificate.name}</span>
+          </div>
+        ) : (
+          <div className="text-center">
+            <Upload className="mx-auto h-8 w-8 text-gray-400" />
+            <p className="mt-1 text-sm text-gray-500">
+              Upload your Government Certificate (PDF or image, max 5MB)
+            </p>
+          </div>
+        )}
+      </div>
     </div>
+    {certificateError && (
+      <div className="mt-1 flex items-center text-sm text-red-600">
+        <AlertCircle className="h-4 w-4 mr-1" />
+        {certificateError}
+      </div>
+    )}
   </div>
-  {certificateError && (
-    <div className="mt-1 flex items-center text-sm text-red-600">
-      <AlertCircle className="h-4 w-4 mr-1" />
-      {certificateError}
-    </div>
-  )}
-</div>
+)}
 
       <div>
         <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">

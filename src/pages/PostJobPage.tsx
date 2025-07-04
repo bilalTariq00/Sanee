@@ -150,7 +150,7 @@ export default function PostJobPage() {
             {['title', 'budget', 'skills'].map(field => (
               <div key={field}>
                 <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-                  {t(field)}
+                  {t(field)}<span className="text-red-500">*</span>
                 </label>
                 <input
                   type={field === 'budget' ? 'number' : 'text'}
@@ -166,7 +166,7 @@ export default function PostJobPage() {
             ))}
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('description')}</label>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('description')}<span className="text-red-500">*</span></label>
               <textarea
                 id="description"
                 name="description"
@@ -181,7 +181,7 @@ export default function PostJobPage() {
 
             {[{ name: 'category_id', label: 'category', options: categories }, { name: 'sub_category_id', label: 'subcategory', options: subcategories }].map(({ name, label, options }) => (
               <div key={name}>
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700">{t(label)}</label>
+                <label htmlFor={name} className="block text-sm font-medium text-gray-700">{t(label)}<span className="text-red-500">*</span></label>
                 <select
                   id={name}
                   name={name}

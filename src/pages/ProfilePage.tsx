@@ -298,18 +298,29 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
 
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-6">
-         <img
-  src={avatar || DEFAULT_AVATAR}
-  alt={fullName}
-  className={`w-24 h-24 border-4 border-white object-cover ${
-    user.account_type === "buyer" ? "rounded-md" : "rounded-full"
-  }`}
-  onError={e => {
-    // avoid recursion if placeholder also errors
-    e.currentTarget.onerror = null;
-    e.currentTarget.src = DEFAULT_AVATAR;
-  }}
-/>
+        <div className="relative">
+    <img
+      src={avatar || DEFAULT_AVATAR}
+      alt={fullName}
+      className={`w-24 h-24 border-4 border-white object-cover ${
+        user.account_type === "buyer" ? "rounded-md" : "rounded-full"
+      }`}
+      onError={e => {
+        e.currentTarget.onerror = null
+        e.currentTarget.src = DEFAULT_AVATAR
+      }}
+    />
+
+    {/* only render when profileStatus is loaded */}
+    {profileStatus && (
+      <span
+        className="absolute bottom-2 right-3 block h-3 w-3 rounded-full border-2 border-white"
+        style={{ backgroundColor: profileStatus.color }}
+        title={profileStatus.status === 'online' ? 'Online' : 'Offline'}
+      />
+    )}
+  </div>
+
           <div>
             <h1 className="text-3xl font-bold capitalize">{fullName}</h1>
             <div className="flex items-center mt-2">
@@ -363,14 +374,9 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
       <div className="flex items-center space-x-12 mt-8">
         {jssData && (
                   <div
-                    className="flex items-center mt-4 p-2 rounded-lg text-white font-semibold"
-                    style={{ backgroundColor: jssData.color }}
-                  >
-                    <span className="w-6 h-6 rounded-full flex justify-center items-center">
-                      <Star className="w-6 h-6 text-white" />
-                    </span>
-                    <span className="ml-2 text-white text-xl">{jssData.level}</span>
-                    <span className="ml-2 text-white text-xl">({jssData.score})</span>
+                  >                    
+                    <span className="text-3xl font-bold ">{jssData.score}%</span>
+                     <div className="text-white/90">{t('profile_page.jobs_completed')}</div>
                   </div>
                 )}
         <div>
@@ -382,7 +388,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
           <div className="text-white/90">{t('profile_page.rating')}</div>
         </div>
         <div>
-          <div className="inline-block rounded-full bg-green-500 text-white text-sm font-semibold px-3 py-2">
+          {/* <div className="inline-block rounded-full bg-green-500 text-white text-sm font-semibold px-3 py-2">
             {profileStatus && (
               <div
                 className="flex items-center  bg-transparent"
@@ -393,7 +399,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
                 <span className="ml-2 text-white text-xl flex items-center">{profileStatus.status}</span>
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
@@ -440,15 +446,17 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
             <div className="text-sm text-gray-500 mt-1">
               {g.category?.name ?? t('profile_page.uncategorized')}
             </div>
+            <div className="flex justify-between">
             <div className="text-xs text-gray-400 mt-1">
               {t('profile_page.delivery_days', { count: g.delivery_time })}
             </div>
             <div>
-            <Link to={`/gig/${g.gig_uid}`}>
-                                  <Button size="sm" className="bg-red-500 text-white">
+            <Link to={`/gig/${g.id}`}>
+                                  <Button size="sm" className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600">
                                     {t("view_details")}
                                   </Button>
                                 </Link>
+            </div>
             </div>
           </div>
         ))

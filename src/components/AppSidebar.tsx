@@ -122,7 +122,12 @@ const handleSignOut = () => {
                   alt="Profile"
                   className="h-10 w-10 rounded-full ring-2 ring-white shadow-sm"
                 />
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" />
+                 <span
+    className="absolute -bottom-0.5 -right-0.5 block h-3 w-3 rounded-full border-2 border-white"
+    style={{ backgroundColor: userStatus.color }}
+    title={userStatus.status === 'online' ? 'Online' : 'Offline'}
+  />
+                {/* <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white" /> */}
               </div>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
