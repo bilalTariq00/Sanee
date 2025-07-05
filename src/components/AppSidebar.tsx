@@ -171,26 +171,30 @@ const handleSignOut = () => {
               {user?.account_type === 'seller' && (
                 <>
                   {[
-                    { path: '/create-gig', label: t('create_gig'), icon: FileIcon },
-                    { path: '/manage-gigs', label: t('manage_gig'), icon: FileX2Icon },
-                    { path: '/seller/contracts', label: t('seller_contract'), icon: Workflow },
-                    { path: '/wallet', label: t('Wallet'), icon: Wallet },
-                    { label: t('jobs'), path: '/jobs', icon: WorkflowIcon },
-                  ].map(({ path, label, icon }) => (
-                    <SidebarMenuItem key={path}>
-                      <SidebarMenuButton asChild>
-                        <Link
-                          to={path}
-                          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-700 hover:bg-red-100 hover:text-red-600 ${
-                            isCollapsed ? 'justify-center' : ''
-                          }`}
-                        >
-                          <icon className="h-5 w-5" />
-                          {!isCollapsed && <span className="font-medium">{label}</span>}
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+  { path: '/create-gig',     label: t('create_gig'),     icon: FileIcon },
+  { path: '/manage-gigs',    label: t('manage_gig'),     icon: FileX2Icon },
+  { path: '/seller/contracts',label: t('seller_contract'),icon: Workflow },
+  { path: '/wallet',         label: t('Wallet'),          icon: Wallet },
+  { path: '/jobs',           label: t('jobs'),            icon: WorkflowIcon },
+].map(({ path, label, icon: Icon }) => (
+  <SidebarMenuItem key={path}>
+    <SidebarMenuButton asChild>
+      <Link
+        to={path}
+        className={`
+          flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+          text-gray-700 hover:bg-red-100 hover:text-red-600
+          ${isCollapsed ? 'justify-center' : ''}
+        `}
+      >
+        {/* now use the capitalized Icon */}
+        <Icon className="h-5 w-5" />
+        {!isCollapsed && <span className="font-medium">{label}</span>}
+      </Link>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+))}
+
                 </>
               )}
               {/* Buyer Routes */}
