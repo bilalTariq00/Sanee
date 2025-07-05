@@ -15,27 +15,26 @@ export default function JobDetailsPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await axios.get(`${config.API_BASE_URL}/jobs/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (res.data && res.data.id) {
-          setJob(res.data);
-        } else {
-          setError(t('job_not_found'));
-        }
-      } catch (err) {
-        console.error('❌ Error fetching job:', err);
-        setError(t('job_load_failed'));
-      } finally {
-        setLoading(false);
-      }
-    };
+   const fetchJob = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.get(
+      `${config.API_BASE_URL}/jobs/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // make sure the top-level `success` is true, and data exists
+    if (res.data?.success && res.data.data) {
+      setJob(res.data.data);
+    } else {
+      setError(t('job_not_found'));
+    }
+  } catch (err) {
+    console.error('❌ Error fetching job:', err);
+    setError(t('job_load_failed'));
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchJob();
   }, [id, t]);

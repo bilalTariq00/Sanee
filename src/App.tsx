@@ -41,6 +41,7 @@ import { useState } from "react"
 import Chat from "./pages/MessagesPage"
 import GigDetail from "./pages/GigDetail"
 import WalletPage from "./pages/wallet-page"
+import SavedJobsPage from "./pages/SavedJobsPage"
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -106,6 +107,7 @@ function AppRoutes() {
         <Route path="edit-job/:id" element={<EditJob />} />
         <Route path="job/:id/proposals" element={<JobProposals />} />
         <Route path="manage-jobs" element={<ManageJobs />} />
+          <Route path="save-jobs" element={<SavedJobsPage />} />
         {/* gigs */}
         <Route path="gigs" element={<AllGigs />} />
         <Route path="create-gig" element={<CreateGig />} />
