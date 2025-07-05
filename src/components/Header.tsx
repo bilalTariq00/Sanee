@@ -141,7 +141,7 @@ const handleSignOut = () => {
                 <div className={`absolute mt-2 w-52 bg-white rounded-xl shadow-lg py-2 border ${isRTL ? 'left-0' : 'right-0'}`}>
                   <p className="text-gray-800 px-4 py-2 text-sm font-medium">{userName}</p>
                   <div className="divide-y text-sm">
-                    <Link to="/profile" className={`block px-4 py-2 ${isActiveRoute('/profile') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
+                    <Link to={`/profile/${user?.uid}`} className={`block px-4 py-2 ${isActiveRoute('/profile') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
                       {t("view_profile")}
                     </Link>
                     <button
@@ -151,7 +151,7 @@ const handleSignOut = () => {
                       <Mail className="h-4 w-4 mr-2" /> {t("messages")}
                     </button>
                     <Link to="/wallet" className={`flex items-center px-4 py-2 ${isActiveRoute('/balance') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
-                      <Wallet className="h-4 w-4 mr-2" /> {t("balance")}
+                      <Wallet className="h-4 w-4 mr-2" /> {t("Wallet")}
                     </Link>
                     <Link to="/notification-settings" className={`flex items-center px-4 py-2 ${isActiveRoute('/settings') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
                       <Settings className="h-4 w-4 mr-2" /> {t("settings")}

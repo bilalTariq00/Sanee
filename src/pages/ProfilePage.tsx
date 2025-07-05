@@ -281,7 +281,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   /* tab labels - Updated to remove wallet tab */
   const tabOrder =
     user.account_type === "buyer"
-      ? (["jobs", "portfolio", "reviews"] as const)
+      ? (["jobs", "reviews"] as const)
       : (["services", "portfolio", "reviews"] as const)
 
   return (
@@ -513,7 +513,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
         )}
 
         {/* Portfolio */}
-          {activeTab === "portfolio" && (
+          {activeTab === "portfolio" && user.account_type === "seller" && (
           <div>
             {user.portfolios && user.portfolios.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

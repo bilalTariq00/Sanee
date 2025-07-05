@@ -186,8 +186,8 @@ const isRTL = i18n.language === "ar";
   return (
   <div className="min-h-screen bg-gray-50">
     <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <button
+      <div className="flex items-center justify-center mb-6">
+        {/* <button
           onClick={() => navigate(-1)}
           className="flex items-center text-gray-600 hover:text-gray-900"
         >
@@ -196,7 +196,7 @@ const isRTL = i18n.language === "ar";
   ) : (
     <ArrowLeft className="h-5 w-5 mr-2" />
   )} {t("create_gigs.back")}
-        </button>
+        </button> */}
         <h1 className="text-2xl font-bold text-gray-900">{t("create_gigs.title")}</h1>
       </div>
 
@@ -234,7 +234,12 @@ const isRTL = i18n.language === "ar";
               onValueChange={(value) => handleSelectChange("category_id", value)}
             >
               <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
-                <SelectValue placeholder={t("create_gigs.select_category")} />
+ <SelectValue>
+      {
+        categories.find(cat => String(cat.id) === form.category_id)?.name
+        ?? t('create_gigs.select_category')
+      }
+    </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -249,7 +254,13 @@ const isRTL = i18n.language === "ar";
                 onValueChange={(value) => handleSelectChange("subcategory_id", value)}
               >
                 <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
-                  <SelectValue placeholder={t("create_gigs.select_subcategory")} />
+                  <SelectValue>
+      {
+        // find the matching subcategory name, or show placeholder
+        subcategories.find(sub => String(sub.id) === form.subcategory_id)?.name
+        ?? t('create_gigs.select_subcategory')
+      }
+    </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {subcategories.map((sub) => (

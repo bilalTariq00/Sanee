@@ -188,14 +188,14 @@ const { t } = useTranslation()
           </Button>
           <h1 className="text-2xl font-semibold text-gray-900">{t("balances.my_balances")}</h1>
         </div>
-        <Button
+        {/* <Button
           onClick={() => setShowWithdrawModal(true)}
           className="bg-green-600 hover:bg-green-700"
           disabled={!walletData?.wallet_summary?.available || walletData.wallet_summary.available <= 0}
         >
           <Upload className="h-4 w-4 mr-2" />
           {t("balances.withdraw_funds")}
-        </Button>
+        </Button> */}
       </div>
     </div>
   </div>

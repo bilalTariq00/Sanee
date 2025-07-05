@@ -53,7 +53,7 @@ const JobPaymentModal = ({
         <div className="space-y-4 py-2">
           <div>
             <label className="block text-sm font-medium text-red-700 mb-1">
-              Price (USD)
+              Price (Riyal)
             </label>
             <Input
               type="number"
