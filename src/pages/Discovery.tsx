@@ -33,30 +33,39 @@ export default function Discover() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [userType] = useState<"buyer" | "seller">("seller");
-
+const [subcategories, setSubcategories] = useState<Category[]>([]);
   const token = localStorage.getItem("token");
 
   // Fetch categories using your existing config
   useEffect(() => {
-    const language = i18n.language.startsWith("ar") ? "ar" : "en";
-    axios.get(`${config.API_BASE_URL}/categories`, {
+  const language = i18n.language.startsWith("ar") ? "ar" : "en";
+
+  axios
+    .get(`${config.API_BASE_URL}/categories`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Accept-Language": language,      // ← send the locale here
+        "Accept-Language": language,
       },
     })
-      .then((res) => setCategories(res.data))
-      .catch((err) => {
-        console.error("Failed to fetch categories:", err);
-        // Set some default categories if API fails
-        setCategories([
+    .then((res) => {
+      // pull out the actual array, convert IDs to strings for your SearchBar
+      const cats = res.data.data.categories.map((c: any) => ({
+        id: c.id.toString(),
+        name: c.name,
+      }));
+      setCategories(cats);
+    })
+    .catch((err) => {
+      console.error("Failed to fetch categories:", err);
+      // fallback
+      setCategories([
         { id: "1", name: language === "ar" ? "تطوير الويب" : "Web Development" },
         { id: "2", name: language === "ar" ? "الصوت" : "Audio" },
         { id: "3", name: language === "ar" ? "الفيديو" : "Video" },
         { id: "4", name: language === "ar" ? "التصميم الجرافيكي" : "Graphic Design" },
       ]);
-      });
-  }, [token]);
+    });
+}, [token, i18n.language]);
 
   useEffect(() => {
     const dir = isRTL ? "rtl" : "ltr";
