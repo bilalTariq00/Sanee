@@ -38,20 +38,23 @@ export default function Discover() {
 
   // Fetch categories using your existing config
   useEffect(() => {
-    axios
-      .get(`${config.API_BASE_URL}/categories`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    const language = i18n.language.startsWith("ar") ? "ar" : "en";
+    axios.get(`${config.API_BASE_URL}/categories`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Accept-Language": language,      // ← send the locale here
+      },
+    })
       .then((res) => setCategories(res.data))
       .catch((err) => {
         console.error("Failed to fetch categories:", err);
         // Set some default categories if API fails
         setCategories([
-          { id: "1", name: "Web Development" },
-          { id: "2", name: "Audio" },
-          { id: "3", name: "Video" },
-          { id: "4", name: "Graphic Design" },
-        ]);
+        { id: "1", name: language === "ar" ? "تطوير الويب" : "Web Development" },
+        { id: "2", name: language === "ar" ? "الصوت" : "Audio" },
+        { id: "3", name: language === "ar" ? "الفيديو" : "Video" },
+        { id: "4", name: language === "ar" ? "التصميم الجرافيكي" : "Graphic Design" },
+      ]);
       });
   }, [token]);
 
