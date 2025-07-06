@@ -1,5 +1,4 @@
 "use client"
-
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -17,6 +16,7 @@ interface SearchBarProps {
   onFilterChange: (filter: string) => void
   categories: Category[]
   userType: "seller" | "buyer"
+  authUserType?: string
   isRTL: boolean
 }
 
@@ -27,33 +27,51 @@ const SearchBar = ({
   onFilterChange,
   categories,
   userType,
+  authUserType,
   isRTL,
 }: SearchBarProps) => {
   const { t } = useTranslation()
 
-  // Base filters
-  const filters = [
-   { id: "gigs", label: t("all_gigs") || "Gigs" },
-    ...(userType === "seller"
-      ? [{ id: "seller", label: t("filter_seller") || "Sellers" }]
-      : [{ id: "buyer", label: t("filter_buyer") || "Buyers" }]),
-  ]
+  // Dynamic filters based on authenticated user type
+  const getFilters = () => {
+    if (authUserType === "seller") {
+      // Sellers see jobs and buyers
+      return [
+        { id: "all", label: t("all_people") || "All People" },
+        { id: "jobs", label: t("all_jobs") || "All Jobs" },
+        { id: "buyer", label: t("filter_buyer") || "Buyers" },
+      ]
+    } else {
+      // Buyers see gigs and sellers
+      return [
+        { id: "all", label: t("all_people") || "All People" },
+        { id: "gigs", label: t("all_services") || "All Services" },
+        { id: "seller", label: t("filter_seller") || "Sellers" },
+      ]
+    }
+  }
+
+  const filters = getFilters()
 
   return (
     <div className={`w-full max-w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
       {/* Search input */}
       <div className="relative mb-6">
         <Search
-          className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 
-            ${isRTL ? "right-3" : "left-3"}`}
+          className={`absolute top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 ${
+            isRTL ? "right-3" : "left-3"
+          }`}
         />
         <Input
           type="text"
-          placeholder={t("search_users") || "Search users..."}
+          placeholder={
+            authUserType === "seller"
+              ? t("search_jobs") || "Search jobs..."
+              : t("search_services") || "Search services..."
+          }
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg 
-            ${isRTL ? "pr-10" : "pl-10"}`}
+          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg ${isRTL ? "pr-10" : "pl-10"}`}
         />
       </div>
 
