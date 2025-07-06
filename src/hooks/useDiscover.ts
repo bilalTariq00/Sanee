@@ -15,7 +15,7 @@ export type DiscoverFilter =
   | `category:${string}`
 
 function buildImageUrl(path: string) {
-  if (!path) return "/placeholder.svg?height=100&width=100"
+  if (!path) return "/placeholder.svg?height=200&width=300"
 
   // If it's already a complete URL, return as is
   if (path.startsWith("http://") || path.startsWith("https://")) {
@@ -29,45 +29,63 @@ function buildImageUrl(path: string) {
   return `${config.API_BASE_URL}/storage/${clean}`
 }
 
+function isValidImageUrl(url: string): boolean {
+  if (!url) return false
+
+  // Check if it's a placeholder
+  if (url.includes("placeholder.svg")) return true
+
+  // Check if it's a complete URL
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    // Make sure it doesn't end with just "/storage" (incomplete URL)
+    return !url.endsWith("/storage")
+  }
+
+  return false
+}
+
 function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number } {
   const users: User[] = []
   let totalPages = 1
 
-  // --- GIGS → sellers (these have images)
+  // --- GIGS → sellers (show only valid gig images)
   if (apiData.gigs?.data) {
     totalPages = Math.max(totalPages, apiData.gigs.last_page || 1)
     for (const gig of apiData.gigs.data) {
       const u = gig.user
       if (!u) continue
 
-      // Gigs have actual project images
+      // Process gig images for projects - only add valid images
       const projectImages = []
-      if (gig.images && gig.images.length > 0) {
-        // Add up to 4 images from the gig
-        for (let i = 0; i < Math.min(4, gig.images.length); i++) {
-          const imgPath = gig.images[i]
-          if (imgPath) {
-            // Handle the case where the API returns incomplete URLs
-            let imageUrl = imgPath
-            if (imgPath.endsWith("/storage")) {
-              // If the URL ends with /storage, it's incomplete - use placeholder
-              imageUrl = "/placeholder.svg?height=200&width=300"
-            } else if (!imgPath.startsWith("http")) {
-              // If it's a relative path, build the complete URL
-              imageUrl = buildImageUrl(imgPath)
-            }
 
+      if (gig.images && Array.isArray(gig.images) && gig.images.length > 0) {
+        // Filter and process only valid images
+        for (const imageUrl of gig.images) {
+          let finalImageUrl = null
+
+          if (isValidImageUrl(imageUrl)) {
+            finalImageUrl = imageUrl
+          } else if (imageUrl && !imageUrl.endsWith("/storage")) {
+            // Try to build the complete URL if it's a relative path
+            const builtUrl = buildImageUrl(imageUrl)
+            if (isValidImageUrl(builtUrl)) {
+              finalImageUrl = builtUrl
+            }
+          }
+
+          // Only add if we have a valid image URL
+          if (finalImageUrl) {
             projectImages.push({
-              title: gig.title,
+              title: `${gig.title} - Image ${projectImages.length + 1}`,
               description: gig.description,
-              image: imageUrl,
+              image: finalImageUrl,
               tags: gig.tags || [],
             })
           }
         }
       }
 
-      // If no valid images or all images are incomplete, add placeholder project
+      // If no valid images were found, add one placeholder project
       if (projectImages.length === 0) {
         projectImages.push({
           title: gig.title,
@@ -91,7 +109,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         skills: [...(gig.skills || []), ...(gig.tags || [])],
         projects: projectImages,
         bio: u.summary || "",
-        categoryId: gig.category_id,
+        categoryId: gig.category?.id || null,
       })
     }
   }
@@ -103,25 +121,15 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
       const b = job.buyer || job.user
       if (!b) continue
 
-      // Jobs don't have images - create placeholder projects showing job details
+      // Jobs don't have images - create one project showing job details
       const jobProjects = [
         {
           title: job.title,
           description: job.description,
-          image: "/placeholder.svg?height=200&width=300", // Always placeholder for jobs
+          image: "/placeholder.svg?height=200&width=300",
           tags: job.skills || [],
         },
       ]
-
-      // Add more placeholder projects to fill the grid (jobs don't have multiple projects)
-      while (jobProjects.length < 4) {
-        jobProjects.push({
-          title: "Job Opportunity",
-          description: "Looking for skilled professionals",
-          image: "/placeholder.svg?height=200&width=300",
-          tags: [],
-        })
-      }
 
       users.push({
         id: b.id.toString(),
@@ -137,7 +145,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         skills: job.skills || [],
         projects: jobProjects,
         bio: b.summary || "",
-        categoryId: job.category_id,
+        categoryId: job.category?.id || null,
       })
     }
   }

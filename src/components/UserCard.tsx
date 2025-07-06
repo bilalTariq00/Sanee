@@ -89,6 +89,14 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
   const isJob = user.badge === "Job"
   const isGig = user.badge === "Gig"
 
+  // Determine grid layout based on number of projects
+  const getGridClass = (projectCount: number) => {
+    if (projectCount === 1) return "grid-cols-1"
+    if (projectCount === 2) return "grid-cols-2"
+    if (projectCount === 3) return "grid-cols-3"
+    return "grid-cols-2" // For 4+ projects, use 2x2 grid
+  }
+
   return (
     <Card
       onClick={goToProfile}
@@ -163,46 +171,30 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
         </div>
       </div>
 
-      {/* Projects Preview - Different handling for jobs vs gigs */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      {/* Projects Preview - Dynamic grid based on actual number of projects */}
+      <div className={`grid ${getGridClass(user.projects.length)} gap-3 mb-6`}>
         {isGig ? (
-          // For gigs, show actual project images
-          user.projects
-            .slice(0, 4)
-            .map((proj, i) => (
-              <div key={i} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-                <img
-                  src={proj.image || "/placeholder.svg"}
-                  alt={proj.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
-                  }}
-                />
-              </div>
-            ))
+          // For gigs, show actual project images (only the real number)
+          user.projects.map((proj, i) => (
+            <div key={i} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+              <img
+                src={proj.image || "/placeholder.svg"}
+                alt={proj.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
+                }}
+              />
+            </div>
+          ))
         ) : (
-          // For jobs, show job information cards instead of images
-          <>
-            <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 flex flex-col items-center justify-center p-2">
-              <div className="text-blue-600 text-xs font-semibold text-center">
-                {user.projects[0]?.title || "Job Available"}
-              </div>
-              <div className="text-blue-500 text-xs mt-1">💼</div>
+          // For jobs, show job information cards
+          <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 flex flex-col items-center justify-center p-2">
+            <div className="text-blue-600 text-xs font-semibold text-center">
+              {user.projects[0]?.title || "Job Available"}
             </div>
-            <div className="aspect-video bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200 flex flex-col items-center justify-center p-2">
-              <div className="text-green-600 text-xs font-semibold">Budget</div>
-              <div className="text-green-500 text-xs mt-1">💰 {user.hourlyRate}+</div>
-            </div>
-            <div className="aspect-video bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200 flex flex-col items-center justify-center p-2">
-              <div className="text-purple-600 text-xs font-semibold">Experience</div>
-              <div className="text-purple-500 text-xs mt-1">⭐ {user.experience}</div>
-            </div>
-            <div className="aspect-video bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 flex flex-col items-center justify-center p-2">
-              <div className="text-orange-600 text-xs font-semibold">Location</div>
-              <div className="text-orange-500 text-xs mt-1">📍 {user.location}</div>
-            </div>
-          </>
+            <div className="text-blue-500 text-xs mt-1">💼</div>
+          </div>
         )}
       </div>
 
