@@ -1,13 +1,14 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import type React from "react"
-
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import type { User } from "@/types/User"
+import { useGigImages } from "@/hooks/useGigImages"
 import axios from "axios"
 import config from "@/config"
 
@@ -21,6 +22,9 @@ interface UserCardProps {
 export default function UserCard({ user, onUserClick, userType, authUserType }: UserCardProps) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+
+  // Fetch gig images specifically for this user if they're a gig seller
+  const { gigImages, loading: gigImagesLoading } = useGigImages(user.badge === "Gig" ? user.uid : undefined)
 
   // State to store the real rating and project data from the API
   const [userRating, setUserRating] = useState<number | null>(null)
@@ -37,17 +41,9 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
 
-        // Extract data from the correct path based on your API response
         const jssData = response.data?.data
-
-        // Try both summary and jss.breakdown for rating
-        const rating = jssData?.summary?.average_rating || jssData?.jss?.breakdown?.average_rating || 0
-
-        // Try both projects_stats and summary for completed projects
-        const completedProjects =
-          jssData?.projects_stats?.total_completed_projects ||
-          jssData?.summary?.total_completed_projects ||
-          jssData?.jss?.breakdown?.total_completed_projects ||
+        const rating =  jssData?.jss?.breakdown?.average_rating || 0
+        const completedProjects =  jssData?.jss?.breakdown?.total_completed_projects ||
           0
 
         setUserRating(rating)
@@ -74,13 +70,9 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
   // Enhanced image URL function
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return "/placeholder.svg?height=200&width=300"
-
-    // If it's already a complete URL, return as is
     if (imagePath.startsWith("http")) {
       return imagePath
     }
-
-    // If it's a relative path, construct the full URL
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`
     return `${config.API_BASE_URL}${cleanPath}`
   }
@@ -88,6 +80,9 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
   // Check if this is a job (buyer) or gig (seller)
   const isJob = user.badge === "Job"
   const isGig = user.badge === "Gig"
+
+  // Use gig images from API if available, otherwise fall back to user.projects
+  const displayProjects = isGig && gigImages.length > 0 ? gigImages : user.projects
 
   // Determine grid layout based on number of projects
   const getGridClass = (projectCount: number) => {
@@ -118,7 +113,6 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
               {user.name}
             </h3>
             <p className="text-gray-600 text-sm mt-1">{user.location}</p>
-            {/* Show badge to indicate if it's a job or gig */}
             <Badge
               variant="outline"
               className={`mt-1 text-xs ${isJob ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"}`}
@@ -138,7 +132,6 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
               <span className="font-medium">{userRating && userRating > 0 ? userRating.toFixed(1) : "New"}</span>
             )}
           </div>
-          {/* Display total completed projects */}
           <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800">
             {loadingRating ? "..." : `${totalCompletedProjects || 0} ${t("projects") || "projects"}`}
           </Badge>
@@ -148,7 +141,6 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
       {/* Details Section */}
       <div className="mb-5">
         <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-          {/* Show price for both gigs and jobs */}
           <span className="flex items-center">
             <img src="/riyal.svg" className="h-5 w-5 mr-1" alt="Price" />
             {user.hourlyRate}+ &nbsp;|&nbsp; {user.experience}
@@ -171,22 +163,29 @@ export default function UserCard({ user, onUserClick, userType, authUserType }: 
         </div>
       </div>
 
-      {/* Projects Preview - Dynamic grid based on actual number of projects */}
-      <div className={`grid ${getGridClass(user.projects.length)} gap-3 mb-6`}>
-        {isGig ? (
-          // For gigs, show actual project images (only the real number)
-          user.projects.map((proj, i) => (
-            <div key={i} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-              <img
-                src={proj.image || "/placeholder.svg"}
-                alt={proj.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
-                }}
-              />
-            </div>
+      {/* Projects Preview - Show loading state for gig images */}
+      <div className={`grid ${getGridClass(displayProjects.length)} gap-3 mb-6`}>
+        {gigImagesLoading && isGig ? (
+          // Show loading skeleton for gig images
+          Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="aspect-video bg-gray-200 rounded-xl animate-pulse" />
           ))
+        ) : isGig ? (
+          // For gigs, show actual project images from /all-gigs API
+          displayProjects
+            .slice(0, 4)
+            .map((proj, i) => (
+              <div key={i} className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
+                <img
+                  src={proj.image || "/placeholder.svg"}
+                  alt={proj.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
+                  }}
+                />
+              </div>
+            ))
         ) : (
           // For jobs, show job information cards
           <div className="aspect-video bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 flex flex-col items-center justify-center p-2">
