@@ -59,10 +59,10 @@ export default function PostJobPage() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${config.API_BASE_URL}/categories`, {
+     const response = await axios.get(`${config.API_BASE_URL}/categories`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setCategories(response.data);
+     setCategories(response.data.data.categories);
     } catch {
       setError(t('error_fetch_categories'));
     }
@@ -70,8 +70,12 @@ export default function PostJobPage() {
 
   const fetchSubcategories = async (categoryId: string) => {
     try {
-      const response = await axios.get(`${config.API_BASE_URL}/categories/${categoryId}/subcategories`);
-      setSubcategories(response.data);
+     const response = await axios.get(
+       `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
+       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+     );
+     // assuming the shape is { success: true, data: { subcategories: SubCategory[] } }
+     setSubcategories(response.data.data.subcategories);
     } catch {
       setError(t('error_fetch_subcategories'));
     }
@@ -191,9 +195,12 @@ export default function PostJobPage() {
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500"
                 >
                   <option value="">{t('select_option')}</option>
-                  {options.map(option => (
-                    <option key={option.id} value={option.id}>{option.name}</option>
-                  ))}
+               {Array.isArray(options)
+  ? options.map(option => (
+      <option key={option.id} value={option.id}>
+        {option.name}
+      </option>
+    )):null}
                 </select>
               </div>
             ))}

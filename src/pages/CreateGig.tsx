@@ -18,6 +18,7 @@ interface Category {
 interface Subcategory {
   id: string
   name: string
+   skills: string[] 
 }
 
 interface Skill {
@@ -104,55 +105,41 @@ function CreateGig() {
 
   // Using your working fetchSubcategories logic
   const fetchSubcategories = async (categoryId: string) => {
-    try {
-      const res = await axios.get(`${config.API_BASE_URL}/categories/${categoryId}/subcategories`)
+  try {
+    const res = await axios.get(
+      `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
 
-      console.log("Subcategories API response:", res.data) // Debug log
+    console.log("Subcategories API response:", res.data) // Debug log
 
-      let subcategoriesData = []
+    // 1. Drill into the right spot
+    const rawSubs: any[] = res.data?.data?.subcategories ?? []
 
-      if (res.data?.data?.subcategories && Array.isArray(res.data.data.subcategories)) {
-        subcategoriesData = res.data.data.subcategories
-      } else if (Array.isArray(res.data?.data)) {
-        subcategoriesData = res.data.data
-      } else if (Array.isArray(res.data)) {
-        subcategoriesData = res.data
-      } else if (res.data?.subcategories && Array.isArray(res.data.subcategories)) {
-        subcategoriesData = res.data.subcategories
-      } else {
-        subcategoriesData = []
+    // 2. Map, preserving skills
+    const formattedSubcategories: Subcategory[] = rawSubs.map((sub) => {
+      // normalize skills to a string[]
+      const skillsRaw = sub.skills
+      const skills: string[] = Array.isArray(skillsRaw)
+        ? skillsRaw
+        : skillsRaw && typeof skillsRaw === "object"
+        ? Object.values(skillsRaw).filter(v => typeof v === "string") as string[]
+        : []
+
+      return {
+        id: String(sub.id),
+        name: sub.name,
+        skills,                // carry the array of skill strings
       }
+    })
 
-      const formattedSubcategories = subcategoriesData.map((sub: any) => ({
-        id: String(sub.id || sub.subcategory_id || ""),
-        name: sub.name || sub.title || String(sub),
-      }))
-
-      setSubcategories(formattedSubcategories)
-    } catch (err) {
-      console.error("Subcategory fetch failed:", err)
-      setSubcategories([])
-    }
+    setSubcategories(formattedSubcategories)
+  } catch (err) {
+    console.error("Subcategory fetch failed:", err)
+    setSubcategories([])
   }
+}
 
-  // Using your working fetchSkills logic
-  const fetchSkills = async (subcategoryId: string) => {
-    try {
-      const res = await axios.get(`${config.API_BASE_URL}/subcategory/${subcategoryId}/skills`)
-      if (Array.isArray(res.data)) {
-        const formattedSkills = res.data.map((skill: string) => ({
-          label: skill,
-          value: skill,
-        }))
-        setSkillsList(formattedSkills)
-      } else {
-        setSkillsList([])
-      }
-    } catch (err) {
-      console.error("Skill fetch failed:", err)
-      setSkillsList([])
-    }
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -160,16 +147,37 @@ function CreateGig() {
   }
 
   const handleSelectChange = (name: string, value: string) => {
-    if (name === "category_id") {
-      setForm({ ...form, category_id: value, subcategory_id: "" })
-      fetchSubcategories(value)
-      setSkillsList([])
-      setSelectedSkills([])
-    } else if (name === "subcategory_id") {
-      setForm({ ...form, subcategory_id: value })
-      fetchSkills(value)
-    }
+  if (name === "category_id") {
+    // When category changes, clear subcategory and skills
+    setForm({ ...form, category_id: value, subcategory_id: "" });
+    fetchSubcategories(value);
+    setSkillsList([]);
+    setSelectedSkills([]);
+    setNewSkill("");
+  } else if (name === "subcategory_id") {
+    // Update form
+    setForm({ ...form, subcategory_id: value });
+
+    // Look up the chosen subcategory
+    const sub = subcategories.find((s) => s.id === value);
+
+    // Pull its skills array (or default to empty)
+    const skillStrings = sub?.skills ?? [];
+
+    // Map into your Skill type
+    const formatted: Skill[] = skillStrings.map((s) => ({
+      label: s,
+      value: s,
+    }));
+
+    // Update state
+    setSkillsList(formatted);
+    setSelectedSkills([]);  // clear any previously selected skills
+    setNewSkill("");        // reset the dropdown value
   }
+};
+
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -324,97 +332,65 @@ function CreateGig() {
           </div>
 
           {/* Skills */}
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t("create_gigs.skills_section") || "Skills"}</h2>
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {selectedSkills.map((skill) => (
-                  <span
-                    key={skill.value}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-600"
-                  >
-                    {skill.label}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSkill(skill.value)}
-                      className="ml-2 text-red-500 hover:text-red-600"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
+         <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    {t("create_gigs.skills_section") || "Skills"}
+  </h2>
+  <div className="space-y-4">
+    {/* Already selected skills */}
+    <div className="flex flex-wrap gap-2">
+      {selectedSkills.map((skill) => (
+        <span
+          key={skill.value}
+          className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-600"
+        >
+          {skill.label}
+          <button
+            type="button"
+            onClick={() => handleRemoveSkill(skill.value)}
+            className="ml-2 text-red-500 hover:text-red-600"
+          >
+            ×
+          </button>
+        </span>
+      ))}
+    </div>
 
-              {skillsList.length > 0 ? (
-                <div className="flex gap-2">
-                  <Select value={newSkill} onValueChange={(value) => setNewSkill(value)}>
-                    <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
-                      <SelectValue placeholder={t("create_gigs.choose_skill") || "Choose a skill"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {skillsList.map((skill) => (
-                        <SelectItem key={skill.value} value={skill.value}>
-                          {skill.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (newSkill) {
-                        handleAddSkill(newSkill)
-                        setNewSkill("")
-                      }
-                    }}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    {t("create_gigs.add_skill") || "Add"}
-                  </button>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  {t("create_gigs.no_skills") || "Select a subcategory to see available skills"}
-                </p>
-              )}
-
-              {/* Manual skill input as fallback */}
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Add Custom Skill:</h4>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="Enter skill name..."
-                    className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault()
-                        if (newSkill.trim()) {
-                          handleAddSkill(newSkill.trim())
-                          setNewSkill("")
-                        }
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (newSkill.trim()) {
-                        handleAddSkill(newSkill.trim())
-                        setNewSkill("")
-                      }
-                    }}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                  >
-                    Add
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">You can add custom skills if they're not in the dropdown</p>
-              </div>
-            </div>
-          </div>
+    {/* Skills dropdown */}
+    {skillsList.length > 0 ? (
+      <div className="flex gap-2">
+        <Select value={newSkill} onValueChange={setNewSkill}>
+          <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
+            <SelectValue placeholder={t("create_gigs.choose_skill") || "Choose a skill"} />
+          </SelectTrigger>
+          <SelectContent>
+            {skillsList.map((skill) => (
+              <SelectItem key={skill.value} value={skill.value}>
+                {skill.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <button
+          type="button"
+          onClick={() => {
+            if (newSkill) {
+              handleAddSkill(newSkill)
+              setNewSkill("")
+            }
+          }}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+        >
+          {t("create_gigs.add_skill") || "Add"}
+        </button>
+      </div>
+    ) : form.subcategory_id ? (
+      <p className="text-gray-500">No skills available for this subcategory.</p>
+    ) : (
+      <p className="text-gray-500">Select a subcategory to see skills.</p>
+    )}
+  </div>
+</div>
 
           {/* Pricing & Delivery */}
           <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
