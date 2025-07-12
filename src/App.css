@@ -1,0 +1,63 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer utilities {
+  .animate-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .slide-in-from-right-full {
+    transform: translateX(100%);
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thumb-slate-300::-webkit-scrollbar-thumb {
+    background-color: rgb(203 213 225);
+  }
+
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(203 213 225);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184);
+}
+
+/* Smooth animations */
+.group:hover .opacity-0 {
+  opacity: 1;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}

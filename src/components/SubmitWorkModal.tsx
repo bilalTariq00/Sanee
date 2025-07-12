@@ -74,6 +74,7 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }) {
               id="note"
               placeholder={t("submit_modal.message_placeholder")}
               value={note}
+              required
               onChange={(e) => setNote(e.target.value)}
             />
           </div>

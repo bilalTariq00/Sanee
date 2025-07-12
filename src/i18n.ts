@@ -683,7 +683,20 @@ profile_pages: {
   },
 
 
-
+ submit_modal: {
+    title: "Submit Work",
+    description: "Attach your files and a note for the buyer.",
+    message_label: "Message",
+    message_placeholder: "Enter a note for the buyer…",
+    attachments_label: "Attachments",
+    attachment_hint: "You can upload multiple files (docs, images, zip, etc.)",
+    success_title: "Submitted!",
+    success_message: "Your work has been successfully submitted.",
+    error_title: "Submission Failed",
+    error_message: "There was an error submitting your work. Please try again.",
+    cancel: "Cancel",
+    submit: "Submit"
+  }
 
 
 
@@ -1364,8 +1377,21 @@ profile_pages: {
       no_portfolio_items: "لا توجد عناصر في محفظتك.",
       reviews_title: "المراجعات",
       reviews_subtitle: "اطلع على ما قاله الآخرون عنك."
-    }
-
+    },
+submit_modal: {
+    title: "إرسال العمل",
+    description: "قم بإرفاق ملفاتك ورسالة للمشتري.",
+    message_label: "الرسالة",
+    message_placeholder: "أدخل رسالة للمشتري…",
+    attachments_label: "المرفقات",
+    attachment_hint: "يمكنك تحميل ملفات متعددة (مستندات، صور، مضغوط، إلخ)",
+    success_title: "تم الإرسال!",
+    success_message: "تم إرسال عملك بنجاح.",
+    error_title: "فشل الإرسال",
+    error_message: "حدث خطأ أثناء إرسال عملك. الرجاء المحاولة مرة أخرى.",
+    cancel: "إلغاء",
+    submit: "إرسال"
+  }
 
 
 

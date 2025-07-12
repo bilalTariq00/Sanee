@@ -1,9 +1,13 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { toast } from 'sonner';
 import config from '../config';
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -11,15 +15,13 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 export default function JobApplicantsPage() {
   const { t } = useTranslation();
-  const { jobId } = useParams<{jobId: string}>();
+  const { jobId } = useParams();
   const navigate = useNavigate();
 
   const [job, setJob] = useState<any>(null);
@@ -29,8 +31,8 @@ export default function JobApplicantsPage() {
   const [price, setPrice] = useState('');
   const [deadline, setDeadline] = useState('');
   const [duration, setDuration] = useState('less than 1 month');
-  const [attachments, setAttachments] = useState<FileList | null>(null);
-  const [selectedGig, setSelectedGig] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [selectedGig, setSelectedGig] = useState<string>('');
   const [applied, setApplied] = useState(false);
 
   const token = localStorage.getItem('token');
@@ -42,11 +44,13 @@ export default function JobApplicantsPage() {
 
   const fetchJob = async () => {
     try {
-      const res = await axios.get(`${config.API_BASE_URL}/jobs/${jobId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setJob(res.data.data);
-    } catch {
+      const res = await axios.get(
+        `${config.API_BASE_URL}/jobs/${jobId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setJob(res.data.data || res.data);
+    } catch (err) {
+      console.error("Failed to load job:", err);
       toast.error(t('job_load_failed'));
     } finally {
       setLoading(false);
@@ -55,17 +59,76 @@ export default function JobApplicantsPage() {
 
   const fetchGigs = async () => {
     try {
-      const res = await axios.get(`${config.API_BASE_URL}/seller/gigs`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await axios.get(
+        `${config.API_BASE_URL}/seller/gigs`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setGigs(res.data.data || res.data);
-    } catch {
+    } catch (err) {
+      console.error("Failed to fetch gigs:", err);
       toast.error(t('gigs_load_failed'));
     }
   };
 
   const handleApply = async () => {
-    // ... your validation logic ...
+    if (!coverLetter.trim()) {
+      return Swal.fire(t('missing_field'), t('cover_letter_required'), 'warning');
+    }
+    if (!selectedGig) {
+      return Swal.fire(t('missing_field'), t('please_select_gig'), 'warning');
+    }
+    if (!price || Number(price) <= 0) {
+      return Swal.fire(t('missing_field'), t('enter_valid_price'), 'warning');
+    }
+    if (!deadline) {
+      return Swal.fire(t('missing_field'), t('select_deadline'), 'warning');
+    }
+    if (attachments.length > 10) {
+      return Swal.fire(t('too_many_files'), t('upload_limit'), 'warning');
+    }
+    for (let file of attachments) {
+      if (file.size > 25 * 1024 * 1024) {
+        return Swal.fire(
+          t('file_too_large'),
+          `${file.name} ${t('exceeds_limit')}`,
+          'warning'
+        );
+      }
+    }
+
+    const formData = new FormData();
+    formData.append('cover_letter', coverLetter);
+    formData.append('price', price);
+    formData.append('deadline', deadline);
+    formData.append('duration', duration);
+    formData.append('gig_id', selectedGig);
+    attachments.forEach((file) => formData.append('attachments[]', file));
+
+    try {
+      await axios.post(
+        `${config.API_BASE_URL}/jobs/${jobId}/apply`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      Swal.fire(t('success'), t('proposal_submitted'), 'success');
+      setApplied(true);
+    } catch (err: any) {
+      console.error("Apply failed:", err);
+      const status = err.response?.status;
+      if (status === 429) {
+        Swal.fire(t('limit_reached'), t('daily_limit_message'), 'error');
+      } else if (status === 409) {
+        Swal.fire(t('already_applied_title'), t('already_applied_msg'), 'info');
+        setApplied(true);
+      } else {
+        Swal.fire(t('error'), err.response?.data?.message || err.message, 'error');
+      }
+    }
   };
 
   if (loading) {
@@ -77,132 +140,116 @@ export default function JobApplicantsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="min-h-screen px-4 py-10 max-w-full mx-auto">
+      <Button
+        onClick={() => navigate(-1)}
+        variant="ghost"
+        className="flex items-center gap-2 mb-6 text-muted-foreground"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        {t('back')}
+      </Button>
 
-        {/* Back & Title */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            {t('back')}
-          </button>
-          <h1 className="text-2xl font-bold text-gray-900">{job?.title}</h1>
-        </div>
+      <div className="bg-white rounded-2xl shadow-md p-6 space-y-6 border border-red-200">
+        <h2 className="text-2xl font-bold text-red-700">{job?.title}</h2>
+        <p className="text-gray-700">{job?.description}</p>
 
-        {/* Job Description */}
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('job_details')}</h2>
-          <p className="text-gray-700">{job?.description}</p>
-        </div>
-
-        {/* Already Applied Banner */}
         {applied && (
-          <div className="bg-green-100 border border-green-300 text-green-700 rounded-lg p-4">
+          <div className="p-3 bg-green-100 text-green-700 rounded-md border border-green-300">
             {t('already_applied')}
           </div>
         )}
 
-        {/* Application Form */}
         {!applied && (
-          <form className="space-y-6" onSubmit={e => { e.preventDefault(); handleApply(); }}>
-
+          <div className="space-y-4">
             {/* Cover Letter */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('cover_letter')}</h2>
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('cover_letter')}</label>
               <Textarea
                 placeholder={t('write_message')}
                 value={coverLetter}
-                onChange={e => setCoverLetter(e.target.value)}
-                required
-                className="w-full"
+                onChange={(e) => setCoverLetter(e.target.value)}
               />
             </div>
 
-            {/* Deadline & Duration */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100 space-y-4">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('project_timing')}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 text-sm font-medium">{t('deadline')}</label>
-                  <Input
-                    type="date"
-                    value={deadline}
-                    onChange={e => setDeadline(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 text-sm font-medium">{t('project_duration')}</label>
-                  <Select value={duration} onValueChange={setDuration}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t('select_duration')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="less than 1 month">{t('less_than_1_month')}</SelectItem>
-                      <SelectItem value="1 to 3 months">{t('one_to_three_months')}</SelectItem>
-                      <SelectItem value="3 to 6 months">{t('three_to_six_months')}</SelectItem>
-                      <SelectItem value="more than 6 months">{t('more_than_six_months')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            {/* Deadline */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('deadline')}</label>
+              <Input
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+              />
+            </div>
+
+            {/* Duration */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('project_duration')}</label>
+              <Select value={duration} onValueChange={setDuration}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('select_duration')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="less than 1 month">{t('less_than_1_month')}</SelectItem>
+                  <SelectItem value="1 to 3 months">{t('one_to_three_months')}</SelectItem>
+                  <SelectItem value="3 to 6 months">{t('three_to_six_months')}</SelectItem>
+                  <SelectItem value="more than 6 months">{t('more_than_six_months')}</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Select Gig */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('select_gig')}</h2>
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('select_gig')}</label>
               <Select value={selectedGig} onValueChange={setSelectedGig}>
-                <SelectTrigger className="w-full">
+                <SelectTrigger>
                   <SelectValue placeholder={t('select_a_gig')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {gigs.map(g => (
-                    <SelectItem key={g.id} value={String(g.id)}>
-                      {g.title}
+                  {gigs.map((gig) => (
+                    <SelectItem key={gig.id} value={String(gig.id)}>
+                      {gig.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Price & Attachments */}
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100 space-y-4">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('pricing_attachments')}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1 text-sm font-medium">{t('price')}</label>
-                  <Input
-                    type="number"
-                    value={price}
-                    onChange={e => setPrice(e.target.value)}
-                    placeholder={t('enter_price')}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 text-sm font-medium">{t('attachments')}</label>
-                  <Input
-                    type="file"
-                    multiple
-                    onChange={e => setAttachments(e.target.files)}
-                  />
-                </div>
-              </div>
+            {/* Price */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('price')}</label>
+              <Input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder={t('enter_price')}
+              />
+            </div>
+
+            {/* Attachments */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">{t('attachments')}</label>
+              <Input
+                type="file"
+                multiple
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setAttachments(Array.from(e.target.files));
+                  }
+                }}
+              />
             </div>
 
             {/* Submit */}
-            <div className="flex justify-end">
-              <Button type="submit" className="bg-red-500 hover:bg-red-600 text-white">
-                {t('submit_proposal')}
-              </Button>
-            </div>
-
-          </form>
+            <Button
+              onClick={handleApply}
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
+            >
+              {t('submit_proposal')}
+            </Button>
+          </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

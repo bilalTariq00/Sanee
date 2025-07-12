@@ -42,6 +42,7 @@ import Chat from "./pages/MessagesPage"
 import GigDetail from "./pages/GigDetail"
 import WalletPage from "./pages/wallet-page"
 import SavedJobsPage from "./pages/SavedJobsPage"
+import "./App.css"
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -95,7 +96,8 @@ function AppRoutes() {
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="my-projects" element={<MyProjectsPage />} />
         <Route path="balance" element={<BalancePage />} />
-        <Route path="messages/:userId" element={<Chat />} />
+       <Route path="/messages/:userId" element={<Chat />} />
+          <Route path="/messages" element={<Chat />} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="notification-settings" element={<NotificationSettingsPage />} /> {/* ⬅️ NEW ROUTE */}
         <Route index element={<Index />} />
