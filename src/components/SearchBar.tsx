@@ -1,4 +1,5 @@
 "use client"
+
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -15,46 +16,37 @@ interface SearchBarProps {
   activeFilter: string
   onFilterChange: (filter: string) => void
   categories: Category[]
-  userType: "seller" | "buyer"
   authUserType?: string
   isRTL: boolean
 }
 
-const SearchBar = ({
+export default function SearchBar({
   searchTerm,
   onSearchChange,
   activeFilter,
   onFilterChange,
   categories,
-  userType,
   authUserType,
   isRTL,
-}: SearchBarProps) => {
+}: SearchBarProps) {
   const { t } = useTranslation()
 
-  // Dynamic filters based on authenticated user type
-  const getFilters = () => {
-    if (authUserType === "seller") {
-      // Sellers see jobs and buyers
-      return [
-        { id: "all", label: t("all_people") || "All People" },
-        { id: "jobs", label: t("all_jobs") || "All Jobs" },
-        { id: "buyer", label: t("filter_buyer") || "Buyers" },
-      ]
-    } else {
-      // Buyers see gigs and sellers
-      return [
-        { id: "all", label: t("all_people") || "All People" },
-        { id: "gigs", label: t("all_services") || "All Services" },
-        { id: "seller", label: t("filter_seller") || "Sellers" },
-      ]
-    }
-  }
-
-  const filters = getFilters()
+  // Determine main filters based on role
+  const filters =
+    authUserType === "seller"
+      ? [
+          { id: "all", label: t("all_people") || "All People" },
+          { id: "jobs", label: t("all_jobs") || "All Jobs" },
+          { id: "buyer", label: t("filter_buyer") || "Buyers" },
+        ]
+      : [
+          { id: "all", label: t("all_people") || "All People" },
+          { id: "gigs", label: t("all_services") || "All Services" },
+          { id: "seller", label: t("filter_seller") || "Sellers" },
+        ]
 
   return (
-    <div className={`w-full max-w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
+    <div className={`w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
       {/* Search input */}
       <div className="relative mb-6">
         <Search
@@ -71,55 +63,60 @@ const SearchBar = ({
           }
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg ${isRTL ? "pr-10" : "pl-10"}`}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              // re-trigger search on Enter
+              onSearchChange(searchTerm)
+            }
+          }}
+          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg ${
+            isRTL ? "pr-10" : "pl-10"
+          }`}
         />
       </div>
 
-      {/* Filter and category buttons */}
-      <div className="space-y-4">
-        {/* Main filters */}
-        <div className="flex flex-wrap gap-2">
-          {filters.map((filter) => (
-            <Button
-              key={filter.id}
-              variant={activeFilter === filter.id ? "default" : "outline"}
-              onClick={() => onFilterChange(filter.id)}
-              className={`rounded-full px-4 py-2 text-sm transition-all ${
-                activeFilter === filter.id
-                  ? "bg-red-500 text-white hover:bg-red-600"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              {filter.label}
-            </Button>
-          ))}
-        </div>
-
-        {/* Category filters */}
-        {categories.length > 0 && (
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-600">{t("categories") || "Categories"}:</h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
-                <Button
-                  key={cat.id}
-                  variant={activeFilter === cat.id ? "default" : "outline"}
-                  onClick={() => onFilterChange(cat.id)}
-                  className={`rounded-full px-4 py-2 text-sm transition-all ${
-                    activeFilter === cat.id
-                      ? "bg-red-500 text-white hover:bg-red-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  {cat.name}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Main filters */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {filters.map((f) => (
+          <Button
+            key={f.id}
+            variant={activeFilter === f.id ? "default" : "outline"}
+            onClick={() => onFilterChange(f.id)}
+            className={`rounded-full px-4 py-2 text-sm ${
+              activeFilter === f.id
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            {f.label}
+          </Button>
+        ))}
       </div>
+
+      {/* Category filters */}
+      {categories.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-gray-600">
+            {t("categories") || "Categories"}:
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <Button
+                key={cat.id}
+                variant={activeFilter === cat.id ? "default" : "outline"}
+                onClick={() => onFilterChange(cat.id)}
+                className={`rounded-full px-4 py-2 text-sm ${
+                  activeFilter === cat.id
+                    ? "bg-red-500 text-white hover:bg-red-600"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-
-export default SearchBar
