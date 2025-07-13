@@ -259,7 +259,7 @@ function CreateGig() {
           <h1 className="text-2xl font-bold text-gray-900">{t("create_gigs.title") || "Create New Gig"}</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={(e) => e.preventDefault()}    className="space-y-6">
           {/* Basic Info */}
           <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
@@ -486,7 +486,8 @@ function CreateGig() {
           {/* Submit */}
           <div className="flex justify-end">
             <button
-              type="submit"
+             type="button"        
+              onClick={handleSubmit}   
               className="px-6 py-3 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
             >
               {t("create_gigs.create_btn") || "Create Gig"}

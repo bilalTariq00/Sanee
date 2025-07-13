@@ -14,7 +14,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="absolute top-8 left-8">
+      {/* <div className="absolute top-8 left-8">
         <button
           onClick={() => navigate('/')}
           className="flex items-center text-gray-600 hover:text-gray-900"
@@ -22,7 +22,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Home
         </button>
-      </div>
+      </div> */}
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <img src='/sanee.png' alt="Logo" className="h-24 mx-auto" /> 
