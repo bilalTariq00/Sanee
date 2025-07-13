@@ -7,6 +7,7 @@ import axios from "axios";
 import config from "@/config";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PortfolioForm {
   id?: number;
@@ -19,6 +20,7 @@ interface PortfolioForm {
 }
 
 export default function EditProfilePage() {
+   const { user } = useAuth();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const auth = token ? { Authorization: `Bearer ${token}` } : {};
@@ -257,8 +259,9 @@ return (
             onChange={(e) => setConfirmPw(e.target.value)}
           />
         </section>
-
+             
         {/* Portfolios */}
+      {user?.account_type === 'seller' && (   
         <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">{t("edit_profile.portfolio_section")}</h2>
           {portfolios.map((p, i) => (
@@ -329,7 +332,7 @@ return (
             {t("edit_profile.add_portfolio")}
           </button>
         </section>
-
+)}
         {/* Save */}
         <div className="flex justify-end">
           <button
