@@ -29,7 +29,7 @@ const { t } = useTranslation();
 
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
-    if (window.confirm("Are you sure you want to delete this gig?")) {
+    if (window.confirm("Are you sure you want to delete this service?")) {
       await axios.delete(`${config.API_BASE_URL}/seller/gigs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

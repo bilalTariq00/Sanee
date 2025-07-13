@@ -36,8 +36,8 @@ function EditGig() {
   const [form, setForm] = useState({
     title: "",
     description: "",
-    category_id: "",
-    subcategory_id: "",
+   category_id: "",      // string
+  subcategory_id: "",   // string
     delivery_time: "",
     price: "",
     tags: ""
@@ -48,6 +48,7 @@ function EditGig() {
   const [skillsList, setSkillsList] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
   const [allImages, setAllImages] = useState([]);
+  const [newSkill, setNewSkill] = useState<string>("")
 const { t } = useTranslation();
 
   useEffect(() => {
@@ -55,61 +56,140 @@ const { t } = useTranslation();
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+ // 1) Categories
+const fetchCategories = async () => {
+  try {
     const token = localStorage.getItem("token");
     const res = await axios.get(`${config.API_BASE_URL}/categories`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
-    setCategories(res.data);
-  };
+    // New shape: { success: true, data: { categories: [...] } }
+    const list =
+      Array.isArray(res.data.data?.categories) 
+        ? res.data.data.categories 
+        : [];
+    setCategories(list);
+  } catch (err) {
+    console.error("Error fetching categories", err);
+    toast.error("Could not load categories.");
+    setCategories([]);
+  }
+};
 
-  const fetchSubcategories = async (categoryId) => {
-    const res = await axios.get(`${config.API_BASE_URL}/categories/${categoryId}/subcategories`);
-    setSubcategories(res.data);
-  };
-
-  const fetchGig = async () => {
+// 2) Subcategories (for the selected category)
+const fetchSubcategories = async (categoryId: string | number) => {
+  try {
     const token = localStorage.getItem("token");
-    const res = await axios.get(`${config.API_BASE_URL}/seller/gigs/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const gig = res.data;
+    const res = await axios.get(
+      `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // New shape: { success: true, data: { subcategories: [...] } }
+    const list =
+      Array.isArray(res.data.data?.subcategories) 
+        ? res.data.data.subcategories 
+        : [];
+    setSubcategories(list);
+    
+  } catch (err) {
+    console.error("Error fetching subcategories", err);
+    setSubcategories([]);
+  }
+};
+
+ const fetchGig = async () => {
+  const token = localStorage.getItem("token")
+  try {
+    const { data: gig } = await axios.get(
+      `${config.API_BASE_URL}/seller/gigs/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+
+    // 1) seed form fields
     setForm({
       title: gig.title,
       description: gig.description,
-      category_id: gig.category_id,
-      subcategory_id: gig.subcategory_id,
+      category_id: String(gig.category_id),
+      subcategory_id: String(gig.subcategory_id),
       delivery_time: gig.delivery_time,
       price: gig.price,
-      tags: Array.isArray(gig.tags) ? gig.tags.join(",") : gig.tags
-    });
-    const formattedImages = gig.images.map((img) => ({
+      tags: Array.isArray(gig.tags) ? gig.tags.join(",") : gig.tags,
+    })
+
+    // 2) seed images
+    const formattedImages = gig.images.map((img: any) => ({
       id: `existing-${img.id}`,
       image_path: img.image_path,
       db_id: img.id,
-      source: "existing"
-    }));
-    setAllImages(formattedImages);
-    fetchSubcategories(gig.category_id);
-    let gigSkills = Array.isArray(gig.skills) ? gig.skills : [];
-    if (typeof gig.skills === "string") {
-      try {
-        const parsed = JSON.parse(gig.skills);
-        gigSkills = Array.isArray(parsed) ? parsed : [];
-      } catch {}
-    }
-    if (gig.subcategory_id) fetchSkills(gig.subcategory_id, gigSkills);
-  };
+      source: "existing" as const,
+    }))
+    setAllImages(formattedImages)
 
-  const fetchSkills = async (subcategoryId, preselected = []) => {
-    const res = await axios.get(`${config.API_BASE_URL}/subcategory/${subcategoryId}/skills`);
-    const formattedSkills = res.data.map((skill) => ({ label: skill, value: skill }));
-    setSkillsList(formattedSkills);
-    const matched = formattedSkills.filter((opt) =>
-      preselected?.some((skill) => skill.toLowerCase().trim() === opt.value.toLowerCase().trim())
+    // 3) determine the old skills array (string[])
+   let gigSkills = Array.isArray(gig.skills) ? gig.skills : [];
+    if (gig.subcategory_id) {
+  await fetchSkills(gig.subcategory_id, gigSkills);
+}else if (typeof gig.skills === "string") {
+      try {
+        const parsed = JSON.parse(gig.skills)
+        gigSkills = Array.isArray(parsed) ? parsed : []
+      } catch {
+        gigSkills = []
+      }
+    }
+
+    // 4) fetch subcategories (so they populate your dropdown + skills data)
+    await fetchSubcategories(gig.category_id)
+
+    // 5) fetchSkills will:
+    //    • load skillsList from the API,
+    //    • preselect any in `gigSkills` into selectedSkills
+    if (gig.subcategory_id) {
+      await fetchSkills(gig.subcategory_id, gigSkills)
+    }
+  } catch (err) {
+    console.error("Error loading gig:", err)
+    toast.error("Could not load gig data.")
+  }
+}
+
+
+ const fetchSkills = async (
+  subcategoryId: string | number,
+  preselected: string[] = []
+) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+      `${config.API_BASE_URL}/subcategory/${subcategoryId}/skills`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // 1. Drill into the right array
+    const skillsArray: string[] =
+      Array.isArray(res.data?.data?.skills)
+        ? res.data.data.skills
+        : [];
+
+    // 2. Map into your dropdown format
+    const formatted: { label: string; value: string }[] = skillsArray.map(
+      (skill) => ({ label: skill, value: skill })
+    );
+    setSkillsList(formatted);
+
+    // 3. Pre-select any old skills you passed in
+    const matched = formatted.filter((opt) =>
+      preselected.some(
+        (old) => old.toLowerCase().trim() === opt.value.toLowerCase().trim()
+      )
     );
     setSelectedSkills(matched);
-  };
+  } catch (err) {
+    console.error("Error fetching skills", err);
+    setSkillsList([]);
+    setSelectedSkills([]);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -125,7 +205,19 @@ const { t } = useTranslation();
       fetchSkills(value);
     }
   };
-
+ const handleAddSkill = (skillValue: string) => {
+    if (!skillValue) return
+    const option = { label: skillValue, value: skillValue }
+    if (selectedSkills.find((s) => s.value === option.value)) {
+      toast("That skill’s already added.")
+      return
+    }
+    setSelectedSkills((prev) => [...prev, option])
+    setNewSkill("")
+  }
+  const handleRemoveSkill = (value: string) => {
+    setSelectedSkills((prev) => prev.filter((s) => s.value !== value))
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -218,39 +310,94 @@ const { t } = useTranslation();
           </div>
           <div>
            <Label>{t("edit_gig.category_label")}</Label>
-            <Select
-              value={form.category_id}
-              onValueChange={(value) => handleSelectChange("category_id", value)}
-              
-            >
-              <SelectTrigger className="w-full border focus:ring-2 focus:ring-red-500">
-                <SelectValue placeholder={t("edit_gig.category_placeholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <Select
+  value={form.category_id}
+  onValueChange={(value) => handleSelectChange("category_id", value)}
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Select a category" />
+  </SelectTrigger>
+  <SelectContent>
+    {categories.map((cat) => (
+      <SelectItem key={cat.id} value={String(cat.id)}>
+        {cat.name}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
           </div>
-          {subcategories.length > 0 && (
-            <div>
-             <Label>{t("edit_gig.subcategory_label")}</Label>
-              <Select
-                value={form.subcategory_id}
-                onValueChange={(value) => handleSelectChange("subcategory_id", value)}
-              >
-                <SelectTrigger className="w-full border focus:ring-2 focus:ring-red-500">
-                  <SelectValue placeholder={t("edit_gig.subcategory_placeholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {subcategories.map((sub) => (
-                    <SelectItem key={sub.id} value={sub.id}>{sub.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+         {subcategories.length > 0 && (
+  <Select
+    value={form.subcategory_id}
+    onValueChange={(value) =>
+      handleSelectChange("subcategory_id", value)
+    }
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select a subcategory" />
+    </SelectTrigger>
+    <SelectContent>
+      {subcategories.map((sub) => (
+        <SelectItem key={sub.id} value={String(sub.id)}>
+          {sub.name}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+)}
+<div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    {t("edit_gig.skills_section") || "Skills"}
+  </h2>
+
+  {/* 1) show existing */}
+  <div className="flex flex-wrap gap-2 mb-4">
+    {selectedSkills.map((skill) => (
+      <span
+        key={skill.value}
+        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-600"
+      >
+        {skill.label}
+        <button
+          type="button"
+          onClick={() => handleRemoveSkill(skill.value)}
+          className="ml-2 text-red-500 hover:text-red-600"
+        >
+          ×
+        </button>
+      </span>
+    ))}
+  </div>
+
+  {/* 2) dropdown + add */}
+  {skillsList.length > 0 ? (
+    <div className="flex gap-2">
+      <Select value={newSkill} onValueChange={setNewSkill}>
+        <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
+          <SelectValue placeholder={t("edit_gig.choose_skill") || "Choose a skill"} />
+        </SelectTrigger>
+        <SelectContent>
+          {skillsList.map((skill) => (
+            <SelectItem key={skill.value} value={skill.value}>
+              {skill.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button
+        type="button"
+        onClick={() => handleAddSkill(newSkill)}
+        className="bg-red-500 hover:bg-red-600 text-white"
+      >
+        {t("edit_gig.add_skill") || "Add Skill"}
+      </Button>
+    </div>
+  ) : form.subcategory_id ? (
+    <p className="text-gray-500">No skills available for this subcategory.</p>
+  ) : (
+    <p className="text-gray-500">Select a subcategory to load skills.</p>
+  )}
+</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
              <Label>{t("edit_gig.delivery_label")}</Label>
@@ -285,7 +432,7 @@ const { t } = useTranslation();
               className="focus:ring-2 focus:ring-red-500"
             />
           </div>
-          {skillsList.length > 0 && (
+          {/* {skillsList.length > 0 && (
             <div>
               <Label>{t("edit_gig.skills_label")}</Label>
               <ReactSelect
@@ -297,7 +444,7 @@ const { t } = useTranslation();
                 placeholder={t("edit_gig.skills_placeholder")}
               />
             </div>
-          )}
+          )} */}
           <div>
             <Label>{t("edit_gig.images_label")}</Label>
             <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>

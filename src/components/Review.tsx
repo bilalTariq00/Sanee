@@ -11,9 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { Star } from "lucide-react"; // import the Star icon
-import { useTranslation } from "react-i18next";
+
 function Review() {
-   const { t } = useTranslation();
   const { id } = useParams(); // contract ID
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +49,7 @@ function Review() {
   const handleSubmit = async () => {
     const reviewType = getReviewType();
     if (!reviewType) {
-      toast.error(t("review_page.error_direction"));
+      toast.error("Unable to determine review direction");
       return;
     }
 
@@ -71,16 +70,16 @@ function Review() {
       await axios.post(`${config.API_BASE_URL}/reviews`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-       toast.success(t("review_page.success_message"));
+      toast.success("Review submitted successfully!");
       navigate("/");
     } catch (err) {
       console.error("Review submission failed", err);
-       toast.error(t("review_page.error_submission"));
+      toast.error("Failed to submit review");
     }
   };
 
-  if (loading) return <p>{t("review_page.loading")}</p>;
-  if (!contract) return <p className="text-red-600">{t("review_page.contract_not_found")}</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!contract) return <p className="text-red-600">Contract not found</p>;
 
   const reviewing = getReviewType() === "buyer_to_seller" ? "seller" : "buyer";
 
@@ -88,14 +87,14 @@ function Review() {
     <div className="max-w-2xl mx-auto mt-10">
       <Card className="bg-white border-red-600 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl text-red-700">{t("review_page.title")} {reviewing}</CardTitle>
+          <CardTitle className="text-2xl text-red-700">Review the {reviewing}</CardTitle>
           <p className="text-sm text-muted-foreground">
-           {t("review_page.gig")}: <strong>{contract.gig?.title}</strong> (UID: {contract.gig?.gig_uid})
+            Gig: <strong>{contract.gig?.title}</strong> (UID: {contract.gig?.gig_uid})
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="rating" className="text-red-600"> {t("review_page.rating")}</Label>
+            <Label htmlFor="rating" className="text-red-600">Rating</Label>
             <div className="flex gap-2 mt-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -111,7 +110,7 @@ function Review() {
           </div>
 
           <div>
-            <Label htmlFor="comment" className="text-red-600">{t("review_page.comment")}</Label>
+            <Label htmlFor="comment" className="text-red-600">Comment</Label>
             <Textarea
               id="comment"
               placeholder={`Write your feedback for the ${reviewing}...`}
@@ -125,7 +124,7 @@ function Review() {
             className="w-full bg-red-600 text-white hover:bg-red-700"
             onClick={handleSubmit}
           >
-            {t("review_page.submit")} 
+            Submit Review
           </Button>
         </CardContent>
       </Card>

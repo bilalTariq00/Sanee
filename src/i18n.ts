@@ -290,6 +290,11 @@ edit_contract: {
   invalid_price: "Please enter a valid price."
 },
 edit_gig: {
+  skills_section: "Skills",
+  choose_skill: "Choose a skill",
+  add_skill: "Add",
+  remove_skill: "Remove",
+  selected_skills_label: "Selected Skills",
   title: "Edit Service",
   title_label: "Title",
   title_placeholder: "Enter title",
@@ -301,7 +306,7 @@ edit_gig: {
   subcategory_placeholder: "Select subcategory",
   delivery_label: "Delivery Time (Days)",
   delivery_placeholder: "Enter delivery days",
-  price_label: "Price ",
+  price_label: "Price",
   price_placeholder: "Enter price",
   tags_label: "Tags",
   tags_placeholder: "Tags (comma separated)",
@@ -310,8 +315,36 @@ edit_gig: {
   images_label: "Images",
   update_button: "Update service",
   success: "Service updated successfully!",
-  error: "Failed to update service"
+  error: "Failed to update service",
+
+  // Additional messages and labels:
+  loading: "Loading service details…",
+  fetch_error: "Could not load service data.",
+  category_fetch_error: "Failed to load categories.",
+  subcategory_fetch_error: "Failed to load subcategories.",
+  skills_fetch_error: "Failed to load skills.",
+  no_categories: "No categories available.",
+  no_subcategories: "No subcategories available.",
+  no_skills: "No skills available for this subcategory.",
+  add_skill_button: "Add Skill",
+  remove_skill_button: "Remove",
+  images_upload_error: "Failed to upload images.",
+  image_placeholder: "Click or drag to upload images",
+  validation: {
+    title_required: "Title is required.",
+    description_required: "Description is required.",
+    category_required: "Please select a category.",
+    subcategory_required: "Please select a subcategory.",
+    delivery_required: "Delivery time is required.",
+    price_required: "Price is required.",
+    tags_required: "Please enter at least one tag.",
+  },
+  confirmation: {
+    unsaved_changes: "You have unsaved changes. Are you sure you want to leave?",
+    delete_image: "Are you sure you want to remove this image?",
+  }
 },
+
 edit_job: {
   title: "Edit Job",
   title_label: "Title",
@@ -987,6 +1020,11 @@ edit_contract: {
   invalid_price: "يرجى إدخال سعر صالح."
 },
 edit_gig: {
+   skills_section: "المهارات",
+  choose_skill: "اختر مهارة",
+  add_skill: "إضافة",
+  remove_skill: "إزالة",
+  selected_skills_label: "المهارات المحددة",
   title: "تعديل الصناعة",
   title_label: "العنوان",
   title_placeholder: "أدخل العنوان",
@@ -1007,7 +1045,33 @@ edit_gig: {
   images_label: "الصور",
   update_button: "تحديث الخدمة",
   success: "تم تحديث الخدمة بنجاح!",
-  error: "فشل في تحديث الخدمة"
+  error: "فشل في تحديث الخدمة",
+  loading: "جاري تحميل بيانات الخدمة…",
+  validation: {
+    title_required: "العنوان مطلوب.",
+    description_required: "الوصف مطلوب.",
+    category_required: "يرجى اختيار الصناعة.",
+    subcategory_required: "يرجى اختيار الصناعة الفرعية.",
+    delivery_required: "مدة التسليم مطلوبة.",
+    price_required: "السعر مطلوب.",
+    tags_required: "رجاءً أدخل تصنيفاً واحداً على الأقل.",
+  },
+  fetch_errors: {
+    gig: "فشل في تحميل بيانات الخدمة.",
+    categories: "فشل في تحميل قائمة الصناعات.",
+    subcategories: "فشل في تحميل قائمة الصناعات الفرعية.",
+    skills: "فشل في تحميل قائمة المهارات.",
+  },
+  empty_states: {
+    no_categories: "لا توجد صناعات متاحة.",
+    no_subcategories: "لا توجد صناعات فرعية متاحة.",
+    no_skills: "لا توجد مهارات متاحة لهذه الصناعة الفرعية.",
+  },
+  confirmation: {
+    unsaved_changes: "لديك تغييرات غير محفوظة. هل تريد الاستمرار بدون حفظ؟",
+    delete_image: "هل أنت متأكد أنك تريد حذف هذه الصورة؟",
+  },
+  
 },
 edit_job: {
   title: "تعديل المشروع",
