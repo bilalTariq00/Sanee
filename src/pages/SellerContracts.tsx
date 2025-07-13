@@ -239,7 +239,7 @@ function SellerContracts() {
                           <Button
                             size="sm"
                             className="bg-red-500 hover:bg-red-600 text-white"
-                            onClick={() => (window.location.href = `/review/${c.seller_id}`)}
+                            onClick={() => (window.location.href = `/review/${c.id}`)}
                           >
                             {t("seller_contracts.review_buyer")}
                           </Button>
