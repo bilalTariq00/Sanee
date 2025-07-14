@@ -1,12 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Clock, DollarSign, MessageCircle, User } from "lucide-react"
+import { ArrowLeft, Clock, DollarSign, MessageCircle, User } from "lucide-react"
 import { HireModal } from "@/components/HireModal"
 import { ImageCarousel } from "@/components/ImageCarousel"
 import config from "@/config"
@@ -88,7 +88,12 @@ export default function GigDetail() {
   }
 
   return (
+    <>
+    <Link to="/" className="top-0">
+              <ArrowLeft/>
+            </Link>
     <div className="container mx-auto px-4 py-8">
+       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Image Carousel */}
         <div className="lg:col-span-2">
@@ -163,5 +168,6 @@ export default function GigDetail() {
       {/* Hire Modal */}
       {showHire && <HireModal gig={gig} onClose={() => setShowHire(false)} onConfirm={handleHireConfirm} />}
     </div>
+    </>
   )
 }

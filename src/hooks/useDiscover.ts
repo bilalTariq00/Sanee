@@ -231,8 +231,13 @@ export function useDiscover(
         })
 
         // Normalize and set
-        const { users: fetched, totalPages: pages } =
+        let { users: fetched, totalPages: pages } =
           normalizeApiResponse(res.data.data || res.data)
+
+        // **ADDED**: if the viewer is a buyer and rawFilter is "all", only keep Gigs
+        if (authUser?.account_type === "buyer" && rawFilter === "all") {
+          fetched = fetched.filter((u) => u.badge === "Gig")
+        }
 
         if (alive) {
           setData(fetched)

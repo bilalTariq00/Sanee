@@ -123,7 +123,7 @@ export default function PostJobPage() {
       if (response.data) {
         toast(t('job_posted_success'));
         setFormData({ title: '', description: '', budget: '', experience_level: 'entry', visibility: 'public', location_type: 'remote', category_id: '', sub_category_id: '', skills: '' });
-        navigate('/jobs');
+        navigate('/');
       }
     } catch (err: any) {
       if (err.response?.status === 403) {

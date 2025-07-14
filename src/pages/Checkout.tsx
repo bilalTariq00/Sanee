@@ -52,8 +52,9 @@ function Checkout() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
-      setGig(gigRes.data);
-      setBuyer(buyerRes.data);
+      // assume gig comes in gigRes.data.data or gigRes.data
+      setGig(gigRes.data?.data ?? gigRes.data);
+      setBuyer(buyerRes.data?.data ?? buyerRes.data);
     } catch (err) {
       console.error("Error fetching data", err);
       toast.error(t("checkout.data_error"));
@@ -81,7 +82,7 @@ function Checkout() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const contractId = contractRes.data.id;
+      const contractId = contractRes.data.data?.id ?? contractRes.data.id;
       // 2) Create payment
       await axios.post(
         `${config.API_BASE_URL}/payments`,
@@ -111,11 +112,23 @@ function Checkout() {
     }
   };
 
+  // ─────────────────────────────────────────────────────────────
+  // EARLY RETURNS
   if (loading) {
     return (
-      <p className="text-center py-10 text-red-600">{t("checkout.loading")}</p>
+      <p className="text-center py-10 text-gray-500">
+        {t("checkout.loading")}
+      </p>
     );
   }
+  if (!gig || !buyer) {
+    return (
+      <p className="text-center py-10 text-red-500">
+        {t("checkout.data_error")}
+      </p>
+    );
+  }
+  // ─────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">

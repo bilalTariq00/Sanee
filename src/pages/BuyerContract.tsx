@@ -28,9 +28,15 @@ export default function ContractsPage() {
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    const rawList: any[] =
+  Array.isArray(res.data)       // seller endpoint: [ {...}, {...} ]
+    ? res.data
+    : Array.isArray(res.data.data) // buyer endpoint: { data: [ ... ] }
+      ? res.data.data
+      : []
 
     // >>> POST-PROCESS: strip submissions for any in_progress item
-    const cleaned: any[] = res.data.map((c: any) => {
+    const cleaned: any[] = rawList.map((c: any) => {
       if (c.status === "in_progress") {
         return {
           ...c,
@@ -256,7 +262,7 @@ const handleViewSubmission = (c: any) => {
                   )}
 
                   {/* Buyer or Seller: once work is submitted */}
-                 { hasWorkSubmission && c.status === "in_progress" && (
+                 { hasWorkSubmission  && (
                     <div className="bg-red-50 p-3 rounded border border-red-100 space-y-2">
                       <p className="font-medium text-red-700">📩 Work Submission</p>
 
