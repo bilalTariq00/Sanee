@@ -223,41 +223,39 @@ useEffect(() => {
     fetchStatus();
   }, [uid]);
   /* fetch reviews - FIXED to use review_type */
-  useEffect(() => {
-    if (!uid) return
+const [buyerToSellerReviews, setBuyerToSellerReviews] = useState<Review[]>([])
+const [sellerToBuyerReviews, setSellerToBuyerReviews] = useState<Review[]>([])
 
-    const fetchReviews = async () => {
-      try {
-        const token = localStorage.getItem("token")
-        const res = await axios.get(`${config.API_BASE_URL}/users/${uid}/reviews`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
 
-        const data = res.data?.data
-        const allReviews = data?.reviews || []
-        const stats=data?.stats || {}
+useEffect(() => {
+  if (!uid || !user) return
 
-        console.log("All reviews received:", allReviews)
-        console.log("User account type:", user?.account_type)
+  const fetchReviews = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await axios.get(
+        `${config.API_BASE_URL}/users/${uid}/reviews`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      const allReviews: Review[] = res.data.data.reviews || []
 
-        // Filter to show only reviews that the user RECEIVED (not gave)
-        // This shows reviews ABOUT the user on their profile
-        const receivedReviews = allReviews.filter((rv: any) => rv.review_type === "given")
+      // Directly split by type:
+      const b2s = allReviews.filter(rv => rv.type === "buyer_to_seller")
+      const s2b = allReviews.filter(rv => rv.type === "seller_to_buyer")
 
-        console.log("Filtered received reviews:", receivedReviews)
-
-        setReviews(receivedReviews)
-        setStats(stats)
-      } catch (error) {
-        console.error("Failed to fetch reviews:", error)
-        setReviews([])
-      }
+      setBuyerToSellerReviews(b2s)
+      setSellerToBuyerReviews(s2b)
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error)
+      setBuyerToSellerReviews([])
+      setSellerToBuyerReviews([])
     }
+  }
 
-    fetchReviews()
-  }, [uid, user])
+  fetchReviews()
+}, [uid, user])
+
+
 const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   /* early exits */
   if (!uid) return <div className="min-h-screen flex items-center justify-center text-red-500">No user id provided</div>
@@ -606,64 +604,133 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
 )} */}
 
 
-        {/* Reviews */}
-       {activeTab === "reviews" && (
+{activeTab === "reviews" && (
   <div className="space-y-6">
+    {/* Header */}
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-2">{t("profile_pages.reviews_title")}</h2>
+      <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        {t("profile_pages.reviews_title")}
+      </h2>
       <p className="text-gray-600">{t("profile_pages.reviews_subtitle")}</p>
     </div>
 
-    {Array.isArray(reviews) && reviews.length > 0 ? (
-      reviews.map((rv: any) => (
-        <div key={rv.id} className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex items-start space-x-4">
-            <img
-              src={rv.other_user?.image || avatar}
-              alt={rv.other_user?.first_name || "Reviewer"}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {rv.other_user?.first_name} {rv.other_user?.last_name}
-                  </h3>
-                  <p className="text-sm text-gray-500">@{rv.other_user?.username}</p>
-                  <div className="flex mt-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 ${i < rv.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
-                      />
-                    ))}
-                    <span className="ml-2 text-sm text-gray-600">({rv.rating}/5)</span>
+    {user.account_type === "seller" ? (
+      // SELLER: show only buyer→seller reviews
+      buyerToSellerReviews.length > 0 ? (
+        <div>
+          <div className="space-y-4">
+            {buyerToSellerReviews.map((rv) => (
+              <div key={rv.id} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-start space-x-4">
+                  <img
+                    src={rv.other_user.image || avatar}
+                    alt={`${rv.other_user.first_name} ${rv.other_user.last_name}`}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">
+                          {rv.other_user.first_name} {rv.other_user.last_name}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          @{rv.other_user.username}
+                        </p>
+                        <div className="flex mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-5 h-5 ${
+                                i < rv.rating
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-2 text-sm text-gray-600">
+                            ({rv.rating}/5)
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {new Date(rv.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {rv.comment && (
+                      <p className="mt-2 text-gray-600">{rv.comment}</p>
+                    )}
                   </div>
                 </div>
-                <span className="text-sm text-gray-500">
-                  {rv.created_at ? new Date(rv.created_at).toLocaleDateString() : ""}
-                </span>
               </div>
-              {rv.comment && <p className="mt-2 text-gray-600">{rv.comment}</p>}
-              <div className="mt-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded inline-block">
-                {rv.type === "seller_to_buyer"
-                  ? t("profile_pages.review_from_buyer")
-                  : t("profile_pages.review_from_seller")}
-              </div>
-              
-            </div>
+            ))}
           </div>
         </div>
-      ))
+      ) : (
+        <div className="text-center text-gray-500">
+          {t("profile_pages.no_reviews_from_buyers")}
+        </div>
+      )
     ) : (
-      <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-        <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">{t("profile_pages.no_reviews_title")}</h3>
-        <p className="text-gray-500">{t("profile_pages.no_reviews_subtitle")}</p>
-      </div>
+      // BUYER: show only seller→buyer reviews
+      sellerToBuyerReviews.length > 0 ? (
+        <div>
+          <div className="space-y-4">
+            {sellerToBuyerReviews.map((rv) => (
+              <div key={rv.id} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-start space-x-4">
+                  <img
+                    src={rv.other_user.image || avatar}
+                    alt={`${rv.other_user.first_name} ${rv.other_user.last_name}`}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-gray-900">
+                          {rv.other_user.first_name} {rv.other_user.last_name}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          @{rv.other_user.username}
+                        </p>
+                        <div className="flex mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-5 h-5 ${
+                                i < rv.rating
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-2 text-sm text-gray-600">
+                            ({rv.rating}/5)
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-500">
+                        {new Date(rv.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {rv.comment && (
+                      <p className="mt-2 text-gray-600">{rv.comment}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center text-gray-500">
+          {t("profile_pages.no_reviews_from_sellers")}
+        </div>
+      )
     )}
   </div>
 )}
+
+
 
       </main>
     </div>
