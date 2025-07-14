@@ -15,6 +15,17 @@ function SellerContracts() {
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [selectedContractId, setSelectedContractId] = useState<number | null>(null)
   const { t } = useTranslation()
+const stored = typeof window !== "undefined"
+  ? JSON.parse(localStorage.getItem("reviewedContracts") || "[]")
+  : []
+const [reviewedContracts, setReviewedContracts] = useState<number[]>(stored)
+const markReviewed = (id: number) => {
+  setReviewedContracts((prev) => {
+    const next = [...prev, id]
+    localStorage.setItem("reviewedContracts", JSON.stringify(next))
+    return next
+  })
+}
 
   const openSubmitModal = (id: number) => {
     setSelectedContractId(id)
@@ -29,13 +40,13 @@ function SellerContracts() {
     })
 
     // Clean out any stale note/attachments when status is back to in_progress
-    const cleaned = res.data.map((c: any) =>
-      c.status === "in_progress"
-        ? { ...c, seller_note: "", seller_attachments: [] }
-        : c
-    )
+   const cleaned = res.data.map((c: any) => ({
+  ...c,
+  reviewed: reviewedContracts.includes(c.id),
+  ...(c.status === "in_progress" && { seller_note: "", seller_attachments: [] })
+}))
+setContracts(cleaned)
 
-    setContracts(cleaned)
     console.log("Fetched seller contracts:", cleaned)
   } catch (err) {
     console.error("Error fetching contracts", err)
@@ -91,6 +102,10 @@ function SellerContracts() {
       Swal.fire("Error", "Something went wrong!", "error")
     }
   }
+const handleReview = (id: number) => {
+  markReviewed(id)                // persists in state+localStorage
+  window.location.href = `/review/${id}`
+}
 
   useEffect(() => {
     fetchContracts()
@@ -235,15 +250,13 @@ function SellerContracts() {
                           </Button>
                         )}
 
-                        {(c.status === "completed" || c.status === "finished") && !c.reviewed_by_seller && (
-                          <Button
-                            size="sm"
-                            className="bg-red-500 hover:bg-red-600 text-white"
-                            onClick={() => (window.location.href = `/review/${c.id}`)}
-                          >
-                            {t("seller_contracts.review_buyer")}
-                          </Button>
-                        )}
+                   {(c.status === "completed" || c.status === "finished") && !c.reviewed && (
+  <Button size="sm" className="bg-red-500 hover:bg-red-600" onClick={() => handleReview(c.id)}>
+    {t("seller_contracts.review_buyer")}
+  </Button>
+)}
+
+
                       </div>
                     </CardContent>
                   </Card>
