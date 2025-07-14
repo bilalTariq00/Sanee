@@ -132,7 +132,7 @@ const handleSignOut = () => {
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 truncate">{userName}</p>
-                  <p className="text-sm text-gray-500 truncate">Frontend Developer</p>
+                  <p className="text-sm text-gray-500 truncate"></p>
                   <div className="flex items-center gap-2 mt-2">
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { api } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
@@ -14,24 +15,34 @@ export type DiscoverFilter =
   | "featured"
   | `category:${string}`
 
+// Helper: build full image URL
 function buildImageUrl(path: string) {
   if (!path) return "/placeholder.svg?height=200&width=300"
   if (path.startsWith("http://") || path.startsWith("https://")) return path
-  const clean = path.startsWith("/storage/") ? path.replace(/^\/storage\//, "") : path.replace(/^\//, "")
+  const clean = path.startsWith("/storage/")
+    ? path.replace(/^\/storage\//, "")
+    : path.replace(/^\//, "")
   return `${config.API_BASE_URL}/storage/${clean}`
 }
 
+// Helper: check if URL is already valid
 function isValidImageUrl(url: string): boolean {
   if (!url) return false
   if (url.includes("placeholder.svg")) return true
-  if (url.startsWith("http://") || url.startsWith("https://")) return !url.endsWith("/storage")
+  if (url.startsWith("http://") || url.startsWith("https://"))
+    return !url.endsWith("/storage")
   return false
 }
 
+/**
+ * Normalize the API response into a flat list of User objects + totalPages
+ * Handles both paginated (apiData.gigs.data) and flat-array (apiData.gigs) shapes.
+ */
 function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number } {
   let totalPages = 1
   const userMap: Record<string, User> = {}
 
+  // Shared helper to add or update user in the map
   const addOrUpdate = (
     u: any,
     badge: "Gig" | "Job",
@@ -42,6 +53,8 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
       tags?: string[]
       category?: any
       subcategory?: any
+      price?: number
+      budget?: number
     }>
   ) => {
     const uid = u.uid
@@ -53,15 +66,16 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         avatar: u.image || "/placeholder.svg?height=100&width=100",
         location:
           badge === "Gig"
-            ? u.country_id ? "Location Available" : "Remote"
-            : projectItems[0]?.category
-              ? projectItems[0].category.name
-              : "Remote",
+            ? u.country_id
+              ? "Location Available"
+              : "Remote"
+            : projectItems[0]?.category?.name || "Remote",
         rating: 0,
         badge,
-        hourlyRate: badge === "Gig"
-          ? parseFloat(projectItems[0]?.price || "0")
-          : parseFloat(projectItems[0]?.budget || "0"),
+        hourlyRate:
+          badge === "Gig"
+            ? parseFloat(projectItems[0]?.price?.toString() || "0")
+            : parseFloat(projectItems[0]?.budget?.toString() || "0"),
         experience: u.headline || u.experience_level || "Professional",
         followers: 0,
         skills: [...(u.skills || []), ...(u.tags || [])],
@@ -75,66 +89,117 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
     userMap[uid].projects.push(...projectItems)
   }
 
-  // GIGS → sellers
-  if (apiData.gigs?.data) {
-    totalPages = Math.max(totalPages, apiData.gigs.last_page || 1)
-    for (const gig of apiData.gigs.data) {
-      const u = gig.user
-      if (!u) continue
+  // Determine gigs array (flat or paginated)
+  const gigArray: any[] = Array.isArray(apiData.gigs)
+    ? apiData.gigs
+    : apiData.gigs?.data || []
 
-      const items: any[] = (gig.images || []).map((img: string, i: number) => {
-        let image = isValidImageUrl(img) ? img : buildImageUrl(img)
-        return {
-          title: gig.title,
-          description: gig.description,
-          image,
-          tags: gig.tags || [],
-          category: gig.category,
-          subcategory: gig.subcategory,
-          price: gig.price,
-        }
-      })
-      if (items.length === 0) {
-        items.push({
-          title: gig.title,
-          description: gig.description,
-          image: "/placeholder.svg?height=200&width=300",
-          tags: gig.tags || [],
-          category: gig.category,
-          subcategory: gig.subcategory,
-          price: gig.price,
-        })
-      }
-      addOrUpdate(u, "Gig", items)
-    }
+  // If paginated shape includes .last_page, update totalPages
+  if (apiData.gigs?.last_page) {
+    totalPages = Math.max(totalPages, apiData.gigs.last_page)
   }
 
-  // JOBS → buyers
-  if (apiData.jobs?.data) {
-    totalPages = Math.max(totalPages, apiData.jobs.last_page || 1)
-    for (const job of apiData.jobs.data) {
-      const b = job.buyer || job.user
-      if (!b) continue
-const imageUrl = b.image
-      ? (isValidImageUrl(b.image) ? b.image : buildImageUrl(b.image))
-      : "/placeholder.svg?height=200&width=300"
-      const item = {
-        title: job.title,
-        description: job.description,
-        image: imageUrl,
-        tags: job.skills || [],
-        category: job.category,
-        subcategory: null,
-        budget: job.budget,
+  // Process each gig
+  for (const gig of gigArray) {
+    const u = gig.user
+    if (!u) continue
+
+    const items = (gig.images || []).map((img: string) => {
+      const image = isValidImageUrl(img) ? img : buildImageUrl(img)
+      return {
+        title: gig.title,
+        description: gig.description,
+        image,
+        tags: gig.tags || [],
+        category: gig.category,
+        subcategory: gig.subcategory,
+        price: parseFloat(gig.price),
       }
-      addOrUpdate(b, "Job", [item])
+    })
+
+    if (items.length === 0) {
+      items.push({
+        title: gig.title,
+        description: gig.description,
+        image: "/placeholder.svg?height=200&width=300",
+        tags: gig.tags || [],
+        category: gig.category,
+        subcategory: gig.subcategory,
+        price: parseFloat(gig.price),
+      })
     }
+
+    addOrUpdate(u, "Gig", items)
+  }
+
+  // Determine jobs array (flat or paginated)
+  const jobArray: any[] = Array.isArray(apiData.jobs)
+    ? apiData.jobs
+    : apiData.jobs?.data || []
+
+  if (apiData.jobs?.last_page) {
+    totalPages = Math.max(totalPages, apiData.jobs.last_page)
+  }
+
+  // Process each job
+  for (const job of jobArray) {
+    const u = job.buyer || job.user
+    if (!u) continue
+
+    const imageUrl = u.image && isValidImageUrl(u.image)
+      ? u.image
+      : "/placeholder.svg?height=200&width=300"
+
+    const item = {
+      title: job.title,
+      description: job.description,
+      image: imageUrl,
+      tags: job.skills || [],
+      category: job.category,
+      subcategory: null,
+      budget: parseFloat(job.budget),
+    }
+
+    addOrUpdate(u, "Job", [item])
   }
 
   return { users: Object.values(userMap), totalPages }
 }
 
-export function useDiscover(rawFilter: DiscoverFilter, search: string, page: number) {
+// Map rawFilter → API 'type' param
+function filterToType(filter: DiscoverFilter): string {
+  switch (filter) {
+    case "seller":
+    case "sellerpeople":
+      return "seller"
+    case "buyer":
+    case "buyerpeople":
+      return "buyer"
+    case "featured":
+      return "featured"
+    case "all":
+      return "all"
+    default:
+      // e.g. "category:3" → "3"
+      return filter.split(":")[1]
+  }
+}
+
+/**
+ * useDiscover
+ * @param rawFilter one of your DiscoverFilter values
+ * @param search search string
+ * @param page   page number
+ * @param sortBy server sort key (default "price_asc")
+ * @param perPage number of items per page (default 10)
+ */
+export function useDiscover(
+  rawFilter: DiscoverFilter,
+  search: string,
+  page: number,
+  sortBy = "price_asc",
+  perPage = 10
+) {
   const { user: authUser } = useAuth()
   const [data, setData] = useState<User[]>([])
   const [totalPages, setTotalPages] = useState(1)
@@ -148,39 +213,43 @@ export function useDiscover(rawFilter: DiscoverFilter, search: string, page: num
     const fetchData = async () => {
       setLoading(true)
       setError(null)
+
       try {
-        const params: any = { page }
-        if (filter.startsWith("category:")) params.category = filter.split(":")[1]
-        if (search) params.q = search
+        const typeParam = filterToType(filter)
+        const token = localStorage.getItem("token")
 
-        const res = await api.get("/discover", { params })
-        const { users: allUsers, totalPages: pages } = normalizeApiResponse(res.data.data || res.data)
+        // Call the search endpoint
+        const res = await api.get("/discover/search", {
+          params: {
+            type: typeParam,
+            search: search || undefined,
+            sort_by: sortBy,
+            per_page: perPage,
+            page,
+          },
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        })
 
-        let filtered = allUsers
-        if (filter.startsWith("category:")) {
-          filtered = allUsers.filter(u => u.categoryId === Number(filter.split(":")[1]))
-        } else if (filter === "seller" || filter === "sellerpeople") {
-          filtered = allUsers.filter(u => u.badge === "Gig")
-        } else if (filter === "buyer" || filter === "buyerpeople") {
-          filtered = allUsers.filter(u => u.badge === "Job")
-        } else if (filter === "featured") {
-          filtered = allUsers.filter(u => ["Gig", "Job"].includes(u.badge))
-        }
+        // Normalize and set
+        const { users: fetched, totalPages: pages } =
+          normalizeApiResponse(res.data.data || res.data)
 
         if (alive) {
-          setData(filtered)
+          setData(fetched)
           setTotalPages(pages)
         }
       } catch (err: any) {
-        if (alive) setError(err?.response?.data?.message || err.message || "Failed to load data.")
+        if (alive) setError(err.response?.data?.message || err.message)
       } finally {
         if (alive) setLoading(false)
       }
     }
 
     fetchData()
-    return () => { alive = false }
-  }, [rawFilter, search, page, authUser?.account_type])
+    return () => {
+      alive = false
+    }
+  }, [rawFilter, search, page, sortBy, perPage, authUser?.account_type])
 
   return { users: data, totalPages, loading, error }
 }

@@ -357,19 +357,19 @@ export default function Chat() {
     setSending(true)
     try {
       const formData = new FormData()
-      formData.append("receiver_id", receiverUid)
-      formData.append("type", file ? "file" : "text")
-      if (newMessage.trim()) {
-        formData.append("message", newMessage.trim())
-      }
-      if (file) {
-        formData.append("attachment", file)
-      }
+      formData.append("receiver_id", receiverUid);
+    if (file) {
+      formData.append("type", "file");
+      // make sure to include the filename
+      formData.append("attachment", file, file.name);
+    } else {
+      formData.append("type", "text");
+      formData.append("message", newMessage.trim());
+    }
 
       const res = await axios.post(`${config.API_BASE_URL}/chat/send`, formData, {
         headers: {
           ...getAuthHeaders(),
-          "Content-Type": "multipart/form-data",
         },
         timeout: 30000,
       })
@@ -960,7 +960,7 @@ export default function Chat() {
                                     if (line.startsWith("Custom order created:")) {
                                       return (
                                         <div key={index} className="flex items-center gap-3 mb-3">
-                                          <span className="font-medium text-slate-500 min-w-[80px]">Gig:</span>
+                                          <span className="font-medium text-slate-500 min-w-[80px]">Service:</span>
                                           <span className="text-slate-800">
                                             {line.replace("Custom order created:", "").trim()}
                                           </span>

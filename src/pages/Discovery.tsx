@@ -34,6 +34,8 @@ export default function Discover() {
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const token = localStorage.getItem("token")
+const [sortBy, setSortBy] = useState<"price_asc"|"price_desc">("price_asc")
+const perPage = 10  // or make it state if you want the user to change it
 
   // Fetch categories (unchanged)
   useEffect(() => {
@@ -77,7 +79,14 @@ export default function Discover() {
       : `category:${filter}`
 
   // Fetch discover data
-  const { users, loading, error, totalPages } = useDiscover(adjustedFilter, search, page)
+  const { users, loading, error, totalPages } = useDiscover(
+  adjustedFilter,
+  search,
+  page,
+  sortBy,
+  perPage
+)
+
 
   const goToChat = (e: React.MouseEvent) => {
     e.stopPropagation()
