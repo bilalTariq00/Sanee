@@ -193,8 +193,9 @@ const handleViewSubmission = (c: any) => {
         }
         return <Badge className="bg-white text-red-700 border border-red-400">In Progress</Badge>
       case "completed":
-      case "finished":
         return <Badge className="bg-green-100 text-green-700 border border-green-200">Completed</Badge>
+      case "finished":
+        return <Badge className="bg-green-100 text-green-700 border border-green-200">Finished</Badge>
          case "rejected":
        return <Badge className="bg-gray-200 text-gray-700 border border-gray-300">Rejected</Badge>
       case "cancelled":
@@ -264,7 +265,7 @@ const handleViewSubmission = (c: any) => {
                   )}
 
                   {/* Buyer or Seller: once work is submitted */}
-                 { hasWorkSubmission  && c.status !== "rejected"&&(
+                 { hasWorkSubmission  && c.status !== "rejected" && c.status !== "finished"&&(
                     <div className="bg-red-50 p-3 rounded border border-red-100 space-y-2">
                       <p className="font-medium text-red-700">📩 Work Submission</p>
 
