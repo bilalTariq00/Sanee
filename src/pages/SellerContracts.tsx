@@ -235,51 +235,50 @@ export default function SellerContracts() {
                       </div>
 
                       {/* BUTTONS */}
-                      <div className="pt-2 space-x-2">
-                        {c.status === "pending" && (
-                          <>
-                            <Button
-                              size="sm"
-                              className="bg-red-600 hover:bg-red-700 text-white"
-                              onClick={() =>
-                                handleAction(c.id, "in_progress")
-                              }
-                            >
-                              {t("seller_contracts.start_button")}
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="bg-gray-600 hover:bg-gray-700 text-white"
-                              onClick={() => handleReject(c.id)}
-                            >
-                              {t("seller_contracts.reject_button")}
-                            </Button>
-                          </>
-                        )}
+                     <div className="pt-2 space-x-2">
+  {/* 1) pending → show Start + Reject */}
+  {c.status === "pending" && (
+    <>
+      <Button
+        size="sm"
+        className="bg-red-600 hover:bg-red-700 text-white"
+        onClick={() => handleAction(c.id, "in_progress")}
+      >
+        {t("seller_contracts.start_button")}
+      </Button>
+      <Button
+        size="sm"
+        className="bg-gray-600 hover:bg-gray-700 text-white"
+        onClick={() => handleReject(c.id)}
+      >
+        {t("seller_contracts.reject_button")}
+      </Button>
+    </>
+  )}
 
-                        {c.status === "in_progress" &&
-                          !hasWorkSubmission &&
-                          Boolean(c.started_at) && (
-                            <Button
-                              size="sm"
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                              onClick={() => openSubmitModal(c.id)}
-                            >
-                              {t("seller_contracts.submit_work")}
-                            </Button>
-                          )}
+  {/* 2) in_progress & no submission yet → show Submit Work */}
+  {c.status === "in_progress" && !hasWorkSubmission && (
+    <Button
+      size="sm"
+      className="bg-blue-600 hover:bg-blue-700 text-white"
+      onClick={() => openSubmitModal(c.id)}
+    >
+      {t("seller_contracts.submit_work")}
+    </Button>
+  )}
 
-                        {(c.status === "completed" || c.status === "finished") &&
-                          !c.reviewed && (
-                            <Button
-                              size="sm"
-                              className="bg-red-500 hover:bg-red-600 text-white"
-                              onClick={() => handleReview(c.id)}
-                            >
-                              {t("seller_contracts.review_buyer")}
-                            </Button>
-                          )}
-                      </div>
+  {/* 3) completed/finished & not reviewed → show Review Buyer */}
+  {(c.status === "completed" || c.status === "finished") && !c.reviewed && (
+    <Button
+      size="sm"
+      className="bg-red-500 hover:bg-red-600 text-white"
+      onClick={() => handleReview(c.id)}
+    >
+      {t("seller_contracts.review_buyer")}
+    </Button>
+  )}
+</div>
+
                     </CardContent>
                   </Card>
                 )

@@ -42,26 +42,82 @@ function Checkout() {
   useEffect(() => {
     fetchGigAndBuyer();
   }, []);
+const fetchActiveContract = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+      `${config.API_BASE_URL}/contracts/active?gig_id=${gig.id}`,
+      { headers: { Authorization: `Bearer ${token}` }}
+    );
+    // assume res.data.data is either null or your active contract
+    setActiveContract(res.data.data);
+  } catch (e) {
+    console.error("Could not fetch active contract", e);
+  }
+};
+// inside your component
+async function fetchActiveContractForGig(gigId: number) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+      `${config.API_BASE_URL}/contracts`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { gig_id: gigId }
+      }
+    );
+    const all: ActiveContract[] = res.data.data ?? [];
+
+    // ONLY treat pending or in_progress as “active”
+    return (
+      all.find(c =>
+        c.status === "pending" ||
+        c.status === "in_progress"
+      ) ?? null
+    );
+  } catch (e) {
+    console.error("Couldn’t fetch gig contracts", e);
+    return null;
+  }
+}
+
 
   const fetchGigAndBuyer = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const [gigRes, buyerRes] = await Promise.all([
-        axios.get(`${config.API_BASE_URL}/gigs/by-uid/${gig_uid}`),
-        axios.get(`${config.API_BASE_URL}/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
-      // assume gig comes in gigRes.data.data or gigRes.data
-      setGig(gigRes.data?.data ?? gigRes.data);
-      setBuyer(buyerRes.data?.data ?? buyerRes.data);
-    } catch (err) {
-      console.error("Error fetching data", err);
-      toast.error(t("checkout.data_error"));
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  setActiveContract(null);
+
+  try {
+    const token = localStorage.getItem("token");
+    // fetch gig + buyer like before…
+    const [gigRes, buyerRes] = await Promise.all([
+      axios.get(`${config.API_BASE_URL}/gigs/by-uid/${gig_uid}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }),
+      axios.get(`${config.API_BASE_URL}/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }),
+    ]);
+
+    const fetchedGig   = gigRes.data.data ?? gigRes.data;
+    const fetchedBuyer = buyerRes.data.data ?? buyerRes.data;
+
+    setGig(fetchedGig);
+    setBuyer(fetchedBuyer);
+
+    // now fetch all contracts for this gig and pick the active one
+   const live = await fetchActiveContractForGig(fetchedGig.id);
+setActiveContract(live);
+
+
+  } catch (err) {
+    console.error("Error fetching data", err);
+    toast.error(t("checkout.data_error"));
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const handlePlaceOrder = async () => {
     setProcessing(true);
@@ -203,8 +259,9 @@ function Checkout() {
           </Card>
 
           {/* Active Contract Warning */}
-          {activeContract && (
-            <Card className="border-yellow-400 bg-yellow-50">
+         {(activeContract?.status === "pending" ||
+  activeContract?.status === "in_progress") && (
+  <Card className="border-yellow-400 bg-yellow-50">
               <CardHeader>
                 <CardTitle className="text-yellow-800">
                   {t("checkout.already_active")}
@@ -256,14 +313,19 @@ function Checkout() {
                 <strong>{t("checkout.method")}:</strong>{" "}
                 {t("checkout.bank_transfer")}
               </p>
-              <p className="text-gray-500">{t("checkout.payment_note")}</p>
+              <p className="text-gray-500">{t("checkout.payment_note")}</p>  
               <Button
-                className="w-full bg-red-600 hover:bg-red-700 text-white"
-                onClick={handlePlaceOrder}
-                disabled={processing || Boolean(activeContract)}
-              >
-                {processing ? t("checkout.placing") : t("checkout.confirm")}
-              </Button>
+  onClick={handlePlaceOrder}
+  disabled={
+    processing ||
+    (activeContract?.status === "pending" ||
+     activeContract?.status === "in_progress")
+  }
+  className="w-full bg-red-600 hover:bg-red-700 text-white"
+>
+  {processing ? t("checkout.placing") : t("checkout.confirm")}
+</Button>
+
             </CardContent>
           </Card>
         </div>
