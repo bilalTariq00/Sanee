@@ -191,6 +191,7 @@ export default function SignupForm() {
         className="hidden"
         accept=".pdf,image/*"
         onChange={handleFileChange}
+        required
       />
       <div className="flex items-center justify-center">
         {govCertificate ? (
