@@ -66,17 +66,26 @@ const perPage = 10  // or make it state if you want the user to change it
     document.documentElement.setAttribute("dir", isRTL ? "rtl" : "ltr")
     document.documentElement.setAttribute("lang", i18n.language)
   }, [i18n.language, isRTL])
-
+const userType: "seller" | "buyer" =
+  authUser?.account_type === "seller" ? "buyer" : "seller"
   // Determine adjusted filter for hook
-  const userType: "seller" | "buyer" = authUser?.account_type === "seller" ? "buyer" : "seller"
-  const adjustedFilter =
-    filter === "people"
-      ? userType === "buyer"
+    // Map your UI filter directly to the API's "type" value:
+  const adjustedFilter = (() => {
+    // Always show actual sellers when you click "seller"
+    if (filter === "seller") return "seller";
+    // Always show actual buyers when you click "buyer"
+    if (filter === "buyer") return "buyer";
+    // "people" still toggles to the opposite of your own role
+    if (filter === "people") {
+      return authUser?.account_type === "seller"
         ? "buyerpeople"
-        : "sellerpeople"
-      : ["all", "seller", "buyer"].includes(filter)
-      ? filter
-      : `category:${filter}`
+        : "sellerpeople";
+    }
+    // The "all" tab
+    if (filter === "all") return "all";
+    // category:<id>
+    return `category:${filter}`;
+  })();
 
   // Fetch discover data
   const { users, loading, error, totalPages } = useDiscover(
@@ -117,8 +126,11 @@ const perPage = 10  // or make it state if you want the user to change it
     }
 
     // 2️⃣ “jobs” and “gigs” still use their special pages
-    if (filter === "jobs") return <JobsPage />
-    if (filter === "gigs") return <AllGigs />
+   if (filter === "jobs")
+  return <JobsPage searchQuery={search} />
+
+if (filter === "gigs")
+  return <AllGigs searchQuery={search} />
 
     // 3️⃣ All other filters → list matching UserCards
     return (

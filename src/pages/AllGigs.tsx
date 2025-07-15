@@ -9,12 +9,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import config from "../config";
 import { User } from "lucide-react";
+interface AllGigsProps {
+  searchQuery: string;
+}
 
-export default function AllGigs() {
+
+export default function AllGigs({ searchQuery }: AllGigsProps) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
   const [gigs, setGigs] = useState([]);
+  const [filteredGigs, setFilteredGigs] = useState<any[]>([]);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +34,7 @@ export default function AllGigs() {
       setError(null);
       const res = await axios.get(`${config.API_BASE_URL}/all-gigs`);
       setGigs(res.data);
+       setFilteredGigs(res.data);  
     } catch (err) {
       console.error("Error fetching gigs:", err);
       setError(t("error_generic") || "Failed to load gigs. Please try again later.");
@@ -36,6 +42,20 @@ export default function AllGigs() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) {
+      setFilteredGigs(gigs);
+    } else {
+      setFilteredGigs(
+        gigs.filter(g =>
+          g.title.toLowerCase().includes(q) ||
+          g.category?.name.toLowerCase().includes(q)
+        )
+      );
+    }
+  }, [searchQuery, gigs]);
+
 
   if (loading) {
     return (
@@ -86,7 +106,7 @@ export default function AllGigs() {
 
 
         <div className="space-y-4">
-          {gigs.map((gig) => {
+         {filteredGigs.map(gig =>{
             const imageUrl = gig.images?.[0]?.image_path
               ? `${config.IMG_BASE_URL}/storage/${gig.images[0].image_path}`
               : "https://via.placeholder.com/400x200";
@@ -119,7 +139,7 @@ export default function AllGigs() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {gigs.map((gig) => {
+         {filteredGigs.map(gig =>{
             const imageUrl = gig.images?.[0]?.image_path
               ? `${config.IMG_BASE_URL}/storage/${gig.images[0].image_path}`
               : "https://via.placeholder.com/400x200";

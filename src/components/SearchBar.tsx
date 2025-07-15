@@ -32,18 +32,18 @@ export default function SearchBar({
   const { t } = useTranslation()
 
   // Determine main filters based on role
-  const filters =
-    authUserType === "seller"
-      ? [
-          { id: "all", label: t("all_people") || "All People" },
-          { id: "jobs", label: t("all_jobs") || "All Jobs" },
-          { id: "buyer", label: t("filter_buyer") || "Buyers" },
-        ]
-      : [
-          { id: "all", label: t("all_people") || "All People" },
-          { id: "gigs", label: t("all_services") || "All Services" },
-          { id: "seller", label: t("filter_seller") || "Sellers" },
-        ]
+ // src/components/SearchBar.tsx
+const filters =
+  authUserType === "seller"
+    ? [
+        { id: "all",  label: t("all_people") || "All People" },
+        { id: "jobs", label: t("all_jobs")   || "All Jobs"    },
+      ]
+    : [
+        { id: "all",  label: t("all_people")   || "All People"   },
+        { id: "gigs", label: t("all_services") || "All Services" },
+      ]
+
 
   return (
     <div className={`w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>

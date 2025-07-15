@@ -27,10 +27,12 @@ interface Job {
     first_name: string;
     last_name: string;
     image?: string;
+
   };
+   searchQuery: string;
 }
 
-export default function JobsPage() {
+export default function JobsPage({ searchQuery }: Job) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -39,7 +41,6 @@ export default function JobsPage() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [savedJobIds, setSavedJobIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
   const [skillsFilter, setSkillsFilter] = useState('__all__');
   const [skillsList, setSkillsList] = useState<string[]>([]);
 
@@ -93,20 +94,18 @@ setSavedJobIds(ids);
 
   // 2️⃣ Filter logic
   useEffect(() => {
-    let filtered = allJobs;
-    const q = searchQuery.toLowerCase();
-    if (q) {
-      filtered = filtered.filter(job =>
-        job.title.toLowerCase().includes(q)
-      );
-    }
-    if (skillsFilter !== '__all__') {
-      filtered = filtered.filter(job =>
-        job.skills?.includes(skillsFilter)
-      );
-    }
-    setFilteredJobs(filtered);
-  }, [searchQuery, skillsFilter, allJobs]);
+  let filtered = allJobs;
+  const q = searchQuery.trim().toLowerCase();
+  if (q) {
+    filtered = filtered.filter(job =>
+      job.title.toLowerCase().includes(q) ||
+      job.description.toLowerCase().includes(q)
+    );
+  }
+  // (keep your skillsFilter logic if you want)
+  setFilteredJobs(filtered);
+}, [searchQuery, skillsFilter, allJobs]);
+
 
   // 3️⃣ Toggle save/unsave handler
   const toggleSave = async (jobId: number) => {
