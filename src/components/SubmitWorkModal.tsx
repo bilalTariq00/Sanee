@@ -129,6 +129,7 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }: SubmitWorkM
               onChange={handleFileChange}
               disabled={submitting}
               accept=".pdf,.doc,.docx,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif"
+              required
             />
             <p className="text-sm text-muted-foreground mt-1">
               {t("submit_modal.attachment_hint") || "You can upload multiple files (images, documents, archives)"}
@@ -142,7 +143,7 @@ function SubmitWorkModal({ show, onClose, contractId, onSubmitted }: SubmitWorkM
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={submitting || !note.trim()}
+            disabled={submitting || !note.trim()||!files}
             className="bg-blue-600 hover:bg-blue-700"
           >
             {submitting ? "Submitting..." : t("submit_modal.submit") || "Submit Work"}
