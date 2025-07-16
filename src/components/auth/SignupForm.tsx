@@ -3,7 +3,7 @@ import { Eye, EyeOff, Upload, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../../config';
-import SocialAuth from './SocialAuth';
+
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -224,7 +224,7 @@ export default function SignupForm() {
         </button>
       </div>
 
-      <SocialAuth />
+     
 
       <div className="text-sm text-center">
         <span className="text-gray-600">Already have an account?</span>{' '}
