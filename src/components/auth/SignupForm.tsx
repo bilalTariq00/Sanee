@@ -3,6 +3,7 @@ import { Eye, EyeOff, Upload, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import config from '../../config';
+import { toast } from 'sonner';
 
 
 export default function SignupForm() {
@@ -106,6 +107,13 @@ export default function SignupForm() {
     } catch (err: any) {
       console.error('Registration Error:', err.response?.data || err.message);
       setError('Registration failed. Please try again.');
+      const serverMsg =
+       err.response?.data?.message ||
+       err.response?.data?.error ||
+       err.response?.data ||
+       err.message ||
+       'An unexpected error occurred.';
+     toast.error(serverMsg);
     }
   };
 
