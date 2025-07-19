@@ -13,6 +13,8 @@ export type DiscoverFilter =
   | "sellerpeople"
   | "buyerpeople"
   | "featured"
+  | "gigs"
+  | "jobs"
   | `category:${string}`
 
 // Helper: build full image URL
@@ -179,6 +181,10 @@ function filterToType(filter: DiscoverFilter): string {
       return "featured"
     case "all":
       return "all"
+    case "gigs":
+      return "seller" // gigs come from sellers
+    case "jobs":
+      return "buyer" // jobs come from buyers
     default:
       // e.g. "category:3" → "3"
       return filter.split(":")[1]
@@ -234,10 +240,19 @@ export function useDiscover(
         let { users: fetched, totalPages: pages } =
           normalizeApiResponse(res.data.data || res.data)
 
-        // **ADDED**: if the viewer is a buyer and rawFilter is "all", only keep Gigs
+        // Apply user-specific filtering logic
         if (authUser?.account_type === "buyer" && rawFilter === "all") {
+          // Buyers see only Gigs when "all" is selected
           fetched = fetched.filter((u) => u.badge === "Gig")
+        } else if (authUser?.account_type === "seller" && rawFilter === "gigs") {
+          // Sellers see only Gigs when "gigs" filter is selected
+          fetched = fetched.filter((u) => u.badge === "Gig")
+        } else if (authUser?.account_type === "seller" && rawFilter === "jobs") {
+          // Sellers see only Jobs when "jobs" filter is selected
+          fetched = fetched.filter((u) => u.badge === "Job")
         }
+        // For seller "all" filter, show both gigs and jobs (no filtering needed)
+        // The component will handle grouping them by badge type
 
         if (alive) {
           setData(fetched)

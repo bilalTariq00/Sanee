@@ -1,5 +1,6 @@
 "use client"
 
+import type { DiscoverFilter } from "@/hooks/useDiscover"
 import { useState, useEffect } from "react"
 import type React from "react"
 import { useTranslation } from "react-i18next"
@@ -27,22 +28,27 @@ export default function Discover() {
   const { user: authUser } = useAuth()
 
   const [search, setSearch] = useState("")
-  const [filter, setFilter] = useState<string>("all")
+  const [filter, setFilter] = useState<DiscoverFilter>(
+    authUser?.account_type === "seller" ? "all" : "all"
+  )
   const [page, setPage] = useState(1)
   const [selected, setSelected] = useState<User | null>(null)
   const [open, setOpen] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const token = localStorage.getItem("token")
-const [sortBy, setSortBy] = useState<"price_asc"|"price_desc">("price_asc")
-const perPage = 10  // or make it state if you want the user to change it
+  const [sortBy, setSortBy] = useState<"price_asc" | "price_desc">("price_asc")
+  const perPage = 10
 
-  // Fetch categories (unchanged)
+  // Fetch categories
   useEffect(() => {
     const language = i18n.language.startsWith("ar") ? "ar" : "en"
     axios
       .get(`${config.API_BASE_URL}/categories`, {
-        headers: { Authorization: `Bearer ${token}`, "Accept-Language": language },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Accept-Language": language,
+        },
       })
       .then((res) => {
         const cats = res.data.data.categories.map((c: any) => ({
@@ -61,91 +67,169 @@ const perPage = 10  // or make it state if you want the user to change it
       })
   }, [token, i18n.language])
 
-  // RTL / LTR
+  // Set RTL/LTR on <html>
   useEffect(() => {
     document.documentElement.setAttribute("dir", isRTL ? "rtl" : "ltr")
     document.documentElement.setAttribute("lang", i18n.language)
   }, [i18n.language, isRTL])
-const userType: "seller" | "buyer" =
-  authUser?.account_type === "seller" ? "buyer" : "seller"
-  // Determine adjusted filter for hook
-    // Map your UI filter directly to the API's "type" value:
-  const adjustedFilter = (() => {
-    // Always show actual sellers when you click "seller"
-    if (filter === "seller") return "seller";
-    // Always show actual buyers when you click "buyer"
-    if (filter === "buyer") return "buyer";
-    // "people" still toggles to the opposite of your own role
-    if (filter === "people") {
-      return authUser?.account_type === "seller"
-        ? "buyerpeople"
-        : "sellerpeople";
-    }
-    // The "all" tab
-    if (filter === "all") return "all";
-    // category:<id>
-    return `category:${filter}`;
-  })();
 
-  // Fetch discover data
+  const userType: "seller" | "buyer" =
+    authUser?.account_type === "seller" ? "buyer" : "seller"
+
+  // Pull discover results
   const { users, loading, error, totalPages } = useDiscover(
-  adjustedFilter,
-  search,
-  page,
-  sortBy,
-  perPage
-)
-
+    filter,
+    search,
+    page,
+    sortBy,
+    perPage
+  )
 
   const goToChat = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (selectedId) navigate(`/messages/${selectedId}`)
   }
 
-  // --- MAIN CONTENT RENDERER ---
+  // Main renderer
   const renderMainContent = () => {
-    // 1️⃣ “All” → one UserCard per user (each UserCard shows all that user’s services)
-    if (filter === "all") {
+    // 1. Jobs/Gigs routes
+    if (filter === "jobs") return <JobsPage searchQuery={search} />
+    if (filter === "gigs") return <AllGigs searchQuery={search} />
+
+    // 2. Seller "all" grouping
+    if (authUser?.account_type === "seller" && filter === "all") {
+      const serviceProviders = users.filter((u) => u.badge === "Gig")
+      const jobPosters = users.filter((u) => u.badge === "Job")
+
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {users.map((u) => (
-            <UserCard
-              key={u.uid}
-              user={u}
-              userType={userType}
-              authUserType={authUser?.account_type}
-              onUserClick={() => {
-                setSelected(u)
-                setSelectedId(u.uid)
-                setOpen(true)
-              }}
-            />
-          ))}
-        </div>
+        <>
+          {/* Service Providers */}
+          {serviceProviders.length > 0 && (
+            <section className="mb-12">
+              <div className={`flex items-center mb-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div className="bg-blue-500 p-2 rounded-lg mr-3">
+                  <span className="text-white font-bold text-sm">🛠️</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {t("service_providers") || "Service Providers"}
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    {t("browse_available_services") || "Browse available services from freelancers"}
+                  </p>
+                </div>
+                <div
+                  className={`bg-blue-100 px-3 py-1 rounded-full text-blue-600 text-sm font-medium ${
+                    isRTL ? "mr-auto" : "ml-auto"
+                  }`}
+                >
+                  {serviceProviders.length} {t("services") || "Services"}
+                </div>
+              </div>
+              <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? "rtl" : ""}`}>
+                {serviceProviders.map((u) => (
+                  <UserCard
+                    key={u.uid}
+                    user={u}
+                    userType={userType}
+                    authUserType={authUser?.account_type}
+                    onUserClick={() => {
+                      setSelected(u)
+                      setSelectedId(u.uid)
+                      setOpen(true)
+                    }}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Job Posters */}
+          {jobPosters.length > 0 && (
+            <section className="mb-12">
+              <div className={`flex items-center mb-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <div className="bg-green-500 p-2 rounded-lg mr-3">
+                  <span className="text-white font-bold text-sm">💼</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {t("job_posters") || "Job Posters"}
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    {t("find_job_opportunities") || "Find job opportunities from clients"}
+                  </p>
+                </div>
+                <div
+                  className={`bg-green-100 px-3 py-1 rounded-full text-green-600 text-sm font-medium ${
+                    isRTL ? "mr-auto" : "ml-auto"
+                  }`}
+                >
+                  {jobPosters.length} {t("jobs") || "Jobs"}
+                </div>
+              </div>
+              <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? "rtl" : ""}`}>
+                {jobPosters.map((u) => (
+                  <UserCard
+                    key={u.uid}
+                    user={u}
+                    userType={userType}
+                    authUserType={authUser?.account_type}
+                    onUserClick={() => {
+                      setSelected(u)
+                      setSelectedId(u.uid)
+                      setOpen(true)
+                    }}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className={`flex justify-center mt-10 gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+              >
+                {t("prev") || "Prev"}
+              </button>
+              <span className="py-2 px-4 bg-white rounded border">
+                {t("page")} {page} / {totalPages}
+              </span>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+              >
+                {t("next") || "Next"}
+              </button>
+            </div>
+          )}
+        </>
       )
     }
 
-    // 2️⃣ “jobs” and “gigs” still use their special pages
-   if (filter === "jobs")
-  return <JobsPage searchQuery={search} />
-
-if (filter === "gigs")
-  return <AllGigs searchQuery={search} />
-
-    // 3️⃣ All other filters → list matching UserCards
+    // 3. Generic grid + pagination for all other filters
     return (
       <>
+        {/* Loading */}
         {loading && (
           <div className="flex justify-center items-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
           </div>
         )}
+
+        {/* Error */}
         {error && (
           <div className="text-center py-16">
             <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
             <p className="text-red-500">{error}</p>
           </div>
         )}
+
+        {/* Results */}
         {!loading && !error && users.length > 0 && (
           <>
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ${isRTL ? "rtl" : ""}`}>
@@ -163,6 +247,7 @@ if (filter === "gigs")
                 />
               ))}
             </div>
+
             {totalPages > 1 && (
               <div className={`flex justify-center mt-10 gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
                 <button
@@ -186,6 +271,8 @@ if (filter === "gigs")
             )}
           </>
         )}
+
+        {/* Empty */}
         {!loading && !error && users.length === 0 && (
           <div className="text-center py-16">
             <div className="text-gray-400 text-6xl mb-4">🔍</div>
@@ -217,10 +304,9 @@ if (filter === "gigs")
           }}
           activeFilter={filter}
           onFilterChange={(f) => {
-            setFilter(f)
+            setFilter(f as DiscoverFilter)
             setPage(1)
           }}
-          userType={userType}
           authUserType={authUser?.account_type}
           categories={categories}
           isRTL={isRTL}

@@ -1,5 +1,4 @@
 "use client"
-
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -30,20 +29,18 @@ export default function SearchBar({
   isRTL,
 }: SearchBarProps) {
   const { t } = useTranslation()
-
+  
   // Determine main filters based on role
- // src/components/SearchBar.tsx
-const filters =
-  authUserType === "seller"
-    ? [
-        { id: "all",  label: t("all_people") || "All People" },
-        { id: "jobs", label: t("all_jobs")   || "All Jobs"    },
-      ]
-    : [
-        { id: "all",  label: t("all_people")   || "All People"   },
-        { id: "gigs", label: t("all_services") || "All Services" },
-      ]
-
+  const filters =
+    authUserType === "seller"
+      ? [
+          { id: "all",  label: t("all_people") || "All People" },
+          { id: "jobs", label: t("all_jobs") || "All Jobs" },
+        ]
+      : [
+          { id: "all",  label: t("all_people") || "All People" },
+          { id: "gigs", label: t("all_services") || "All Services" },
+        ]
 
   return (
     <div className={`w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
@@ -58,7 +55,7 @@ const filters =
           type="text"
           placeholder={
             authUserType === "seller"
-              ? t("search_jobs") || "Search jobs..."
+              ? t("search_jobs_services") || "Search jobs and services..."
               : t("search_services") || "Search services..."
           }
           value={searchTerm}
@@ -74,7 +71,7 @@ const filters =
           }`}
         />
       </div>
-
+      
       {/* Main filters */}
       <div className="flex flex-wrap gap-2 mb-4">
         {filters.map((f) => (
@@ -92,7 +89,7 @@ const filters =
           </Button>
         ))}
       </div>
-
+      
       {/* Category filters */}
       {categories.length > 0 && (
         <div className="space-y-2">
