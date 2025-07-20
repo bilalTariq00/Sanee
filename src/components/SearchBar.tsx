@@ -27,6 +27,7 @@ export default function SearchBar({
   categories,
   authUserType,
   isRTL,
+    tabs,
 }: SearchBarProps) {
   const { t } = useTranslation()
   
@@ -34,11 +35,11 @@ export default function SearchBar({
   const filters =
     authUserType === "seller"
       ? [
-          { id: "all",  label: t("all_people") || "All People" },
+          { id: "all",  label: t("seller_buyer") || "All People" },
           { id: "jobs", label: t("all_jobs") || "All Jobs" },
         ]
       : [
-          { id: "all",  label: t("all_people") || "All People" },
+          { id: "all",  label: t("seller") || "All People" },
           { id: "gigs", label: t("all_services") || "All Services" },
         ]
 
@@ -74,6 +75,7 @@ export default function SearchBar({
       
       {/* Main filters */}
       <div className="flex flex-wrap gap-2 mb-4">
+        
         {filters.map((f) => (
           <Button
             key={f.id}

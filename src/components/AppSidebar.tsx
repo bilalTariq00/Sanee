@@ -11,6 +11,7 @@ import {
   FileX2Icon,
   Wallet,
   WorkflowIcon,
+  Bookmark,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -232,6 +233,21 @@ const handleSignOut = () => {
                         {!isCollapsed && <span className="font-medium">{t('buyer_contract')}</span>}
                       </Link>
                     </SidebarMenuButton>
+                  </SidebarMenuItem>
+                                    <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+  <Link
+    to="/saved-gigs"
+    className={`
+      flex items-center gap-3 p-3 rounded-xl text-gray-700
+      hover:bg-red-100 hover:text-red-600
+      ${isCollapsed ? "justify-center" : ""}
+    `}
+  >
+    <Bookmark className="h-4 w-4" />
+    {!isCollapsed && <span className="font-medium">{t("saved_gigs")}</span>}
+  </Link>
+</SidebarMenuButton>
                   </SidebarMenuItem>
                 </>
               )}

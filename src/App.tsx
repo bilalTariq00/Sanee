@@ -43,6 +43,7 @@ import GigDetail from "./pages/GigDetail"
 import WalletPage from "./pages/wallet-page"
 import SavedJobsPage from "./pages/SavedJobsPage"
 import "./App.css"
+import SavedGigsPage from "./pages/SavedGigsPage"
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -112,6 +113,7 @@ function AppRoutes() {
           <Route path="save-jobs" element={<SavedJobsPage />} />
         {/* gigs */}
         <Route path="gigs" element={<AllGigs />} />
+        <Route path="saved-gigs" element={<SavedGigsPage />} />
         <Route path="create-gig" element={<CreateGig />} />
         <Route path="manage-gigs" element={<ManageGigs />} />
         <Route path="edit-gig/:id" element={<EditGig />} />

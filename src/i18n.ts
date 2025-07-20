@@ -38,6 +38,11 @@ navigation: "Navigation",
 sign_out: "Sign Out",
 discover_title: "Discover",
 no_results: "No results found.",
+ service_providers: "Service Providers",
+  browse_available_services: "Browse available services from freelancers",
+  job_posters: "Job Posters",
+  find_job_opportunities: "Find job opportunities from clients",
+  search_jobs_services: "Search jobs and services…",
 prev: "Prev",
 next: "Next",
 page: "Page",
@@ -107,6 +112,11 @@ submit_proposal: "Submit Proposal",
 already_applied: "✅ You have  submitted a proposal for this job.",
 your_price: "Your price",
 your_deadline: "Deadline",
+seller_buyer: "Seller – Buyer",
+ job_posters_tab: "Job Posters", // New translation key
+      service_providers_tab: "Service Providers", // New translation key
+      no_job_posters_found: "No job posters found", // New translation key
+      no_service_providers_found: "No service providers found", // New translation key
 too_many_files: "Too many files",
 upload_limit: "You can upload up to 10 files only.",
 file_too_large: "File too large",
@@ -439,7 +449,9 @@ manage_gigs: {
   edit: "Edit",
   delete: "Delete",
   confirm_delete: "Are you sure you want to delete this service?",
-  gig_id: "Service ID"
+  gig_id: "Service ID",
+  available: "Available",
+    unavailable: "Unavailable",
 },
 manage_job: {
   title: "My Jobs",
@@ -786,6 +798,10 @@ followers: "متابعون",
 arabic: "العربية",
 english: "ENGLISH",
 messages: "المحادثات",
+job_posters_tab: "ناشرو الوظائف", // New translation key
+      service_providers_tab: "مقدمي الخدمات", // New translation key
+      no_job_posters_found: "لم يتم العثور على ناشري وظائف", // New translation key
+      no_service_providers_found: "لم يتم العثور على مقدمي خدمات", // New translation key
 balance: "فلوسك",
 settings: "الإعدادات",
 user: "المستخدم",
@@ -812,6 +828,12 @@ job_not_found: "المشروع غير موجود",
 job_not_found_subtext: "المشروع الذي تبحث عنه غير موجودأو تم خذفه.",
 go_back: "العودة",
 back: "رجوع",
+  service_providers: "مزودو الخدمات",
+  browse_available_services: "تصفح الخدمات المتاحة من المستقلين",
+  job_posters: "منشئو الوظائف",
+  find_job_opportunities: "اكتشف فرص العمل من العملاء",
+  search_job_services: "ابحث عن الوظائف والخدمات…",
+  
 not_specified: "غير محدد",
 status_unknown: "حالة غير معروفة",
 skills_required: "المهارات المطلوبة",
@@ -910,6 +932,7 @@ contract_finished_title: "تم إنهاء العقد!",
 leave_review_msg: "يرجى ترك تقييم لراعي المشروع.",
 reject_submission_title: "رفض التسليم؟",
 reject_submission_text: "هل أنت متأكد؟ سيتم إخطار راعي المشروع.",
+ seller_buyer: "بائع – مشتري",
 yes_reject: "نعم، رفض",
 rejected_title: "تم الرفض",
 view_employer_profile:"عرض",
@@ -1168,7 +1191,9 @@ manage_gigs: {
   edit: "تعديل",
   delete: "حذف",
   confirm_delete: "هل أنت متأكد أنك تريد حذف هذه الصناعة؟",
-  gig_id: "معرّف الصناعة"
+  gig_id: "معرّف الصناعة",
+     available: "متاح",
+    unavailable: "غير متاح",
 },
 manage_job: {
   title: "مشاريعي",

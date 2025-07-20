@@ -112,6 +112,10 @@ export default function GigDetail() {
                     <Badge variant="secondary" className="bg-red-50 text-red-700 hover:bg-red-100">
                       {gig.category.name}
                     </Badge>
+                    <Badge variant="secondary" className="bg-red-50 text-red-700 hover:bg-red-100">
+                    {gig.subcategory?.name}
+                    </Badge>
+                    
                   </div>
                 )}
 
@@ -144,22 +148,29 @@ export default function GigDetail() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <Button onClick={handleHireClick} className="w-full bg-red-600 hover:bg-red-700 text-white" size="lg">
-                  <User className="h-4 w-4 mr-2" />
-                  Hire Now
-                </Button>
+            <div className="space-y-3">
+  {gig.is_available_for_hire && (
+    <Button
+      onClick={handleHireClick}
+      className="w-full bg-red-600 hover:bg-red-700 text-white"
+      size="lg"
+    >
+      <User className="h-4 w-4 mr-2" />
+      Hire Now
+    </Button>
+  )}
 
-                <Button
-                  onClick={() => navigate(`/messages/${gig.user?.uid}`)}
-                  variant="outline"
-                  className="w-full border-red-600 text-red-600 hover:bg-red-50"
-                  size="lg"
-                >
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Chat with Seller
-                </Button>
-              </div>
+  <Button
+    onClick={() => navigate(`/messages/${gig.user?.uid}`)}
+    variant="outline"
+    className="w-full border-red-600 text-red-600 hover:bg-red-50"
+    size="lg"
+  >
+    <MessageCircle className="h-4 w-4 mr-2" />
+    Chat with Seller
+  </Button>
+</div>
+
             </CardContent>
           </Card>
         </div>
