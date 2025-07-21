@@ -1,29 +1,17 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { api } from "@/lib/api"
 import { useAuth } from "@/contexts/AuthContext"
 import type { User } from "@/types/User"
 import config from "@/config"
 
-export type DiscoverFilter =
-  | "all"
-  | "seller"
-  | "buyer"
-  | "sellerpeople"
-  | "buyerpeople"
-  | "featured"
-  | "gigs"
-  | "jobs"
-  | `category:${string}`
+export type DiscoverFilter = "all" | "seller" | "buyer" | "sellerpeople" | "buyerpeople" | "featured" | "gigs" | "jobs"
 
 // Helper: build full image URL
 function buildImageUrl(path: string) {
   if (!path) return "/placeholder.svg?height=200&width=300"
   if (path.startsWith("http://") || path.startsWith("https://")) return path
-  const clean = path.startsWith("/storage/")
-    ? path.replace(/^\/storage\//, "")
-    : path.replace(/^\//, "")
+  const clean = path.startsWith("/storage/") ? path.replace(/^\/storage\//, "") : path.replace(/^\//, "")
   return `${config.API_BASE_URL}/storage/${clean}`
 }
 
@@ -31,8 +19,7 @@ function buildImageUrl(path: string) {
 function isValidImageUrl(url: string): boolean {
   if (!url) return false
   if (url.includes("placeholder.svg")) return true
-  if (url.startsWith("http://") || url.startsWith("https://"))
-    return !url.endsWith("/storage")
+  if (url.startsWith("http://") || url.startsWith("https://")) return !url.endsWith("/storage")
   return false
 }
 
@@ -57,7 +44,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
       subcategory?: any
       price?: number
       budget?: number
-    }>
+    }>,
   ) => {
     const uid = u.uid
     if (!userMap[uid]) {
@@ -76,8 +63,8 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         badge,
         hourlyRate:
           badge === "Gig"
-            ? parseFloat(projectItems[0]?.price?.toString() || "0")
-            : parseFloat(projectItems[0]?.budget?.toString() || "0"),
+            ? Number.parseFloat(projectItems[0]?.price?.toString() || "0")
+            : Number.parseFloat(projectItems[0]?.budget?.toString() || "0"),
         experience: u.headline || u.experience_level || "Professional",
         followers: 0,
         skills: [...(u.skills || []), ...(u.tags || [])],
@@ -92,9 +79,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
   }
 
   // Determine gigs array (flat or paginated)
-  const gigArray: any[] = Array.isArray(apiData.gigs)
-    ? apiData.gigs
-    : apiData.gigs?.data || []
+  const gigArray: any[] = Array.isArray(apiData.gigs) ? apiData.gigs : apiData.gigs?.data || []
 
   // If paginated shape includes .last_page, update totalPages
   if (apiData.gigs?.last_page) {
@@ -105,7 +90,6 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
   for (const gig of gigArray) {
     const u = gig.user
     if (!u) continue
-
     const items = (gig.images || []).map((img: string) => {
       const image = isValidImageUrl(img) ? img : buildImageUrl(img)
       return {
@@ -115,10 +99,9 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         tags: gig.tags || [],
         category: gig.category,
         subcategory: gig.subcategory,
-        price: parseFloat(gig.price),
+        price: Number.parseFloat(gig.price),
       }
     })
-
     if (items.length === 0) {
       items.push({
         title: gig.title,
@@ -127,18 +110,14 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         tags: gig.tags || [],
         category: gig.category,
         subcategory: gig.subcategory,
-        price: parseFloat(gig.price),
+        price: Number.parseFloat(gig.price),
       })
     }
-
     addOrUpdate(u, "Gig", items)
   }
 
   // Determine jobs array (flat or paginated)
-  const jobArray: any[] = Array.isArray(apiData.jobs)
-    ? apiData.jobs
-    : apiData.jobs?.data || []
-
+  const jobArray: any[] = Array.isArray(apiData.jobs) ? apiData.jobs : apiData.jobs?.data || []
   if (apiData.jobs?.last_page) {
     totalPages = Math.max(totalPages, apiData.jobs.last_page)
   }
@@ -147,11 +126,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
   for (const job of jobArray) {
     const u = job.buyer || job.user
     if (!u) continue
-
-    const imageUrl = u.image && isValidImageUrl(u.image)
-      ? u.image
-      : "/placeholder.svg?height=200&width=300"
-
+    const imageUrl = u.image && isValidImageUrl(u.image) ? u.image : "/placeholder.svg?height=200&width=300"
     const item = {
       title: job.title,
       description: job.description,
@@ -159,9 +134,8 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
       tags: job.skills || [],
       category: job.category,
       subcategory: null,
-      budget: parseFloat(job.budget),
+      budget: Number.parseFloat(job.budget),
     }
-
     addOrUpdate(u, "Job", [item])
   }
 
@@ -186,8 +160,7 @@ function filterToType(filter: DiscoverFilter): string {
     case "jobs":
       return "buyer" // jobs come from buyers
     default:
-      // e.g. "category:3" → "3"
-      return filter.split(":")[1]
+      return filter
   }
 }
 
@@ -198,13 +171,15 @@ function filterToType(filter: DiscoverFilter): string {
  * @param page   page number
  * @param sortBy server sort key (default "price_asc")
  * @param perPage number of items per page (default 10)
+ * @param categoryId optional category ID for filtering
  */
 export function useDiscover(
   rawFilter: DiscoverFilter,
   search: string,
   page: number,
   sortBy = "price_asc",
-  perPage = 10
+  perPage = 10,
+  categoryId?: string, // New parameter
 ) {
   const { user: authUser } = useAuth()
   const [data, setData] = useState<User[]>([])
@@ -215,30 +190,32 @@ export function useDiscover(
   useEffect(() => {
     let alive = true
     const filter = rawFilter === "all" ? "all" : rawFilter
-
     const fetchData = async () => {
       setLoading(true)
       setError(null)
-
       try {
         const typeParam = filterToType(filter)
         const token = localStorage.getItem("token")
 
+        const requestParams = {
+          type: typeParam,
+          search: search || undefined,
+          sort_by: sortBy,
+          per_page: perPage,
+          page,
+          category_id: categoryId && categoryId !== "all" ? categoryId : undefined, // Add category_id
+        }
+
+        console.log("useDiscover API Request Params:", requestParams) // Log params
+
         // Call the search endpoint
         const res = await api.get("/discover/search", {
-          params: {
-            type: typeParam,
-            search: search || undefined,
-            sort_by: sortBy,
-            per_page: perPage,
-            page,
-          },
+          params: requestParams,
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         })
 
         // Normalize and set
-        let { users: fetched, totalPages: pages } =
-          normalizeApiResponse(res.data.data || res.data)
+        let { users: fetched, totalPages: pages } = normalizeApiResponse(res.data.data || res.data)
 
         // Apply user-specific filtering logic
         if (authUser?.account_type === "buyer" && rawFilter === "all") {
@@ -253,7 +230,6 @@ export function useDiscover(
         }
         // For seller "all" filter, show both gigs and jobs (no filtering needed)
         // The component will handle grouping them by badge type
-
         if (alive) {
           setData(fetched)
           setTotalPages(pages)
@@ -264,12 +240,10 @@ export function useDiscover(
         if (alive) setLoading(false)
       }
     }
-
     fetchData()
     return () => {
       alive = false
     }
-  }, [rawFilter, search, page, sortBy, perPage, authUser?.account_type])
-
+  }, [rawFilter, search, page, sortBy, perPage, authUser?.account_type, categoryId]) // Add categoryId to dependencies
   return { users: data, totalPages, loading, error }
 }

@@ -3,17 +3,17 @@ import { useState, useEffect } from "react"
 import type React from "react"
 import { useTranslation } from "react-i18next"
 import { useNavigate } from "react-router-dom"
-import SearchBar from "@/components/SearchBar" // Changed to kebab-case
-import UserCard from "@/components/UserCard" // Changed to kebab-case
-import UserProfileDialog from "@/components/UserProfileDialog" // Changed to kebab-case
+import SearchBar from "@/components/SearchBar"
+import UserCard from "@/components/UserCard"
+import UserProfileDialog from "@/components/UserProfileDialog"
 import type { User } from "@/types/User"
 import { useDiscover } from "@/hooks/useDiscover"
 import axios from "axios"
 import config from "@/config"
-import AllGigs from "@/pages/AllGigs" // Assuming these are in components now
-import JobsPage from "@/pages/JobsPage" // Assuming these are in components now
+import AllGigs from "@/pages/AllGigs"
+import JobsPage from "@/pages/JobsPage"
 import { useAuth } from "@/contexts/AuthContext"
-import { Button } from "@/components/ui/button" // Added Button import
+import { Button } from "@/components/ui/button"
 
 interface Category {
   id: string
@@ -25,9 +25,19 @@ export default function Discover() {
   const isRTL = i18n.language === "ar"
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
+const sellerTabs = [
+  { id: "all",  label: t("seller_buyer")  || "All People"        },
+  { id: "jobs", label: t("all_jobs") || "Job Posters"       },
+];
+
+const buyerTabs = [
+  { id: "all",  label: t("seller")   || "All People"        },
+  { id: "gigs", label: t("all_services") || "Service Providers" },
+];
   const [search, setSearch] = useState("")
-  type DiscoverFilter = "all" | "jobs" | "gigs"
-  const [filter, setFilter] = useState<DiscoverFilter>("all")
+  const [mainFilter, setMainFilter] = useState<"all" | "jobs" | "gigs">("all") // Renamed from 'filter'
+  const [activeCategory, setActiveCategory] = useState<string>("all") // New state for category filter
+
   // New state for sub-tabs when 'all' filter is active for sellers
   const [activeSubFilter, setActiveSubFilter] = useState<"job_posters" | "service_providers">("job_posters")
   const [page, setPage] = useState(1)
@@ -38,7 +48,9 @@ export default function Discover() {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
   const [sortBy, setSortBy] = useState<"price_asc" | "price_desc">("price_asc")
   const perPage = 10
-
+const tabs = authUser?.account_type === "seller" 
+  ? sellerTabs 
+  : buyerTabs;
   // Fetch categories
   useEffect(() => {
     const language = i18n.language.startsWith("ar") ? "ar" : "en"
@@ -74,8 +86,8 @@ export default function Discover() {
 
   const userType: "seller" | "buyer" = authUser?.account_type === "seller" ? "buyer" : "seller"
 
-  // Pull discover results
-  const { users, loading, error, totalPages } = useDiscover(filter, search, page, sortBy, perPage)
+  // Pull discover results, passing activeCategory
+  const { users, loading, error, totalPages } = useDiscover(mainFilter, search, page, sortBy, perPage, activeCategory)
 
   const goToChat = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -84,12 +96,12 @@ export default function Discover() {
 
   // Main renderer
   const renderMainContent = () => {
-    // 1. Jobs/Gigs routes
-    if (filter === "jobs") return <JobsPage searchQuery={search} />
-    if (filter === "gigs") return <AllGigs searchQuery={search} />
+    // 1. Jobs/Gigs routes, passing activeCategory
+    if (mainFilter === "jobs") return <JobsPage searchQuery={search} activeCategory={activeCategory} />
+    if (mainFilter === "gigs") return <AllGigs searchQuery={search} activeCategory={activeCategory} />
 
     // 2. Seller "all" grouping with sub-tabs
-    if (authUser?.account_type === "seller" && filter === "all") {
+    if (authUser?.account_type === "seller" && mainFilter === "all") {
       const serviceProviders = users.filter((u) => u.badge === "Gig")
       const jobPosters = users.filter((u) => u.badge === "Job")
 
@@ -102,7 +114,7 @@ export default function Discover() {
         <>
           <div className={`flex justify-center mb-6 gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
             <Button
-             className="selection:bg-red-500 focus:bg-red-500 selection:text-white focus:text-white text-black hover:bg-red-600 hover:text-white rounded-2xl"
+              className=" bg-white text-black selection:bg-red-500 focus:bg-red-500 selection:text-white focus:text-white text-black hover:bg-red-600 hover:text-white rounded-2xl"
               variant={activeSubFilter === "job_posters" ? "default" : "outline"}
               onClick={() => {
                 setActiveSubFilter("job_posters")
@@ -112,7 +124,7 @@ export default function Discover() {
               {t("job_posters_tab") || "Job Posters"}
             </Button>
             <Button
-             className="selection:bg-red-500 focus:bg-red-500 selection:text-white focus:text-white text-black hover:bg-red-600 hover:text-white rounded-2xl"
+              className=" bg-white selection:bg-red-500 focus:bg-red-500 selection:text-white focus:text-white text-black hover:bg-red-600 hover:text-white rounded-2xl"
               variant={activeSubFilter === "service_providers" ? "default" : "outline"}
               onClick={() => {
                 setActiveSubFilter("service_providers")
@@ -122,7 +134,6 @@ export default function Discover() {
               {t("service_providers_tab") || "Service Providers"}
             </Button>
           </div>
-
           {/* Loading and Error states for sub-filtered content */}
           {loading && (
             <div className="flex justify-center items-center py-16">
@@ -135,7 +146,6 @@ export default function Discover() {
               <p className="text-red-500">{error}</p>
             </div>
           )}
-
           {!loading && !error && (
             <>
               {activeSubFilter === "job_posters" && (
@@ -186,7 +196,6 @@ export default function Discover() {
                   )}
                 </>
               )}
-
               {activeSubFilter === "service_providers" && (
                 <>
                   {paginatedList.length > 0 ? (
@@ -237,7 +246,6 @@ export default function Discover() {
                   )}
                 </>
               )}
-
               {/* Pagination for sub-filtered content */}
               {localTotalPages > 1 && (
                 <div className={`flex justify-center mt-10 gap-4 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -275,7 +283,6 @@ export default function Discover() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
           </div>
         )}
-
         {/* Error */}
         {error && (
           <div className="text-center py-16">
@@ -283,7 +290,6 @@ export default function Discover() {
             <p className="text-red-500">{error}</p>
           </div>
         )}
-
         {/* Results */}
         {!loading && !error && users.length > 0 && (
           <>
@@ -325,7 +331,6 @@ export default function Discover() {
             )}
           </>
         )}
-
         {/* Empty */}
         {!loading && !error && users.length === 0 && (
           <div className="text-center py-16">
@@ -343,30 +348,32 @@ export default function Discover() {
         <h1 className={`text-4xl font-bold mb-6 text-center ${isRTL ? "text-red-600" : "text-red-500"}`}>
           {t("discover")}
         </h1>
-        <SearchBar
-          searchTerm={search}
-          onSearchChange={(v) => {
-            setSearch(v)
-            setPage(1)
-          }}
-          activeFilter={filter}
-          onFilterChange={(f) => {
-            setFilter(f as DiscoverFilter)
-            setPage(1)
-            // Reset sub-filter to default when main filter changes to 'all'
-            if (f === "all" && authUser?.account_type === "seller") {
-              setActiveSubFilter("job_posters")
-            }
-          }}
-          authUserType={authUser?.account_type}
-          categories={categories}
-          isRTL={isRTL}
-          tabs={[
-            { id: "all", label: t("all_people") || "All People" },
-            { id: "gigs", label: t("service_providers") || "Service Providers" },
-            { id: "jobs", label: t("job_posters") || "Job Posters" },
-          ]}
-        />
+       <SearchBar
+  searchTerm={search}
+  onSearchChange={(v) => {
+    setSearch(v);
+    setPage(1);
+  }}
+  activeMainFilter={mainFilter}
+  onMainFilterChange={(f) => {
+    setMainFilter(f as "all" | "jobs" | "gigs");
+    setPage(1);
+    setActiveCategory("all");
+    if (f === "all" && authUser?.account_type === "seller") {
+      setActiveSubFilter("job_posters");
+    }
+  }}
+  activeCategoryFilter={activeCategory}
+  onCategoryFilterChange={(catId) => {
+    setActiveCategory(catId);
+    setPage(1);
+  }}
+  authUserType={authUser?.account_type}
+  categories={categories}
+  isRTL={isRTL}
+  tabs={tabs}
+/>
+
         {renderMainContent()}
       </main>
       <UserProfileDialog

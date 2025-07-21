@@ -9,13 +9,14 @@ import config from '@/config';
 import { useTranslation } from 'react-i18next';
 import { useNotificationSettings } from '@/contexts/NotificationContext'; // ✅ Import notification context
 import Swal from 'sweetalert2'; 
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { unreadCount: notificationCount } = useNotificationSettings(); // ✅ Real-time notifications
-  const messageCount = 0; // 🔁 TODO: Replace with real unread message count from context or API
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { count: messageCount, markRead } = useUnreadMessages();
 
   const [language, setLanguage] = useState(() => {
     const savedLang = sessionStorage.getItem('lang') || 'en';
@@ -41,6 +42,12 @@ export default function Header() {
     sessionStorage.setItem('lang', language);
     i18n.changeLanguage(language);
   }, [language, i18n]);
+   const goToMessages = () => {
+    if (user?.uid) {
+      markRead(user.uid);
+      navigate(`/messages/${user.uid}`);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -108,16 +115,16 @@ const handleSignOut = () => {
             </button>
 
             <button
-              onClick={() => user?.uid && navigate(`/messages/${user.uid}`)}
-              className="relative text-gray-700 hover:text-red-500"
-            >
-              <Mail className="h-6 w-6" />
-              {messageCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {messageCount}
-                </span>
-              )}
-            </button>
+        onClick={goToMessages}
+        className="relative text-gray-700 hover:text-red-500"
+      >
+        <Mail className="h-6 w-6" />
+        {messageCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+            {messageCount}
+          </span>
+        )}
+      </button>
 
             <button onClick={() => navigate('/notifications')} className="relative text-gray-700 hover:text-red-500">
               <Bell className="h-6 w-6" />

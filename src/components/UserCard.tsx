@@ -75,7 +75,9 @@ export default function UserCard({
   const isGig = user.badge === "Gig"
 
   // Show all projects/services for this user
-  const projects = user.projects || []
+// Show at most 3 projects/services for this user
+const projects = (user.projects || []).slice(0, 3)
+
 
   // Helper to build full URLs
   const getImageUrl = (path: string) => {

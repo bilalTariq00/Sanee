@@ -12,36 +12,32 @@ interface Category {
 interface SearchBarProps {
   searchTerm: string
   onSearchChange: (value: string) => void
-  activeFilter: string
-  onFilterChange: (filter: string) => void
+  activeMainFilter: string // Prop for main tabs (all, gigs, jobs)
+  onMainFilterChange: (filter: string) => void // Handler for main tabs
+  activeCategoryFilter: string // Prop for category selection
+  onCategoryFilterChange: (categoryId: string) => void // Handler for category selection
   categories: Category[]
   authUserType?: string
   isRTL: boolean
+  tabs: { id: string; label: string }[] // This prop is now used for the main filters
 }
 
 export default function SearchBar({
   searchTerm,
   onSearchChange,
-  activeFilter,
-  onFilterChange,
+  activeMainFilter,
+  onMainFilterChange,
+  activeCategoryFilter,
+  onCategoryFilterChange,
   categories,
   authUserType,
   isRTL,
-    tabs,
+  tabs, // Using the 'tabs' prop for the main filters
 }: SearchBarProps) {
   const { t } = useTranslation()
-  
-  // Determine main filters based on role
-  const filters =
-    authUserType === "seller"
-      ? [
-          { id: "all",  label: t("seller_buyer") || "All People" },
-          { id: "jobs", label: t("all_jobs") || "All Jobs" },
-        ]
-      : [
-          { id: "all",  label: t("seller") || "All People" },
-          { id: "gigs", label: t("all_services") || "All Services" },
-        ]
+
+  // Determine main filters based on role (using the 'tabs' prop passed from Discover.tsx)
+  const mainFilters = tabs
 
   return (
     <div className={`w-full mx-auto mb-8 ${isRTL ? "text-right" : "text-left"}`}>
@@ -63,26 +59,21 @@ export default function SearchBar({
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              // re-trigger search on Enter
               onSearchChange(searchTerm)
             }
           }}
-          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg ${
-            isRTL ? "pr-10" : "pl-10"
-          }`}
+          className={`py-3 text-lg border-red-200 focus:border-red-500 rounded-lg ${isRTL ? "pr-10" : "pl-10"}`}
         />
       </div>
-      
-      {/* Main filters */}
+      {/* Main filters (tabs) */}
       <div className="flex flex-wrap gap-2 mb-4">
-        
-        {filters.map((f) => (
+        {mainFilters.map((f) => (
           <Button
             key={f.id}
-            variant={activeFilter === f.id ? "default" : "outline"}
-            onClick={() => onFilterChange(f.id)}
+            variant={activeMainFilter === f.id ? "default" : "outline"}
+            onClick={() => onMainFilterChange(f.id)}
             className={`rounded-full px-4 py-2 text-sm ${
-              activeFilter === f.id
+              activeMainFilter === f.id
                 ? "bg-red-500 text-white hover:bg-red-600"
                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
             }`}
@@ -91,21 +82,32 @@ export default function SearchBar({
           </Button>
         ))}
       </div>
-      
       {/* Category filters */}
       {categories.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-600">
-            {t("categories") || "Categories"}:
-          </h3>
+          <h3 className="text-sm font-medium text-gray-600">{t("categories") || "Categories"}:</h3>
           <div className="flex flex-wrap gap-2">
+            {/* "All Categories" button */}
+            <Button
+              key="all-categories"
+              variant={activeCategoryFilter === "all" ? "default" : "outline"}
+              onClick={() => onCategoryFilterChange("all")}
+              className={`rounded-full px-4 py-2 text-sm ${
+                activeCategoryFilter === "all"
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {t("all_categories") || "All Categories"}
+            </Button>
+            {/* Dynamic category buttons */}
             {categories.map((cat) => (
               <Button
                 key={cat.id}
-                variant={activeFilter === cat.id ? "default" : "outline"}
-                onClick={() => onFilterChange(cat.id)}
+                variant={activeCategoryFilter === cat.id ? "default" : "outline"}
+                onClick={() => onCategoryFilterChange(cat.id)}
                 className={`rounded-full px-4 py-2 text-sm ${
-                  activeFilter === cat.id
+                  activeCategoryFilter === cat.id
                     ? "bg-red-500 text-white hover:bg-red-600"
                     : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                 }`}

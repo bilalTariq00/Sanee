@@ -112,10 +112,11 @@ function Checkout() {
         `${config.API_BASE_URL}/contracts`,
         {
           gig_id: gig.id,
+          job_id:jobId,
           buyer_id: buyer.id,
           seller_id: gig.user_id,
           price: proposalPrice || gig.price,
-          status: "pending",
+          status: "in_progress",
           is_custom_order: !!isCustomOrder,
         },
         { headers: { Authorization: `Bearer ${token}` } }

@@ -1,7 +1,5 @@
-// src/pages/JobsPage.tsx
 "use client"
-
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import config from "../config"
 import { useAuth } from "../contexts/AuthContext"
@@ -17,6 +15,8 @@ interface Job {
   status: string
   skills: string[]
   created_at: string
+  category: { id: string; name: string } // Ensure category has id
+  subcategory: { id: string; name: string } // Ensure subcategory has id
   buyer?: {
     id: number
     uid: string
@@ -28,13 +28,13 @@ interface Job {
 
 interface JobsPageProps {
   searchQuery: string
+  activeCategory: string // New prop
 }
 
-export default function JobsPage({ searchQuery }: JobsPageProps) {
+export default function JobsPage({ searchQuery, activeCategory }: JobsPageProps) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
-
   const [allJobs, setAllJobs] = useState<Job[]>([])
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([])
   const [savedJobIds, setSavedJobIds] = useState<number[]>([])
@@ -44,15 +44,27 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
   // Fetch jobs + saved jobs
   useEffect(() => {
     const fetchAll = async () => {
+      setLoading(true)
       const token = localStorage.getItem("token")
       if (!token) {
         setLoading(false)
         return
       }
       try {
+        const params: { search?: string; category_id?: string } = {}
+        if (searchQuery) {
+          params.search = searchQuery
+        }
+        if (activeCategory && activeCategory !== "all") {
+          params.category_id = activeCategory
+        }
+
+        console.log("JobsPage API Request Params:", params) // Log params
+
         const [jobsRes, savedRes] = await Promise.all([
           axios.get(`${config.API_BASE_URL}/all-jobs`, {
             headers: { Authorization: `Bearer ${token}` },
+            params: params, // Pass params here
           }),
           axios.get(`${config.API_BASE_URL}/saved-jobs`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -60,15 +72,11 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
         ])
 
         // Extract jobs array
-        const jobsData: Job[] = Array.isArray(jobsRes.data?.data?.jobs)
-          ? jobsRes.data.data.jobs
-          : []
+        const jobsData: Job[] = Array.isArray(jobsRes.data?.data?.jobs) ? jobsRes.data.data.jobs : []
         setAllJobs(jobsData)
 
         // Extract saved job IDs
-        const savedArr: any[] = Array.isArray(savedRes.data?.data?.saved_jobs)
-          ? savedRes.data.data.saved_jobs
-          : []
+        const savedArr: any[] = Array.isArray(savedRes.data?.data?.saved_jobs) ? savedRes.data.data.saved_jobs : []
         const ids = savedArr.map((item) => item.job.id)
         setSavedJobIds(ids)
 
@@ -81,50 +89,32 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
         setLoading(false)
       }
     }
-
     fetchAll()
-  }, [])
+  }, [searchQuery, activeCategory]) // Add activeCategory to dependencies
 
-  // Filter by searchQuery
+  // Filter by searchQuery (now redundant as API handles filtering)
   useEffect(() => {
-    const q = searchQuery.trim().toLowerCase()
-    let filtered = allJobs
-
-    if (q) {
-      filtered = filtered.filter(
-        (job) =>
-          job.title.toLowerCase().includes(q) ||
-          job.description.toLowerCase().includes(q)
-      )
-    }
-
-    setFilteredJobs(filtered)
+    setFilteredJobs(allJobs) // allJobs is already filtered by category and search from API
   }, [searchQuery, allJobs])
 
   // Toggle save/unsave
   const toggleSave = async (jobId: number) => {
     const token = localStorage.getItem("token")
     if (!token) return
-
     const isCurrentlySaved = savedJobIds.includes(jobId)
 
     // Optimistic update
-    setSavedJobIds((ids) =>
-      isCurrentlySaved ? ids.filter((id) => id !== jobId) : [...ids, jobId]
-    )
-
+    setSavedJobIds((ids) => (isCurrentlySaved ? ids.filter((id) => id !== jobId) : [...ids, jobId]))
     try {
       await axios.post(
         `${config.API_BASE_URL}/saved-jobs/toggle`,
         { job_id: jobId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       )
     } catch (err) {
       console.error("Toggle save failed, reverting UI", err)
       // Revert on error
-      setSavedJobIds((ids) =>
-        isCurrentlySaved ? [...ids, jobId] : ids.filter((id) => id !== jobId)
-      )
+      setSavedJobIds((ids) => (isCurrentlySaved ? [...ids, jobId] : ids.filter((id) => id !== jobId)))
     }
   }
 
@@ -143,7 +133,6 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
             </button>
           )}
         </div>
-
         {/* Jobs List */}
         <div className="space-y-6">
           {loading ? (
@@ -154,17 +143,12 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
             filteredJobs.map((job) => {
               const isSaved = savedJobIds.includes(job.id)
               return (
-                <div
-                  key={job.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6"
-                >
+                <div key={job.id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6">
                   <div className="flex items-start space-x-4">
                     <div className="flex-1">
                       {/* Title & Employer */}
                       <div className="flex justify-between items-start">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          {job.title}
-                        </h2>
+                        <h2 className="text-xl font-semibold text-gray-900">{job.title}</h2>
                         {job.buyer && (
                           <Link
                             to={`/profile/${job.buyer.uid}`}
@@ -176,7 +160,6 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
                         )}
                       </div>
                       <p className="mt-2 text-gray-600">{job.description}</p>
-
                       {/* Budget & Date */}
                       <div className="mt-4 flex flex-wrap gap-4 text-gray-500">
                         <div className="flex items-center">
@@ -188,24 +171,42 @@ export default function JobsPage({ searchQuery }: JobsPageProps) {
                           {new Date(job.created_at).toLocaleDateString()}
                         </div>
                       </div>
-
                       {/* Skills */}
-                      <div className="mt-4">
-                        <h3 className="text-sm font-medium text-gray-900 mb-2">
-                          {t("skills")}
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {job.skills.map((skill) => (
-                            <span
-                              key={skill}
-                              className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
-                            >
-                              {skill}
-                            </span>
-                          ))}
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-4">
+                          <h3 className="text-sm font-medium text-gray-900 mb-2">{t("skills")}</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {job.skills.map((skill) => (
+                              <span
+                                key={skill}
+                                className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
                         </div>
+                        {job.category && (
+                          <div className="mt-4">
+                            <h3 className="text-sm font-medium text-gray-900 mb-2">{t("category")}</h3>
+                            <div className="flex flex-wrap gap-2">
+                              <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                {job.category.name}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        {job.subcategory && (
+                          <div className="mt-4">
+                            <h3 className="text-sm font-medium text-gray-900 mb-2">{t("subcategory")}</h3>
+                            <div className="flex flex-wrap gap-2">
+                              <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                {job.subcategory.name}
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-
                       {/* Actions */}
                       <div className="mt-6 flex space-x-4">
                         <Link
