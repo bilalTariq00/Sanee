@@ -1,8 +1,8 @@
 // src/config.ts
 const config = {
-    API_BASE_URL: "https://confidential-wp-hostel-supplemental.trycloudflare.com/api",
-    IMG_BASE_URL: "https://confidential-wp-hostel-supplemental.trycloudflare.com",
-    WS_URL: "wss://confidential-wp-hostel-supplemental.trycloudflare.com/ws", // Add WebSocket URL
+    API_BASE_URL: "https://continues-sussex-view-electric.trycloudflare.com/api",
+    IMG_BASE_URL: "https://continues-sussex-view-electric.trycloudflare.com",
+    WS_URL: "wss://continues-sussex-view-electric.trycloudflare.com/ws", // Add WebSocket URL
     menuItems: {
         buyer: [
             { label: 'All Gigs', path: '/' },
