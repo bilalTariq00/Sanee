@@ -71,20 +71,20 @@ export default function ContractsPage() {
     }
   }, [user, reviewedContracts])
 
-  // ─── 3) Render helper ──────────────────────────────────────────────
-  const renderBadge = (status: string, hasSubmission = false) => {
-    switch (status) {
-      case "pending":      return <Badge className="bg-red-100 text-red-600">Pending</Badge>
-      case "in_progress":  return hasSubmission
-                                ? <Badge className="bg-blue-100 text-blue-700">Work Submitted</Badge>
-                                : <Badge className="bg-white text-red-700 border border-red-400">In Progress</Badge>
-      case "completed":
-      case "finished":     return <Badge className="bg-green-100 text-green-700">Finished</Badge>
-      case "rejected":     return <Badge className="bg-gray-200 text-gray-700">Rejected</Badge>
-      case "cancelled":    return <Badge className="bg-red-200 text-red-800">Cancelled</Badge>
-      default:             return <Badge>Unknown</Badge>
-    }
-  }
+  // // ─── 3) Render helper ──────────────────────────────────────────────
+  // const renderBadge = (status: string, hasSubmission = false) => {
+  //   switch (status) {
+  //     case "pending":      return <Badge className="bg-red-100 text-red-600">Pending</Badge>
+  //     case "in_progress":  return hasSubmission
+  //                               ? <Badge className="bg-blue-100 text-blue-700">Work Submitted</Badge>
+  //                               : <Badge className="bg-white text-red-700 border border-red-400">In Progress</Badge>
+  //     case "completed":
+  //     case "finished":     return <Badge className="bg-green-100 text-green-700">Finished</Badge>
+  //     case "rejected":     return <Badge className="bg-gray-200 text-gray-700">Rejected</Badge>
+  //     case "cancelled":    return <Badge className="bg-red-200 text-red-800">Cancelled</Badge>
+  //     default:             return <Badge>Unknown</Badge>
+  //   }
+  // }
 
   // ─── 4) Review button handler ──────────────────────────────────────
   const handleReview = (id: number) => {
@@ -103,14 +103,146 @@ export default function ContractsPage() {
     fetchContracts()
   }
 
-  const handleEndContract = async (id: number) => {
-    // … your existing end‐contract logic …
-  }
-  const handleRejectContract = async (id: number) => {
-    // … your existing reject logic …
+  const handleViewSubmission = (c: any) => {
+    let html = ""
+    if (c.seller_note) html += `<p><strong>Note:</strong> ${c.seller_note}</p>`
+
+    const files: string[] = Array.isArray(c.seller_attachments)
+      ? c.seller_attachments
+      : c.seller_attachments
+      ? [c.seller_attachments]
+      : []
+
+    if (files.length) {
+      html +=
+        "<p><strong>Attachments:</strong></p><div style='display:flex;flex-wrap:wrap;gap:8px'>"
+      files.forEach((file, idx) => {
+        const url = `${config.IMG_BASE_URL}/storage/${file}`
+        const isImage = /\.(jpe?g|png|gif|webp)$/i.test(file)
+        html += isImage
+          ? `<div style="border:1px solid #ddd;padding:4px;">
+               <img src="${url}" style="max-width:120px;max-height:120px;" />
+               <div><a href="${url}" target="_blank">View full</a></div>
+             </div>`
+          : `<div><a href="${url}" target="_blank">Download File ${idx + 1}</a></div>`
+      })
+      html += "</div>"
+    }
+
+    if (!html) html = "<p>No submission details available.</p>"
+
+    Swal.fire({
+      title: "Work Submission Details",
+      html,
+      width: 700,
+      showCloseButton: true,
+      focusConfirm: false,
+      confirmButtonText: "Close",
+    })
   }
 
-  // ─── 6) Render UI ─────────────────────────────────────────────────
+  const handleEndContract = async (id: number) => {
+    const confirm = await Swal.fire({
+      title: "End Contract?",
+      text: "Release funds and finish this contract?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, finish",
+      confirmButtonColor: "#dc2626",
+    })
+    if (!confirm.isConfirmed) return
+
+    try {
+      const token = localStorage.getItem("token")
+      await axios.put(
+        `${config.API_BASE_URL}/contracts/${id}/finish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      await Swal.fire(
+        "Contract Finished!",
+        "Please leave a review for the seller.",
+        "success"
+      )
+      window.location.href = `/review/${id}`
+    } catch (err) {
+      console.error(err)
+      Swal.fire("Error", "Could not finish the contract.", "error")
+    }
+  }
+
+  const handleRejectContract = async (id: number) => {
+    const { isConfirmed } = await Swal.fire({
+      title: "Reject Submission?",
+      text: "Are you sure? Seller will be notified.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, reject it",
+      confirmButtonColor: "#dc2626",
+    })
+    if (!isConfirmed) return
+
+    try {
+      const token = localStorage.getItem("token")
+      await axios.put(
+        `${config.API_BASE_URL}/contracts/${id}`,
+        {
+          status: "in_progress",
+          seller_note: "",
+          seller_attachments: [],
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      // optimistic UI update
+      setContracts((prev) =>
+        prev.map((c) =>
+          c.id === id
+            ? { ...c, status: "in_progress", seller_note: "", seller_attachments: [] }
+            : c
+        )
+      )
+      await Swal.fire("Rejected", "Contract reset to in progress.", "info")
+    } catch (err) {
+      console.error(err)
+      Swal.fire("Error", "Could not reject the submission.", "error")
+    }
+  }
+
+  const renderBadge = (status: string, hasSubmission = false) => {
+    switch (status) {
+      case "pending":
+        return (
+          <Badge className="bg-red-100 text-red-600">Pending</Badge>
+        )
+      case "in_progress":
+        return hasSubmission ? (
+          <Badge className="bg-blue-100 text-blue-700">Work Submitted</Badge>
+        ) : (
+          <Badge className="bg-white text-red-700 border border-red-400">
+            In Progress
+          </Badge>
+        )
+      case "completed":
+        return (
+          <Badge className="bg-green-100 text-green-700">Completed</Badge>
+        )
+      case "finished":
+        return (
+          <Badge className="bg-green-100 text-green-700">Finished</Badge>
+        )
+      case "rejected":
+        return (
+          <Badge className="bg-gray-200 text-gray-700">Rejected</Badge>
+        )
+      case "cancelled":
+        return (
+          <Badge className="bg-red-200 text-red-800">Cancelled</Badge>
+        )
+      default:
+        return <Badge>Unknown</Badge>
+    }
+  }
+
   if (loading) {
     return <p className="text-center py-10 text-gray-500">Loading contracts...</p>
   }
@@ -168,7 +300,7 @@ export default function ContractsPage() {
   )}
 
                   {/* ─── 7) NEW: Review Seller when finished ─────────────────────────── */}
-                  {(c.status === "finished" || c.status === "completed") && !c.reviewed && (
+                  {(c.status === "finished" || c.status !== "completed") && !c.reviewed && (
                     <Button
                       className="mt-4 bg-red-500 text-white hover:bg-red-600"
                       onClick={() => handleReview(c.id)}
