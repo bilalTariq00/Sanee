@@ -76,7 +76,9 @@ export default function UserCard({
 
   // Show all projects/services for this user
 // Show at most 3 projects/services for this user
-const projects = (user.projects || []).slice(0, 3)
+const previewItems = isJob
+    ? (user.projects || []).slice(0, 3)
+    : (user.portfolios || []).slice(0, 3)
 
 
   // Helper to build full URLs
@@ -183,29 +185,41 @@ const projects = (user.projects || []).slice(0, 3)
       </div>
 
       {/* — All Services/Projects Preview — */}
-      {projects.length > 0 && (
+      {/* — Preview Grid — */}
+      {previewItems.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-          {projects.map((proj, idx) => (
+          {previewItems.map((item, idx) => (
             <div
               key={idx}
               className="cursor-pointer overflow-hidden rounded-lg border border-gray-100 hover:shadow-md transition"
               onClick={(e) => {
                 e.stopPropagation()
-                navigate(`/gig/${encodeURIComponent(proj.title)}`)
+                if (isJob) {
+                  // for jobs/gigs navigate to gig page
+                  navigate(`/gig/${encodeURIComponent(item.title)}`)
+                } else {
+                  // for portfolios open external link
+                  window.open(item.link, "_blank")
+                }
               }}
             >
               <img
-                src={getImageUrl(proj.image)}
-                alt={proj.title}
+                src={getImageUrl(item.image)}
+                alt={item.title}
                 className="w-full h-24 object-cover"
               />
               <div className="p-2">
                 <h4 className="text-sm font-semibold line-clamp-1">
-                  {proj.title}
+                  {item.title}
                 </h4>
-                {proj.subcategoryName && (
+                {isJob && item.subcategoryName && (
                   <p className="text-xs text-gray-500">
-                    {proj.subcategoryName}
+                    {item.subcategoryName}
+                  </p>
+                )}
+                {!isJob && item.description && (
+                  <p className="text-xs text-gray-500 line-clamp-1">
+                    {item.description}
                   </p>
                 )}
               </div>
@@ -233,7 +247,7 @@ const projects = (user.projects || []).slice(0, 3)
             onClick={goToChat}
             className="px-6 bg-red-500 text-white hover:bg-red-800 rounded-full"
           >
-            {isJob ? t("apply_now") || "Apply Now" : t("get_in_touch") || "Get in Touch"}
+            { t("get_in_touch") || "Get in Touch"}
           </Button>
         )}
       </div>

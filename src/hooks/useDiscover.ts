@@ -69,6 +69,13 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         followers: 0,
         skills: [...(u.skills || []), ...(u.tags || [])],
         projects: [] as any[],
+         portfolios: (u.portfolios || []).map((p: any) => ({
+      title: p.title,
+      description: p.description,
+      image: p.image,
+      link: p.link,
+    })),
+
         bio: u.summary || "",
         categoryId: projectItems[0]?.category?.id || null,
         categoryName: projectItems[0]?.category?.name,

@@ -152,11 +152,11 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
           </div>
         </div>
         {/* Add this after the user details in the header section */}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <Button onClick={gotoChat} className="bg-red-500 text-white hover:bg-red-600 px-6 py-2">
             {t("get_in_touch") || "Get in Touch"}
           </Button>
-        </div>
+        </div> */}
 
         {/* -------- About -------- */}
         {user.bio && (
@@ -187,36 +187,38 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
               {isJob ? t("job_opportunities") || "Job Opportunities" : t("featured_projects") || "Featured Projects"}
             </h3>
 
-            {isGig ? (
-              // For gigs, show actual project portfolio
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {user.projects.map((project, idx) => (
+           {isGig ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(user.portfolios || []).map((portfolio, idx) => (
                   <article key={idx} className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                    {project.image && (
-                      <img
-                        src={getImageUrl(project.image) || "/placeholder.svg"}
-                        alt={project.title}
+                     {portfolio.image && (
+                        <img
+                          src={getImageUrl(portfolio.image)}
+                        alt={portfolio.title}
                         className="w-full h-40 object-cover"
                         onError={(e) => {
                           ;(e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=300"
                         }}
                       />
                     )}
-                    <div className="p-4">
-                      <h4 className="font-semibold mb-2">{project.title}</h4>
-                      {project.description && (
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-3">{project.description}</p>
-                      )}
-                      {project.tags?.length && (
-                        <div className="flex flex-wrap gap-1">
-                          {project.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                     <div className="p-4">
+                   <h4 className="font-semibold mb-2">{portfolio.title}</h4>
+                   {portfolio.description && (
+                     <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+                       {portfolio.description}
+                     </p>
+                   )}
+                   {portfolio.link && (
+                     <a
+                       href={portfolio.link}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       className="text-blue-600 text-sm hover:underline"
+                     >
+                       View More
+                     </a>
+                   )}
+                 </div>
                   </article>
                 ))}
               </div>

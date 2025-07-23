@@ -26,8 +26,9 @@ export default function Discover() {
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
 const sellerTabs = [
-  { id: "all",  label: t("seller_buyer")  || "All People"        },
+  { id: "seller",  label: t("seller")  || "All People"        },
   { id: "jobs", label: t("all_jobs") || "Job Posters"       },
+  { id: "buyer",  label: t("buyer")  || "All People"        },
 ];
 
 const buyerTabs = [
@@ -175,7 +176,7 @@ const tabs = authUser?.account_type === "seller"
                           <UserCard
                             key={u.uid}
                             user={u}
-                            userType={userType}
+                            userType={u.account_type as "buyer" | "seller"}
                             authUserType={authUser?.account_type}
                             onUserClick={() => {
                               setSelected(u)
