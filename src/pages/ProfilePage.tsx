@@ -449,7 +449,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
               {t('profile_page.delivery_days', { count: g.delivery_time })}
             </div>
             <div>
-            <Link to={`/gig/${g.id}`}>
+            <Link to={`/gig/${g.gig_uid}`}>
                                   <Button size="sm" className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600">
                                     {t("view_details")}
                                   </Button>
