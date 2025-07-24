@@ -712,6 +712,8 @@ export default function Chat() {
 
   const selectedUser = users.find((u) => u.uid === receiverUid)
 
+  
+
   return (
     <div className="flex h-[calc(100vh-100px)] bg-white rounded-[20px] overflow-hidden m-5">
       {/* Users Sidebar */}
@@ -933,33 +935,18 @@ export default function Chat() {
                           <div>
                             {isCustomOrder ? (
                               <div className="bg-white border border-yellow-300 rounded-2xl p-5 mb-2 shadow-[0_4px_12px_rgba(252,211,77,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(252,211,77,0.15)]">
-                                <div className="flex justify-between items-center mb-4 pb-3 border-b border-yellow-300">
+                                <div className="flex  flex-col justify-between items-center mb-4 pb-3 border-b border-yellow-300">
                                   <span className="font-semibold text-slate-800 text-lg">Custom Order</span>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                      message.status === "accepted"
-                                        ? "bg-green-100 text-green-800"
-                                        : message.status === "rejected"
-                                          ? "bg-red-100 text-red-800"
-                                          : message.status === "paid"
-                                            ? "bg-blue-100 text-blue-800"
-                                            : "bg-yellow-100 text-yellow-800"
-                                    }`}
+                                  <span className="flex justify-between items-center mb-4 pb-1 text-gray-500 text-xs"
                                   >
-                                    {message.status === "accepted"
-                                      ? "Accepted"
-                                      : message.status === "rejected"
-                                        ? "Rejected"
-                                        : message.status === "paid"
-                                          ? "Paid"
-                                          : "Pending"}
+                                    {message.message}
                                   </span>
                                 </div>
-                                <div className="mt-4 text-slate-800">
+                                <div className="mt-2 text-slate-800">
                                   {message.message.split("\n").map((line, index) => {
                                     if (line.startsWith("Custom order created:")) {
                                       return (
-                                        <div key={index} className="flex items-center gap-3 mb-3">
+                                        <div key={index} className="flex items-center gap-3 mb-3 text-sm">
                                           <span className="font-medium text-slate-500 min-w-[80px]">Service:</span>
                                           <span className="text-slate-800">
                                             {line.replace("Custom order created:", "").trim()}
@@ -969,7 +956,7 @@ export default function Chat() {
                                     }
                                     if (line.startsWith("Price:")) {
                                       return (
-                                        <div key={index} className="flex items-center gap-3 mb-3">
+                                        <div key={index} className="flex items-center gap-3 mb-3 text-sm">
                                           <span className="font-medium text-slate-500 min-w-[80px]">Price:</span>
                                           <span className="text-slate-800">{line}</span>
                                         </div>
@@ -977,7 +964,7 @@ export default function Chat() {
                                     }
                                     if (line.startsWith("Expires in:")) {
                                       return (
-                                        <div key={index} className="flex items-center gap-3 mb-3">
+                                        <div key={index} className="flex items-center gap-3 mb-3 text-sm">
                                           <span className="font-medium text-slate-500 min-w-[80px]">Expires:</span>
                                           <span className="text-slate-800">
                                             {line.replace("Expires in:", "").trim()}
@@ -987,7 +974,7 @@ export default function Chat() {
                                     }
                                     if (line.startsWith("UID:")) {
                                       return (
-                                        <div key={index} className="flex items-center gap-3 mb-3">
+                                        <div key={index} className="flex items-center gap-3 mb-3 text-sm">
                                           <span className="font-medium text-slate-500 min-w-[80px]">Order ID:</span>
                                           <span className="text-slate-800">{line.replace("UID:", "").trim()}</span>
                                         </div>
@@ -1010,7 +997,7 @@ export default function Chat() {
                                   message.is_custom_order &&
                                   message.receiver_id === currentUser?.id &&
                                   //  message.status === "pending" && 
-                                  message.status !=="accepted" && (
+                                  message.is_custom_order_accepted !==true && (
                                   
                                     <div className="flex gap-2 mt-3">
                                       <button
