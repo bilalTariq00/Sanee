@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import config from '../config';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,6 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { toast } from 'sonner';
 
 interface Category {
@@ -21,6 +23,7 @@ interface Category {
 interface SubCategory {
   id: string;
   name: string;
+  skills: string[];
 }
 
 export default function PostJobPage() {
@@ -37,7 +40,7 @@ export default function PostJobPage() {
     location_type: 'remote',
     category_id: '',
     sub_category_id: '',
-    skills: ''
+    skills: [] as string[]
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
@@ -59,10 +62,10 @@ export default function PostJobPage() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-     const response = await axios.get(`${config.API_BASE_URL}/categories`, {
+      const response = await axios.get(`${config.API_BASE_URL}/categories`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-     setCategories(response.data.data.categories);
+      setCategories(response.data.data.categories);
     } catch {
       setError(t('error_fetch_categories'));
     }
@@ -70,12 +73,12 @@ export default function PostJobPage() {
 
   const fetchSubcategories = async (categoryId: string) => {
     try {
-     const response = await axios.get(
-       `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
-       { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
-     );
-     // assuming the shape is { success: true, data: { subcategories: SubCategory[] } }
-     setSubcategories(response.data.data.subcategories);
+      const response = await axios.get(
+        `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      // assuming the shape is { success: true, data: { subcategories: SubCategory[] } }
+      setSubcategories(response.data.data.subcategories);
     } catch {
       setError(t('error_fetch_subcategories'));
     }
@@ -107,9 +110,9 @@ export default function PostJobPage() {
       const data = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'skills') {
-          value.split(',').forEach(skill => data.append('skills[]', skill.trim()));
+          (value as string[]).forEach(skill => data.append('skills[]', skill.trim()));
         } else {
-          data.append(key, value);
+          data.append(key, value as string);
         }
       });
 
@@ -122,7 +125,7 @@ export default function PostJobPage() {
 
       if (response.data) {
         toast(t('job_posted_success'));
-        setFormData({ title: '', description: '', budget: '', experience_level: 'entry', visibility: 'public', location_type: 'remote', category_id: '', sub_category_id: '', skills: '' });
+        setFormData({ title: '', description: '', budget: '', experience_level: 'entry', visibility: 'public', location_type: 'remote', category_id: '', sub_category_id: '', skills: [] });
         navigate('/');
       }
     } catch (err: any) {
@@ -141,106 +144,280 @@ export default function PostJobPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">{t('post_job_title')}</h1>
+        <div className="flex items-center justify-between mb-6">
+          <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900">
+            <ArrowLeft className="h-5 w-5 mr-2" /> {t('back') || 'Back'}
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">{t('post_job_title')}</h1>
+        </div>
 
-          {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-              {error}
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {t('basic_information') || 'Basic Information'}
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder={t('title_placeholder') || 'Job Title *'}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+              <div>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder={t('description_placeholder') || 'Job Description *'}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                  required
+                />
+              </div>
+              <div>
+                <input
+                  type="number"
+                  name="budget"
+                  value={formData.budget}
+                  onChange={handleChange}
+                  placeholder={t('budget_placeholder') || 'Budget (USD) *'}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Category & Subcategory */}
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {t('category_section') || 'Category'}
+            </h2>
+            <div className="space-y-4">
+              <Select
+                value={formData.category_id}
+                onValueChange={(val) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    category_id: val,
+                    sub_category_id: '',
+                    skills: []
+                  }));
+                  fetchSubcategories(val);
+                }}
+              >
+                <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
+                <SelectValue>
+                  {categories.find(c => String(c.id) === formData.category_id)?.name
+                  ?? t('select_category')}
+                 </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {subcategories.length > 0 && (
+                <Select
+                  value={formData.sub_category_id}
+                  onValueChange={(val) => {
+                    setFormData(prev => ({ ...prev, sub_category_id: val, skills: [] }));
+                  }}
+                >
+                  <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
+                 {subcategories.find(c => String(c.id) === formData.sub_category_id)?.name
+                  ?? t('select_sub_category')}
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories.map(sub => (
+                      <SelectItem key={sub.id} value={sub.id}>
+                        {sub.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </div>
+
+          {/* Skills Section */}
+          {formData.sub_category_id && (
+            <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                {t('skills_section') || 'Required Skills'}
+              </h2>
+              <div className="space-y-4">
+                {/* Selected skills display */}
+                {formData.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.skills.map(skill => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-600"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData(prev => ({
+                              ...prev,
+                              skills: prev.skills.filter(s => s !== skill)
+                            }))
+                          }
+                          className="ml-2 text-red-500 hover:text-red-600"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                {/* Skills dropdown */}
+                <div className="flex gap-2">
+                  <Select
+                    value=""
+                    onValueChange={(val) => {
+                      if (val && !formData.skills.includes(val)) {
+                        setFormData(prev => ({
+                          ...prev,
+                          skills: [...prev.skills, val]
+                        }))
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
+                      <SelectValue placeholder={t('choose_skill') || 'Choose a skill'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(() => {
+                        const chosen = subcategories.find(s => String(s.id) === formData.sub_category_id)
+                        return chosen
+                          ? chosen.skills.map(skill => (
+                              <SelectItem key={skill} value={skill}>
+                                {skill}
+                              </SelectItem>
+                            ))
+                          : null
+                      })()}
+                    </SelectContent>
+                  </Select>
+                
+                </div>
+              </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {['title', 'budget', 'skills'].map(field => (
-              <div key={field}>
-                <label htmlFor={field} className="block text-sm font-medium text-gray-700">
-                  {t(field)}<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type={field === 'budget' ? 'number' : 'text'}
-                  id={field}
-                  name={field}
-                  required
-                  value={(formData as any)[field]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                  placeholder={t(`${field}_placeholder`)}
-                />
-              </div>
-            ))}
+          {/* Job Details */}
+       <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    {t('job_details') || 'Job Details'}
+  </h2>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    {/* Experience Level */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {t('experience_level') || 'Experience Level'}
+      </label>
+      <Select
+        value={formData.experience_level}
+        onValueChange={(val) =>
+          setFormData((p) => ({ ...p, experience_level: val }))
+        }
+      >
+        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+          <SelectValue placeholder={t('select_option')!} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="entry">{t('entry') || 'Entry Level'}</SelectItem>
+          <SelectItem value="intermediate">
+            {t('intermediate') || 'Intermediate'}
+          </SelectItem>
+          <SelectItem value="expert">{t('expert') || 'Expert'}</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
 
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('description')}<span className="text-red-500">*</span></label>
-              <textarea
-                id="description"
-                name="description"
-                required
-                rows={4}
-                value={formData.description}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                placeholder={t('description_placeholder')}
-              />
-            </div>
+    {/* Visibility */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {t('visibility') || 'Visibility'}
+      </label>
+      <Select
+        value={formData.visibility}
+        onValueChange={(val) =>
+          setFormData((p) => ({ ...p, visibility: val }))
+        }
+      >
+        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+          <SelectValue placeholder={t('select_option')!} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="public">{t('public') || 'Public'}</SelectItem>
+          <SelectItem value="private">{t('private') || 'Private'}</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
 
-            {[{ name: 'category_id', label: 'category', options: categories }, { name: 'sub_category_id', label: 'subcategory', options: subcategories }].map(({ name, label, options }) => (
-              <div key={name}>
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700">{t(label)}<span className="text-red-500">*</span></label>
-                <select
-                  id={name}
-                  name={name}
-                  required
-                  value={(formData as any)[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                >
-                  <option value="">{t('select_option')}</option>
-               {Array.isArray(options)
-  ? options.map(option => (
-      <option key={option.id} value={option.id}>
-        {option.name}
-      </option>
-    )):null}
-                </select>
-              </div>
-            ))}
+    {/* Location Type */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        {t('location_type') || 'Location Type'}
+      </label>
+      <Select
+        value={formData.location_type}
+        onValueChange={(val) =>
+          setFormData((p) => ({ ...p, location_type: val }))
+        }
+      >
+        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+          <SelectValue placeholder={t('select_option')!} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="remote">{t('remote') || 'Remote'}</SelectItem>
+          <SelectItem value="onsite">{t('onsite') || 'On-site'}</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  </div>
+</div>
 
-            {[{ name: 'experience_level', options: ['entry', 'intermediate', 'expert'] }, { name: 'visibility', options: ['public', 'private'] }, { name: 'location_type', options: ['remote', 'onsite'] }].map(({ name, options }) => (
-              <div key={name}>
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700">{t(name)}</label>
-                <select
-                  id={name}
-                  name={name}
-                  required
-                  value={(formData as any)[name]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                >
-                  {options.map(option => (
-                    <option key={option} value={option}>{t(option)}</option>
-                  ))}
-                </select>
-              </div>
-            ))}
 
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate('/jobs')}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
-              >
-                {loading ? t('posting') : t('post_job')}
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Submit Button */}
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/jobs')}
+              className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              {t('cancel') || 'Cancel'}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-3 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (t('posting') || 'Posting...') : (t('post_job') || 'Post Job')}
+            </button>
+          </div>
+        </form>
       </main>
     </div>
   );
