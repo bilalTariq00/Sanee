@@ -155,11 +155,8 @@ export default function SellerContracts() {
 
   useEffect(() => {
     fetchContracts()
-    const iv = setInterval(fetchContracts, 15_000)
-    window.addEventListener("focus", fetchContracts)
     return () => {
-      clearInterval(iv)
-      window.removeEventListener("focus", fetchContracts)
+      fetchContracts()
     }
   }, [reviewedContracts])
 

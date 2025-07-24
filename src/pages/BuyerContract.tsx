@@ -164,7 +164,6 @@ export default function ContractsPage() {
         "Please leave a review for the seller.",
         "success"
       )
-      window.location.href = `/review/${id}`
     } catch (err) {
       console.error(err)
       Swal.fire("Error", "Could not finish the contract.", "error")
