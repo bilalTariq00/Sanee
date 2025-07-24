@@ -1,8 +1,8 @@
 // src/config.ts
 const config = {
-    API_BASE_URL: "https://continues-sussex-view-electric.trycloudflare.com/api",
-    IMG_BASE_URL: "https://continues-sussex-view-electric.trycloudflare.com",
-    WS_URL: "wss://continues-sussex-view-electric.trycloudflare.com/ws", // Add WebSocket URL
+    API_BASE_URL: "https://male-device-climate-understanding.trycloudflare.com/api",
+    IMG_BASE_URL: "https://male-device-climate-understanding.trycloudflare.com",
+    WS_URL: "wss://male-device-climate-understanding.trycloudflare.com/ws", // Add WebSocket URL
     menuItems: {
         buyer: [
             { label: 'All Gigs', path: '/' },

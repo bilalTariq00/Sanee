@@ -30,8 +30,36 @@ function isValidImageUrl(url: string): boolean {
 function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number } {
   let totalPages = 1
   const userMap: Record<string, User> = {}
+  let gigArray: any[] = []
+  let jobArray: any[] = []
 
-  // Shared helper to add or update user in the map
+  // 1) New wrapper shape?
+  if (Array.isArray(apiData.data) && typeof apiData.type === "string") {
+    totalPages = apiData.last_page ?? 1
+
+    if (apiData.type === "gigs") {
+      gigArray = apiData.data
+    } else if (apiData.type === "jobs") {
+      jobArray = apiData.data
+    }
+  } else {
+    // 2) Old shape: apiData.gigs / apiData.jobs
+    gigArray = Array.isArray(apiData.gigs)
+      ? apiData.gigs
+      : apiData.gigs?.data || []
+    if (apiData.gigs?.last_page) {
+      totalPages = Math.max(totalPages, apiData.gigs.last_page)
+    }
+
+    jobArray = Array.isArray(apiData.jobs)
+      ? apiData.jobs
+      : apiData.jobs?.data || []
+    if (apiData.jobs?.last_page) {
+      totalPages = Math.max(totalPages, apiData.jobs.last_page)
+    }
+  }
+
+  // Shared add/update logic
   const addOrUpdate = (
     u: any,
     badge: "Gig" | "Job",
@@ -49,7 +77,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
     const uid = u.uid
     if (!userMap[uid]) {
       userMap[uid] = {
-        id: u.id.toString(),
+        id: String(u.id),
         uid,
         name: `${u.first_name} ${u.last_name}`.trim(),
         avatar: u.image || "/placeholder.svg?height=100&width=100",
@@ -63,19 +91,18 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         badge,
         hourlyRate:
           badge === "Gig"
-            ? Number.parseFloat(projectItems[0]?.price?.toString() || "0")
-            : Number.parseFloat(projectItems[0]?.budget?.toString() || "0"),
+            ? Number(projectItems[0]?.price ?? 0)
+            : Number(projectItems[0]?.budget ?? 0),
         experience: u.headline || u.experience_level || "Professional",
         followers: 0,
         skills: [...(u.skills || []), ...(u.tags || [])],
         projects: [] as any[],
-         portfolios: (u.portfolios || []).map((p: any) => ({
-      title: p.title,
-      description: p.description,
-      image: p.image,
-      link: p.link,
-    })),
-
+        portfolios: (u.portfolios || []).map((p: any) => ({
+          title: p.title,
+          description: p.description,
+          image: p.image,
+          link: p.link,
+        })),
         bio: u.summary || "",
         categoryId: projectItems[0]?.category?.id || null,
         categoryName: projectItems[0]?.category?.name,
@@ -85,15 +112,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
     userMap[uid].projects.push(...projectItems)
   }
 
-  // Determine gigs array (flat or paginated)
-  const gigArray: any[] = Array.isArray(apiData.gigs) ? apiData.gigs : apiData.gigs?.data || []
-
-  // If paginated shape includes .last_page, update totalPages
-  if (apiData.gigs?.last_page) {
-    totalPages = Math.max(totalPages, apiData.gigs.last_page)
-  }
-
-  // Process each gig
+  // Process gigs
   for (const gig of gigArray) {
     const u = gig.user
     if (!u) continue
@@ -106,7 +125,7 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         tags: gig.tags || [],
         category: gig.category,
         subcategory: gig.subcategory,
-        price: Number.parseFloat(gig.price),
+        price: parseFloat(gig.price),
       }
     })
     if (items.length === 0) {
@@ -117,23 +136,20 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
         tags: gig.tags || [],
         category: gig.category,
         subcategory: gig.subcategory,
-        price: Number.parseFloat(gig.price),
+        price: parseFloat(gig.price),
       })
     }
     addOrUpdate(u, "Gig", items)
   }
 
-  // Determine jobs array (flat or paginated)
-  const jobArray: any[] = Array.isArray(apiData.jobs) ? apiData.jobs : apiData.jobs?.data || []
-  if (apiData.jobs?.last_page) {
-    totalPages = Math.max(totalPages, apiData.jobs.last_page)
-  }
-
-  // Process each job
+  // Process jobs
   for (const job of jobArray) {
     const u = job.buyer || job.user
     if (!u) continue
-    const imageUrl = u.image && isValidImageUrl(u.image) ? u.image : "/placeholder.svg?height=200&width=300"
+    const imageUrl =
+      u.image && isValidImageUrl(u.image)
+        ? u.image
+        : "/placeholder.svg?height=200&width=300"
     const item = {
       title: job.title,
       description: job.description,
@@ -141,13 +157,14 @@ function normalizeApiResponse(apiData: any): { users: User[]; totalPages: number
       tags: job.skills || [],
       category: job.category,
       subcategory: null,
-      budget: Number.parseFloat(job.budget),
+      budget: parseFloat(job.budget),
     }
     addOrUpdate(u, "Job", [item])
   }
 
   return { users: Object.values(userMap), totalPages }
 }
+
 
 // Map rawFilter → API 'type' param
 function filterToType(filter: DiscoverFilter): string {
@@ -222,19 +239,19 @@ export function useDiscover(
         })
 
         // Normalize and set
-        let { users: fetched, totalPages: pages } = normalizeApiResponse(res.data.data || res.data)
+        const { users: fetched, totalPages: pages } = normalizeApiResponse(res.data)
 
         // Apply user-specific filtering logic
-        if (authUser?.account_type === "buyer" && rawFilter === "all") {
-          // Buyers see only Gigs when "all" is selected
-          fetched = fetched.filter((u) => u.badge === "Gig")
-        } else if (authUser?.account_type === "seller" && rawFilter === "gigs") {
-          // Sellers see only Gigs when "gigs" filter is selected
-          fetched = fetched.filter((u) => u.badge === "Gig")
-        } else if (authUser?.account_type === "seller" && rawFilter === "jobs") {
-          // Sellers see only Jobs when "jobs" filter is selected
-          fetched = fetched.filter((u) => u.badge === "Job")
-        }
+        // if (authUser?.account_type === "buyer" && rawFilter === "all") {
+        //   // Buyers see only Gigs when "all" is selected
+        //   fetched = fetched.filter((u) => u.badge === "Gig")
+        // } else if (authUser?.account_type === "seller" && rawFilter === "gigs") {
+        //   // Sellers see only Gigs when "gigs" filter is selected
+        //   fetched = fetched.filter((u) => u.badge === "Gig")
+        // } else if (authUser?.account_type === "seller" && rawFilter === "jobs") {
+        //   // Sellers see only Jobs when "jobs" filter is selected
+        //   fetched = fetched.filter((u) => u.badge === "Job")
+        // }
         // For seller "all" filter, show both gigs and jobs (no filtering needed)
         // The component will handle grouping them by badge type
         if (alive) {

@@ -26,17 +26,17 @@ export default function Discover() {
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
 const sellerTabs = [
-  { id: "seller",  label: t("seller")  || "All People"        },
+  { id: "buyer",  label: t("seller")  || "All People"        },
   { id: "jobs", label: t("all_jobs") || "Job Posters"       },
-  { id: "buyer",  label: t("buyer")  || "All People"        },
+  { id: "seller",  label: t("buyer")  || "All People"        },
 ];
 
 const buyerTabs = [
-  { id: "all",  label: t("seller")   || "All People"        },
+  { id: "buyer",  label: t("seller")   || "All People"        },
   { id: "gigs", label: t("all_services") || "Service Providers" },
 ];
   const [search, setSearch] = useState("")
-  const [mainFilter, setMainFilter] = useState<"all" | "jobs" | "gigs">("all") // Renamed from 'filter'
+  const [mainFilter, setMainFilter] = useState<"buyer" | "jobs" | "gigs">("buyer") // Renamed from 'filter'
   const [activeCategory, setActiveCategory] = useState<string>("all") // New state for category filter
 
   // New state for sub-tabs when 'all' filter is active for sellers
@@ -176,7 +176,7 @@ const tabs = authUser?.account_type === "seller"
                           <UserCard
                             key={u.uid}
                             user={u}
-                            userType={u.account_type as "buyer" | "seller"}
+                            userType={userType}
                             authUserType={authUser?.account_type}
                             onUserClick={() => {
                               setSelected(u)
