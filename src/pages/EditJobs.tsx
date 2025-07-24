@@ -56,7 +56,7 @@ const { t } = useTranslation();
       const res = await axios.get(`${config.API_BASE_URL}/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCategories(res.data);
+     setCategories(res.data.data.categories);
     } catch (err) {
       console.error("Failed to fetch categories:", err);
     }
@@ -65,7 +65,7 @@ const { t } = useTranslation();
   const fetchSubcategories = async (categoryId) => {
     try {
       const res = await axios.get(`${config.API_BASE_URL}/categories/${categoryId}/subcategories`);
-      setSubcategories(res.data);
+      setSubcategories(res.data.data.subcategories);
     } catch (err) {
       console.error("Failed to fetch subcategories:", err);
     }
@@ -74,7 +74,7 @@ const { t } = useTranslation();
   const fetchSkills = async (subcategoryId) => {
     try {
       const res = await axios.get(`${config.API_BASE_URL}/subcategory/${subcategoryId}/skills`);
-      const formatted = res.data.map(skill => ({ label: skill, value: skill }));
+      const formatted = res.data.data.skills.map(skill => ({ label: skill, value: skill }));
       setSkillsList(formatted);
     } catch (err) {
       console.error("Failed to fetch skills:", err);

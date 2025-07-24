@@ -505,12 +505,23 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
                       Posted on: {new Date(j.created_at).toLocaleDateString()}
                     </div>
                   )}
-                   <Link
+                  
+                                                      {currentUser ? (
+         /* You own this gig — let you edit it */
+         <Link to={`/edit-job/${j.id}`}>
+           <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+             {t('edit_jobs') /* e.g. “Edit Gig” */}
+           </Button>
+         </Link>
+       ) : (
+         /* Not you — just let you view the public gig */
+          <Link
                                           to={`/jobs/${j.id}`}
                                           className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600"
                                         >
                                           {t('view_details')}
                                         </Link>
+       )}
                                         </div>
                 </div>
               ))
