@@ -449,17 +449,27 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
               {t('profile_page.delivery_days', { count: g.delivery_time })}
             </div>
             <div>
-            <Link to={`/gig/${g.gig_uid}`}>
-                                  <Button size="sm" className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600">
-                                    {t("view_details")}
-                                  </Button>
-                                </Link>
+              {currentUser ? (
+         /* You own this gig — let you edit it */
+         <Link to={`/edit-gig/${g.id}`}>
+           <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+             {t('edit_services') /* e.g. “Edit Gig” */}
+           </Button>
+         </Link>
+       ) : (
+         /* Not you — just let you view the public gig */
+         <Link to={`/gig/${g.gig_uid}`}>
+           <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+             {t('view_details')}
+           </Button>
+         </Link>
+       )}
             </div>
             </div>
           </div>
         ))
       ) : (
-        <p className="text-gray-500">{t('profile_page.no_gigs_listed')}</p>
+        <p className="text-gray-500">{t('no_gigs_listed')}</p>
       )}
     </div>
   )}

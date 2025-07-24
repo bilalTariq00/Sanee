@@ -13,6 +13,7 @@ export default function JobDetailsPage() {
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+   const [savedJobIds, setSavedJobIds] = useState<number[]>([])
 
   useEffect(() => {
    const fetchJob = async () => {
@@ -38,6 +39,28 @@ export default function JobDetailsPage() {
 
     fetchJob();
   }, [id, t]);
+
+   const toggleSave = async () => {
+  if (!job) return
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  // flip locally
+  setJob(prev => prev && ({ ...prev, is_saved: !prev.is_saved }))
+
+  try {
+    await axios.post(
+      `${config.API_BASE_URL}/saved-jobs/toggle`,
+      { job_id: job.id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+  } catch (err) {
+    console.error('Toggle save failed, reverting UI', err)
+    // revert
+    setJob(prev => prev && ({ ...prev, is_saved: !prev.is_saved }))
+  }
+}
+const isSaved = Boolean(job?.is_saved)
 
   if (loading) {
     return (
@@ -66,7 +89,6 @@ export default function JobDetailsPage() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -145,9 +167,16 @@ export default function JobDetailsPage() {
                   {t('apply_now')}
                 </button>
 
-                <button className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                  {t('save_job')}
-                </button>
+                  <button
+                          onClick={() => toggleSave(job.id)}
+                          className={`px-4 py-2 rounded-lg transition-all ${
+                            isSaved
+                              ? "bg-gray-100 text-red-600 hover:bg-gray-200"
+                              : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          {isSaved ? t("unsave_job") : t("save_job")}
+                        </button>
               </div>
             </div>
           </div>
