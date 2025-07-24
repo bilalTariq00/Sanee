@@ -57,11 +57,15 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
 
         console.log("AllGigs API Request Params:", params) // Log params
 
+   const token = localStorage.getItem("token")
+   
         const res = await axios.get<Gig[]>(`${config.API_BASE_URL}/all-gigs`, {
           params: params, // Pass params here
+           headers: { Authorization: `Bearer ${token}` },
         })
         setGigs(res.data)
         setFilteredGigs(res.data) // Initial filter is just the fetched data
+         
       } catch (err) {
         console.error(err)
         setError(t("error_generic") || "Failed to load gigs.")
@@ -107,18 +111,29 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
         }
       }>(
         `${config.API_BASE_URL}/saved-gigs/toggle`,
-        { gig_id: gigId },
+        { gig_uid: gigId },
         { headers: { Authorization: `Bearer ${token}` } },
       )
       toast.success("" + res.data.message)
       const { is_saved, saved_gig } = res.data.data
-      setSavedLookup((prev) => {
-        const next = { ...prev }
-        const key = String(gigId)
-        if (is_saved) next[key] = saved_gig.id
-        else delete next[key]
-        return next
-      })
+     setSavedLookup((prev) => {
+      const next = { ...prev }
+      if (is_saved) next[gigId] = saved_gig.id
+      else delete next[gigId]
+      return next
+    })
+    const patchGig = (g: Gig) =>
+      g.gig_uid === gigId
+        ? {
+            ...g,
+            is_saved,
+            // if you need saved_gig later:
+            saved_gig: is_saved ? saved_gig : null,
+          }
+        : g
+
+    setGigs((prev) => prev.map(patchGig))
+    setFilteredGigs((prev) => prev.map(patchGig))
     } catch (err: any) {
       console.error("Toggle failed:", err.response?.data || err)
     }
@@ -220,7 +235,7 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
         /* Grid view */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredGigs.map((gig) => {
-            const isSaved = Boolean(savedLookup[gig.gig_uid])
+           const isSaved = Boolean(gig.is_saved)
             const imageUrl = gig.images?.[0]?.image_path
               ? `${config.IMG_BASE_URL}/storage/${gig.images[0].image_path}`
               : "https://via.placeholder.com/400x200"
@@ -241,7 +256,7 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
                     <Button
                       size="sm"
                       variant={isSaved ? "outline" : "default"}
-                      className={isSaved ? "border-gray-500 text-gray-700 px-8" : "bg-red-600 text-white px-8"}
+                      className={isSaved ? "border-red-500 text-red-500 px-8 mt-2" : "bg-red-600 text-white px-8"}
                       onClick={() => handleToggleSave(gig.gig_uid)}
                     >
                       {isSaved ? t("unsave") || "Unsave" : t("save") || "Save"}

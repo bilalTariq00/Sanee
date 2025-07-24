@@ -77,8 +77,8 @@ export default function UserCard({
   // Show all projects/services for this user
 // Show at most 3 projects/services for this user
 const previewItems = isJob
-    ? (user.projects || []).slice(0, 3)
-    : (user.portfolios || []).slice(0, 3)
+    ? (user.projects || []).slice(0, 1)
+    : (user.portfolios || []).slice(0, 1)
 
 
   // Helper to build full URLs
@@ -187,7 +187,7 @@ const previewItems = isJob
       {/* — All Services/Projects Preview — */}
       {/* — Preview Grid — */}
       {previewItems.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+        <div className="grid  gap-3 mb-6">
           {previewItems.map((item, idx) => (
             <div
               key={idx}

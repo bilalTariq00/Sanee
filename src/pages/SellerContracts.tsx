@@ -268,7 +268,7 @@ export default function SellerContracts() {
   )}
 
   {/* 3) completed/finished & not reviewed → show Review Buyer */}
-  {(c.status === "completed" || c.status === "finished") && !c.reviewed && (
+  {( c.status === "finished") && !c.reviewed && (
     <Button
       size="sm"
       className="bg-red-500 hover:bg-red-600 text-white"
