@@ -300,7 +300,7 @@ export default function ContractsPage() {
   )}
 
                   {/* ─── 7) NEW: Review Seller when finished ─────────────────────────── */}
-                  {(c.status === "finished" || c.status !== "completed") && !c.reviewed && (
+                  {(c.status === "finished" ) && !c.reviewed && (
                     <Button
                       className="mt-4 bg-red-500 text-white hover:bg-red-600"
                       onClick={() => handleReview(c.id)}
