@@ -1009,7 +1009,7 @@ export default function Chat() {
                                 {isBuyer &&
                                   message.is_custom_order &&
                                   message.receiver_id === currentUser?.id &&
-                                  // message.status === "pending" && 
+                                   message.status === "pending" && 
                                   (
                                     <div className="flex gap-2 mt-3">
                                       <button
