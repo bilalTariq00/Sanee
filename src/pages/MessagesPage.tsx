@@ -91,6 +91,8 @@ export default function Chat() {
   const [unread, setUnread] = useState<Record<string, boolean>>({})
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [acceptingOrder, setAcceptingOrder] = useState<number | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
 
   const isBuyer = currentUser?.account_type === "buyer"
 
@@ -366,7 +368,9 @@ export default function Chat() {
       formData.append("type", "text");
       formData.append("message", newMessage.trim());
     }
-
+setSelectedFile(null)
+  setFilePreviewUrl(null)
+  if (fileInputRef.current) fileInputRef.current.value = ""
       const res = await axios.post(`${config.API_BASE_URL}/chat/send`, formData, {
         headers: {
           ...getAuthHeaders(),
@@ -931,6 +935,7 @@ export default function Chat() {
                             : "bg-white border border-gray-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                         } ${isDeleted ? "p-2 italic" : ""}`}
                       >
+                        
                         {message.message && (
                           <div>
                             {isCustomOrder ? (
@@ -1098,6 +1103,7 @@ export default function Chat() {
 
             {/* Chat Input */}
             <div className="p-4 bg-white border-t border-gray-300 flex gap-3 items-center relative">
+           
               <div className="relative">
                 <button
                   className="w-10 h-10 border border-gray-300 rounded-lg bg-white flex items-center justify-center cursor-pointer transition-all duration-200 text-xl text-slate-600 p-0 min-w-[40px] shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:border-green-500 hover:text-green-500 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
@@ -1120,7 +1126,32 @@ export default function Chat() {
                   </div>
                 )}
               </div>
-
+   {filePreviewUrl && (
+  <div className="p-2 bg-slate-100 rounded-lg mb-2 max-h-24 overflow-hidden">
+    {selectedFile?.type.startsWith("image/") ? (
+      <img
+        src={filePreviewUrl}
+        alt="preview"
+        className="max-h-20 rounded-md"
+      />
+    ) : (
+      <div className="flex items-center gap-2 text-sm text-slate-700">
+        <span className="text-xl">📎</span>
+        {selectedFile?.name}
+      </div>
+    )}
+    <button
+      className="absolute top-1 right-1 text-slate-500 hover:text-slate-800"
+      onClick={() => {
+        setSelectedFile(null)
+        setFilePreviewUrl(null)
+        if (fileInputRef.current) fileInputRef.current.value = ""
+      }}
+    >
+      <X className="w-4 h-4"/>
+    </button>
+  </div>
+)}
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
@@ -1135,7 +1166,20 @@ export default function Chat() {
                 rows={1}
               />
 
-              <input type="file" ref={fileInputRef} className="hidden" />
+              <input
+                   type="file"
+                   ref={fileInputRef}
+                   className="hidden"
+                   onChange={(e) => {
+                     const file = e.target.files?.[0] ?? null
+                     setSelectedFile(file)
+                     if (file) {
+                       setFilePreviewUrl(URL.createObjectURL(file))
+                     } else {
+                       setFilePreviewUrl(null)
+                     }
+                   }}
+                 />
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="w-[40px] h-[40px] p-2 border border-gray-300 rounded bg-white text-sm cursor-pointer text-slate-600 hover:border-green-500 hover:text-green-500 flex items-center justify-center transition-colors"
