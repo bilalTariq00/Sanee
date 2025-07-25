@@ -1102,31 +1102,7 @@ setSelectedFile(null)
             </div>
 
             {/* Chat Input */}
-            <div className="p-4 bg-white border-t border-gray-300 flex gap-3 items-center relative">
-           
-              <div className="relative">
-                <button
-                  className="w-10 h-10 border border-gray-300 rounded-lg bg-white flex items-center justify-center cursor-pointer transition-all duration-200 text-xl text-slate-600 p-0 min-w-[40px] shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:border-green-500 hover:text-green-500 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
-                  onClick={() => setShowEmoji(!showEmoji)}
-                >
-                  <Smile className="w-5 h-5" />
-                </button>
-                {showEmoji && (
-                  <div className="absolute bottom-[calc(100%+8px)] left-0 z-[1000] bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-gray-300 overflow-hidden">
-                    <EmojiPicker
-                      height={300}
-                      width={250}
-                      onEmojiClick={(emoji) => setNewMessage((prev) => prev + emoji.emoji)}
-                      searchDisabled={false}
-                      skinTonesDisabled={true}
-                      previewConfig={{
-                        showPreview: false,
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-   {filePreviewUrl && (
+ {filePreviewUrl && (
   <div className="p-2 bg-slate-100 rounded-lg mb-2 max-h-24 overflow-hidden">
     {selectedFile?.type.startsWith("image/") ? (
       <img
@@ -1152,6 +1128,31 @@ setSelectedFile(null)
     </button>
   </div>
 )}
+            <div className="p-4 bg-white border-t border-gray-300 flex gap-3 items-center relative">
+           
+              <div className="relative">
+                <button
+                  className="w-10 h-10 border border-gray-300 rounded-lg bg-white flex items-center justify-center cursor-pointer transition-all duration-200 text-xl text-slate-600 p-0 min-w-[40px] shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:border-green-500 hover:text-green-500 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
+                  onClick={() => setShowEmoji(!showEmoji)}
+                >
+                  <Smile className="w-5 h-5" />
+                </button>
+                {showEmoji && (
+                  <div className="absolute bottom-[calc(100%+8px)] left-0 z-[1000] bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-gray-300 overflow-hidden">
+                    <EmojiPicker
+                      height={300}
+                      width={250}
+                      onEmojiClick={(emoji) => setNewMessage((prev) => prev + emoji.emoji)}
+                      searchDisabled={false}
+                      skinTonesDisabled={true}
+                      previewConfig={{
+                        showPreview: false,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+  
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
