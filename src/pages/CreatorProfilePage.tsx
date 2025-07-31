@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import config from "@/config";
+import { useTranslation } from "react-i18next";
 
 interface Service {
   name: string;
@@ -53,7 +54,7 @@ interface UserProfile {
 export default function CreatorProfilePage() {
   const { creatorId } = useParams<{ creatorId: string }>();
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"services" | "portfolio" | "reviews">(
     "services"
   );
@@ -131,7 +132,7 @@ export default function CreatorProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
-        Loading profile…
+        {t('loading_profile')}
       </div>
     );
   }

@@ -249,7 +249,7 @@ export default function WalletPage() {
                   <div>
                     <span className="text-gray-500">Withdrawal Limits:</span>
                     <span className="ml-2 font-medium">
-                      ${walletData.config.min_withdrawal} - ${walletData.config.max_withdrawal}
+                      &#xea;{walletData.config.min_withdrawal} - ${walletData.config.max_withdrawal}
                     </span>
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export default function WalletPage() {
                       <div>
                         <h2 className="text-2xl font-bold">{formatCardTitle(expandedCard)} Transactions</h2>
                         <p className="text-white/90">
-                          ${walletData?.wallet_summary?.[expandedCard as keyof typeof walletData.wallet_summary] || 0} •{" "}
+                          riyal {walletData?.wallet_summary?.[expandedCard as keyof typeof walletData.wallet_summary] || 0} •{" "}
                           {walletData?.recent_transactions?.[
                             expandedCard as keyof typeof walletData.recent_transactions
                           ]?.length || 0}{" "}
@@ -326,7 +326,7 @@ export default function WalletPage() {
                                             : "text-gray-900"
                                     }`}
                                   >
-                                    ${transaction.amount}
+                                    riyal {transaction.amount}
                                   </span>
                                 </div>
 
@@ -334,7 +334,7 @@ export default function WalletPage() {
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm font-medium text-gray-500">Commission</span>
                                     <span className="text-sm font-semibold text-red-500">
-                                      ${transaction.commission_amount}
+                                      riyal {transaction.commission_amount}
                                     </span>
                                   </div>
                                 )}

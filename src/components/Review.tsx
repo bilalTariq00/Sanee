@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { Star } from "lucide-react"; // import the Star icon
+import { Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function Review() {
+  const { t } = useTranslation();
   const { id } = useParams(); // contract ID
   const [contract, setContract] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,7 +29,7 @@ function Review() {
     fetchContract(token);
   }, []);
 
-  const fetchContract = async (token) => {
+  const fetchContract = async (token: string | null) => {
     try {
       const res = await axios.get(`${config.API_BASE_URL}/contracts/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -35,7 +37,7 @@ function Review() {
       console.log("Response Data", res.data);
       setContract(res.data);
     } catch (err) {
-      console.error("Failed to load contract", err);
+      console.error(t("review.contractLoadFailed"), err);
     } finally {
       setLoading(false);
     }
@@ -49,7 +51,7 @@ function Review() {
   const handleSubmit = async () => {
     const reviewType = getReviewType();
     if (!reviewType) {
-      toast.error("Unable to determine review direction");
+      toast.error(t("review.unknownDirection"));
       return;
     }
 
@@ -68,39 +70,43 @@ function Review() {
 
     try {
       await axios.post(`${config.API_BASE_URL}/reviews`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success("Review submitted successfully!");
+      toast.success(t("review.success"));
       navigate("/");
     } catch (err) {
-      console.error("Review submission failed", err);
-      toast.error("Failed to submit review");
+      console.error(t("review.failed"), err);
+      toast.error(t("review.failed"));
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!contract) return <p className="text-red-600">Contract not found</p>;
+  if (loading) return <p>{t("review.loading")}</p>;
+  if (!contract) return <p className="text-red-600">{t("review.contractNotFound")}</p>;
 
-  const reviewing = getReviewType() === "buyer_to_seller" ? "seller" : "buyer";
+  const reviewing = getReviewType() === "buyer_to_seller" ? t("review.seller") : t("review.buyer");
 
   return (
     <div className="max-w-2xl mx-auto mt-10">
       <Card className="bg-white border-red-600 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl text-red-700">Review the {reviewing}</CardTitle>
+          <CardTitle className="text-2xl text-red-700">
+            {t("review.reviewThe")} {reviewing}
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Gig: <strong>{contract.gig?.title}</strong> (UID: {contract.gig?.gig_uid})
+            {t("review.gig")}: <strong>{contract.gig?.title}</strong> (UID: {contract.gig?.gig_uid})
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="rating" className="text-red-600">Rating</Label>
+            <Label htmlFor="rating" className="text-red-600">
+              {t("review.rating")}
+            </Label>
             <div className="flex gap-2 mt-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
                   key={star}
                   size={32}
-                  className={`cursor-pointer ${star <= (hoverRating || rating) ? 'fill-yellow-400 stroke-yellow-400' : 'stroke-gray-400'}`}
+                  className={`cursor-pointer ${star <= (hoverRating || rating) ? "fill-yellow-400 stroke-yellow-400" : "stroke-gray-400"}`}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => setRating(star)}
@@ -110,10 +116,12 @@ function Review() {
           </div>
 
           <div>
-            <Label htmlFor="comment" className="text-red-600">Comment</Label>
+            <Label htmlFor="comment" className="text-red-600">
+              {t("review.comment")}
+            </Label>
             <Textarea
               id="comment"
-              placeholder={`Write your feedback for the ${reviewing}...`}
+              placeholder={`${t("review.placeholder")} ${reviewing}...`}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               className="border-red-600"
@@ -124,7 +132,7 @@ function Review() {
             className="w-full bg-red-600 text-white hover:bg-red-700"
             onClick={handleSubmit}
           >
-            Submit Review
+            {t("review.submit")}
           </Button>
         </CardContent>
       </Card>

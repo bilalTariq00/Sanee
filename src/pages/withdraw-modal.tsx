@@ -57,7 +57,7 @@ export default function WithdrawModal({ onClose, balance, config }: WithdrawModa
           <div className="bg-green-50 p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Available Balance</span>
-              <span className="text-lg font-semibold text-green-600">${balance.toLocaleString()}</span>
+              <span className="text-lg font-semibold text-green-600">riyal{balance.toLocaleString()}</span>
             </div>
           </div>
 
@@ -102,16 +102,16 @@ export default function WithdrawModal({ onClose, balance, config }: WithdrawModa
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Withdrawal Amount</span>
-                  <span>${Number.parseFloat(amount).toFixed(2)}</span>
+                  <span>riyal{Number.parseFloat(amount).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Processing Fee ({config?.commission_rate || 3}%)</span>
-                  <span>-${withdrawalFee.toFixed(2)}</span>
+                  <span>-riyal{withdrawalFee.toFixed(2)}</span>
                 </div>
                 <hr />
                 <div className="flex justify-between font-semibold">
                   <span>You'll Receive</span>
-                  <span>${netAmount.toFixed(2)}</span>
+                  <span>riyal{netAmount.toFixed(2)}</span>
                 </div>
               </div>
             )}

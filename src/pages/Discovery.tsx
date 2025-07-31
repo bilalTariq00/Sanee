@@ -28,7 +28,7 @@ export default function Discover() {
 const sellerTabs = [
   { id: "buyer",  label: t("seller")  || "All People"        },
   { id: "jobs", label: t("all_jobs") || "Job Posters"       },
-  { id: "seller",  label: t("buyer")  || "All People"        },
+  { id: "seller",  label: t("review_page.buyer")  || "All People"        },
 ];
 
 const buyerTabs = [

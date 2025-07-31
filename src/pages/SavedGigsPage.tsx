@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User } from "lucide-react";
 import config from "../config";
+import { useTranslation } from "react-i18next"
 
 interface SavedGig {
   id: number;
@@ -27,7 +28,7 @@ export default function SavedGigsPage() {
   const [savedGigs, setSavedGigs] = useState<SavedGig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+const { t } = useTranslation()
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -51,14 +52,14 @@ setSavedGigs(res.data.data.saved_gigs);
     })();
   }, []);
 
-  if (loading) return <p className="p-6 text-center">Loading saved gigs…</p>;
+ if (loading) return <p className="p-6 text-center">{t("saved_gig.loading")}</p>
   if (error) return <p className="p-6 text-center text-red-600">{error}</p>;
-  if (!savedGigs.length)
-    return <p className="p-6 text-center">You haven’t saved any gigs yet.</p>;
+ if (!savedGigs.length)
+  return <p className="p-6 text-center">{t("saved_gig.no_saved")}</p>;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Your Saved Gigs</h1>
+      <h1 className="text-2xl font-semibold mb-4">{t("saved_gig.title")}</h1>
       <div className="space-y-4">
         {savedGigs.map(sg => {
           const { gig, notes, saved_at, id: savedId } = sg;
@@ -88,14 +89,15 @@ setSavedGigs(res.data.data.saved_gigs);
                       />
                       {gig.price}
                     </Badge>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Saved on{" "}
-                      {new Date(saved_at).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
+                  <p className="text-sm text-gray-500 mt-1">
+  {t("saved_gig.saved_on")}{" "}
+  {new Date(saved_at).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })}
+</p>
+
                     {notes && (
                       <p className="text-sm italic mt-1">“{notes}”</p>
                     )}
@@ -103,7 +105,7 @@ setSavedGigs(res.data.data.saved_gigs);
                   <div className="flex flex-col gap-2">
                     <Link to={`/gig/${gig.gig_uid}`}>
                       <Button size="sm" className="bg-red-600 text-white">
-                        View Details
+                        {t("saved_gig.view_details")}
                       </Button>
                     </Link>
                     <Button
@@ -120,7 +122,7 @@ setSavedGigs(res.data.data.saved_gigs);
                         );
                       }}
                     >
-                      Remove
+                     {t("saved_gig.remove")}
                     </Button>
                   </div>
                 </CardContent>

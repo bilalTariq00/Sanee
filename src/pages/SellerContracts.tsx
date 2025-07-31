@@ -212,7 +212,7 @@ export default function SellerContracts() {
 
                     <CardContent className="space-y-2 text-sm text-gray-700">
                       <div>
-                        <strong>{t("seller_contracts.price")}:</strong> ${c.price}
+                         <span className="font-medium  flex items-center"><strong>{t("seller_contracts.price")}:</strong> <img src='/riyal.svg' className="h-3 w-3 mr-1" />{c.price}</span>
                       </div>
                       <div>
                         <strong>{t("seller_contracts.status")}:</strong>{" "}

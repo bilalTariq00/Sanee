@@ -261,7 +261,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   if (!uid) return <div className="min-h-screen flex items-center justify-center text-red-500">No user id provided</div>
 
   if (loadingProfile)
-    return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading profile…</div>
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">{t('loading_profile')}</div>
 
   if (!user) return <div className="min-h-screen flex items-center justify-center text-red-500">User not found</div>
 

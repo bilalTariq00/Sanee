@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useAuth } from "@/contexts/AuthContext"
+import { useTranslation } from "react-i18next"
+
 
 export default function ContractsPage() {
   const { user } = useAuth()
@@ -16,6 +18,8 @@ export default function ContractsPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingContract, setEditingContract] = useState<any>(null)
+  const { t } = useTranslation()
+
 
   // ─── 1) Load reviewed IDs from localStorage ─────────────────────────
   const [reviewedContracts, setReviewedContracts] = useState<number[]>(() => {
@@ -59,7 +63,8 @@ export default function ContractsPage() {
       setContracts(deduped)
     } catch (err) {
       console.error(err)
-      Swal.fire("Error", "Could not load your contracts.", "error")
+     Swal.fire(t("buyer_contracts.error"), t("buyer_contracts.could_not_load"), "error")
+
     } finally {
       setLoading(false)
     }
@@ -143,11 +148,11 @@ export default function ContractsPage() {
 
   const handleEndContract = async (id: number) => {
     const confirm = await Swal.fire({
-      title: "End Contract?",
-      text: "Release funds and finish this contract?",
+      title: t("buyer_contracts.end_confirm_title"),
+      text: t("buyer_contracts.end_confirm_text"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, finish",
+      confirmButtonText: t("buyer_contracts.yes_finish"),
       confirmButtonColor: "#dc2626",
     })
     if (!confirm.isConfirmed) return
@@ -160,8 +165,8 @@ export default function ContractsPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       await Swal.fire(
-        "Contract Finished!",
-        "Please leave a review for the seller.",
+        t("buyer_contracts.finished_title"),
+       t("buyer_contracts.leave_review"),
         "success"
       )
     } catch (err) {
@@ -172,11 +177,11 @@ export default function ContractsPage() {
 
   const handleRejectContract = async (id: number) => {
     const { isConfirmed } = await Swal.fire({
-      title: "Reject Submission?",
-      text: "Are you sure? Seller will be notified.",
+      title: t("buyer_contracts.reject_confirm_title"),
+      text: t("buyer_contracts.reject_confirm_text"),
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, reject it",
+      confirmButtonText:t("buyer_contracts.yes_reject"),
       confirmButtonColor: "#dc2626",
     })
     if (!isConfirmed) return
@@ -200,10 +205,10 @@ export default function ContractsPage() {
             : c
         )
       )
-      await Swal.fire("Rejected", "Contract reset to in progress.", "info")
+      await Swal.fire(t("buyer_contracts.rejected"),t("buyer_contracts.reset_to_progress"), "info")
     } catch (err) {
       console.error(err)
-      Swal.fire("Error", "Could not reject the submission.", "error")
+      Swal.fire("Error",t("buyer_contracts.could_not_reject"), "error")
     }
   }
 
@@ -243,15 +248,17 @@ export default function ContractsPage() {
   }
 
   if (loading) {
-    return <p className="text-center py-10 text-gray-500">Loading contracts...</p>
+    return <p className="text-center py-10 text-gray-500">{t("buyer_contracts.loading")}</p>
+
   }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
-      <h2 className="text-2xl font-semibold mb-4 text-red-700">My Contracts</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-red-700">{t("buyer_contracts.title")}</h2>
 
       {contracts.length === 0 ? (
-        <p className="text-gray-500">No contracts found.</p>
+        <p className="text-gray-500">{t("buyer_contracts.no_contracts")}</p>
+
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {contracts.map((c) => {
@@ -260,22 +267,22 @@ export default function ContractsPage() {
               <Card key={c.id} className="bg-white shadow-sm">
                 <CardHeader>
                   <CardTitle className="text-lg text-red-700">
-                    {c.gig?.title || "Untitled Gig"}
+                    {c.gig?.title || t("buyer_contracts.untitled_gig")}
                   </CardTitle>
                   <p className="text-sm text-gray-500">
-                    Buyer: {user?.first_name} {user?.last_name}
+                    {t("buyer_contracts.buyer")}: {user?.first_name} {user?.last_name}
                   </p>
                 </CardHeader>
 
                 <CardContent className="space-y-2 text-sm text-gray-700">
-                  <p><strong>Price:</strong> ${c.price}</p>
-                  <div><strong>Status:</strong> {renderBadge(c.status, hasSubmission)}</div>
+                   <span className="font-medium  flex items-center"><strong>{t("buyer_contracts.price")}</strong> <img src='/riyal.svg' className="h-3 w-3 mr-1" />{c.price}</span>
+                  <div><strong>{t("buyer_contracts.status")}:</strong> {renderBadge(c.status, hasSubmission)}</div>
                   <p>
-                    <strong>Start:</strong>{" "}
+                    <strong>{t("buyer_contracts.start")}:</strong>{" "}
                     {c.started_at ? new Date(c.started_at).toLocaleDateString() : "-"}
                   </p>
                   <p>
-                    <strong>End:</strong>{" "}
+                    <strong>{t("buyer_contracts.end")}:</strong>{" "}
                     {c.completed_at ? new Date(c.completed_at).toLocaleDateString() : "-"}
                   </p>
 
@@ -283,17 +290,17 @@ export default function ContractsPage() {
                  {hasSubmission && c.status !== "finished" && (
     <>
       <Button onClick={() => handleViewSubmission(c)} className="mt-2 block">
-        👀 View Submission
+         {t("buyer_contracts.view_submission")}
       </Button>
       <Button onClick={() => handleEndContract(c.id)} className="mt-2 bg-green-600 text-white">
-        ✅ Accept & End Contract
+        {t("buyer_contracts.accept_end")}
       </Button>
       <Button
         onClick={() => handleRejectContract(c.id)}
         variant="outline"
         className="mt-2 border-red-600 text-red-600"
       >
-        ❌ Reject Work
+        {t("buyer_contracts.reject_work")}
       </Button>
     </>
   )}
@@ -304,7 +311,7 @@ export default function ContractsPage() {
                       className="mt-4 bg-red-500 text-white hover:bg-red-600"
                       onClick={() => handleReview(c.id)}
                     >
-                      ⭐ Review Seller
+                      {t("buyer_contracts.review_seller")}
                     </Button>
                   )}
                 </CardContent>

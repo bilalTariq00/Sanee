@@ -177,7 +177,7 @@ const handleSignOut = () => {
   { path: '/seller/contracts',label: t('seller_contract'),icon: Workflow },
   { path: '/wallet',         label: t('Wallet'),          icon: Wallet },
   // { path: '/jobs',           label: t('jobs'),            icon: WorkflowIcon },
-  { path: '/save-jobs',           label: t('Save jobs'),            icon: WorkflowIcon },
+  { path: '/save-jobs',           label: t('save_job'),            icon: WorkflowIcon },
 ].map(({ path, label, icon: Icon }) => (
   <SidebarMenuItem key={path}>
     <SidebarMenuButton asChild>
