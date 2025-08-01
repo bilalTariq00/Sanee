@@ -44,6 +44,7 @@ import WalletPage from "./pages/wallet-page"
 import SavedJobsPage from "./pages/SavedJobsPage"
 import "./App.css"
 import SavedGigsPage from "./pages/SavedGigsPage"
+import LandingPage from "./pages/LandingPage";  // ⬅️ ADD THIS
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -91,7 +92,12 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupPage />} />
 
       {/* –––––– Private (wrapped in AuthenticatedLayout + NotificationProvider) –––––– */}
-      <Route path="/" element={<AuthenticatedRoutes />}>
+      {/* If user is not logged in, show LandingPage */}
+<Route
+  path="/"
+  element={user ? <AuthenticatedRoutes /> : <LandingPage />}
+>
+
         {/* dashboard & general */}
         <Route path="dashboard" element={<HomePage />} />
         <Route path="projects" element={<ProjectsPage />} />
@@ -100,7 +106,7 @@ function AppRoutes() {
        <Route path="/messages/:userId" element={<Chat />} />
           <Route path="/messages" element={<Chat />} />
         <Route path="notifications" element={<NotificationsPage />} />
-        <Route path="notification-settings" element={<NotificationSettingsPage />} /> {/* ⬅️ NEW ROUTE */}
+        <Route path="notification-settings" element={<NotificationSettingsPage />} />
         <Route index element={<Index />} />
         {/* jobs */}
         <Route path="jobs" element={<JobsPage />} />
