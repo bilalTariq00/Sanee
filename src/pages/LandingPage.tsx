@@ -208,7 +208,7 @@ export default function LandingPage() {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-gray-600 mb-12">
-            Join thousands of businesses and creators who trust Creva for their creative projects.
+            Join thousands of businesses and creators who trust Sanee for their creative projects.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -278,7 +278,7 @@ export default function LandingPage() {
               <div className="space-y-2 text-gray-300">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2" />
-                  <span>hello@creva.com</span>
+                  <span>hello@sanee.com</span>
                 </div>
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2" />
@@ -351,7 +351,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Creva. All rights reserved.</p>
+            <p>&copy; 2024 Sanee. All rights reserved.</p>
           </div>
         </div>
       </footer>
