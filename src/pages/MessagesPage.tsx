@@ -976,9 +976,11 @@ const handleAcceptOrder = async (message: Message) => {
                   const canDelete = isOwn && !isDeleted && isMessageRecent(message.created_at)
                   const hasNote = message.message?.includes("Note:") || message.note
 
-                  const isExpired = message.status === "expired" || message.is_expired
-  const isAccepted = message.status === "accepted" || message.is_approved
-  const isRejected = message.status === "rejected" || message.is_rejected
+                const order = message.chat_order || {};
+const isAccepted = order.is_approved === true;
+const isRejected = order.is_rejected === true;
+const isExpired = order.is_expired === true || order.is_past_expiry === true;
+
 
                   return (
                     <div
@@ -1066,35 +1068,64 @@ const handleAcceptOrder = async (message: Message) => {
                                 </div>
 
 
-{isBuyer &&
-  message.is_custom_order &&
-  message.receiver_id === currentUser?.id &&
-  !isAccepted &&
-  !isExpired &&
-  !isRejected && (
-    <div className="flex gap-2 mt-3">
+{isBuyer && message.is_custom_order && message.receiver_id === currentUser?.id && (
+  <>
+    {/* Show Accept & Reject only when order is pending */}
+    {!isAccepted && !isRejected && !isExpired && (
+      <div className="flex gap-2 mt-3">
+        <button
+          onClick={() => handleAcceptOrder(message)}
+          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+          className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {acceptingOrder === (message.order_id || message.chat_order_id) ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              Processing...
+            </>
+          ) : (
+            <>✓ Accept & Pay</>
+          )}
+        </button>
+        <button
+          onClick={() => handleRejectOrder(message)}
+          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+          className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+        >
+          ✗ Reject
+        </button>
+      </div>
+    )}
+
+    {/* Show final status as styled buttons */}
+    {isAccepted && (
       <button
-        onClick={() => handleAcceptOrder(message)}
-        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        type="button"
+        disabled
+        className="flex-1 mt-3 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm font-medium cursor-default"
       >
-        {acceptingOrder === (message.order_id || message.chat_order_id) ? (
-          <>
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            Processing...
-          </>
-        ) : (
-          <>✓ Accept & Pay</>
-        )}
+        ✓ Order Accepted
       </button>
+    )}
+    {isRejected && (
       <button
-        onClick={() => handleRejectOrder(message)}
-        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-        className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+        type="button"
+        disabled
+        className="flex-1 mt-3 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-medium cursor-default"
       >
-        ✗ Reject
+        ✗ Order Rejected
       </button>
-    </div>
+    )}
+    {isExpired && (
+      <button
+        type="button"
+        disabled
+        className="flex-1 mt-3 px-4 py-2 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium cursor-default"
+      >
+        ⏳ Order Expired
+      </button>
+    )}
+  </>
 )}
 
 
