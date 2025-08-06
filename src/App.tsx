@@ -45,6 +45,7 @@ import SavedJobsPage from "./pages/SavedJobsPage"
 import "./App.css"
 import SavedGigsPage from "./pages/SavedGigsPage"
 import LandingPage from "./pages/LandingPage";  // ⬅️ ADD THIS
+import SupportPage from "./pages/support"
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -99,6 +100,7 @@ function AppRoutes() {
 >
 
         {/* dashboard & general */}
+        <Route path="support" element={<SupportPage />} />
         <Route path="dashboard" element={<HomePage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="my-projects" element={<MyProjectsPage />} />

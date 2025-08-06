@@ -442,7 +442,7 @@ setSelectedFile(null)
           sender_uid: currentUser?.uid,
           gig_id: selectedService,
           amount: Number.parseFloat(orderAmount),
-          expiry_date: getExpiryDate(orderExpiry),
+          expiry_date: orderExpiry,
           note: orderNote,
         },
         {
@@ -450,6 +450,7 @@ setSelectedFile(null)
           timeout: 10000,
         },
       )
+      // console.log("Sending expiry_date to API:", orderExpiry)
 
       const orderData = orderRes.data.data
       const messageText = `Custom order created: ${selectedServiceData.title}\n\nPrice: ${orderAmount} Riyals\n\nExpires in: ${
@@ -500,7 +501,7 @@ setSelectedFile(null)
       setShowOrderModal(false)
       setSelectedService("")
       setOrderAmount("")
-      setOrderExpiry("1_hour")
+      setOrderExpiry("1_hour")  // keep default
       setOrderNote("")
       scrollToBottom()
       toast.success("Custom order created successfully!")
@@ -511,39 +512,91 @@ setSelectedFile(null)
   }
 
   // Handle order acceptance - ENHANCED
-  const handleAcceptOrder = async (message: Message) => {
-    const orderId = message.order_id || message.chat_order_id
-    if (!orderId) {
-      toast.error("Order ID not found")
-      return
+const handleAcceptOrder = async (message: Message) => {
+  const orderId = message.order_id || message.chat_order_id;
+  if (!orderId) {
+    toast.error("Order ID not found");
+    return;
+  }
+
+  setAcceptingOrder(orderId);
+
+  try {
+    const response = await fetch(`${config.API_BASE_URL}/buyer/chat/order/accept/${orderId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    const result = await response.json();
+    console.log("API Response result:", result);
+
+    // Handle common failure cases explicitly
+    if (!response.ok || !result.success) {
+      const msg = result.message?.toLowerCase() || "";
+
+      if (msg.includes("already been accepted")) {
+        // Mark as accepted
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === message.id
+              ? { ...msg, is_expired: false, is_approved: true, status: "accepted" }
+              : msg
+          )
+        );
+        toast.info("Order was already accepted.");
+      } else if (msg.includes("expired")) {
+        // Mark as expired
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === message.id
+              ? { ...msg, is_expired: true, is_approved: false, status: "expired" }
+              : msg
+          )
+        );
+        toast.error("Order has expired.");
+      } else {
+        toast.error(result.message || "Failed to accept order");
+      }
+      return;
     }
 
-    setAcceptingOrder(orderId)
+    // Success: update the message flags from API response
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === message.id
+          ? {
+              ...msg,
+              is_expired: result.data?.is_expired ?? false,
+              is_approved: result.data?.is_approved ?? false,
+              is_rejected: result.data?.is_rejected ?? false,
+              status: result.data?.is_approved
+                ? "accepted"
+                : result.data?.is_expired
+                ? "expired"
+                : result.data?.is_rejected
+                ? "rejected"
+                : "pending",
+            }
+          : msg
+      )
+    );
 
-    try {
-      // First, accept the order on the backend
-     
+    toast.success(result.message || "Order accepted successfully!");
 
-        // Update message status locally
-        setMessages((prev) => prev.map((msg) => (msg.id === message.id ? { ...msg, status: "accepted" } : msg)))
+    // Redirect only if approved & not expired
+    if (!result.data?.is_expired && result.data?.is_approved) {
+      let gigUid = message.gig_uid || message.service_uid;
+      if (!gigUid) {
+        const uidLine = message.message
+          .split("\n")
+          .find((line) => line.includes("UID:"));
+        gigUid = uidLine?.split("UID:")[1]?.trim();
+      }
 
-        toast.success("Order accepted! Redirecting to payment...")
-
-        // Get the gig UID for checkout
-        const gigUid = message.gig_uid || message.service_uid
-        if (!gigUid) {
-          // Try to extract from message text as fallback
-          const lines = message.message.split("\n")
-          const uidLine = lines.find((line) => line.includes("UID:"))
-          const extractedUid = uidLine?.split("UID:")[1]?.trim()
-
-          if (!extractedUid) {
-            toast.error("Could not find order details for checkout")
-            return
-          }
-        }
-
-        // Navigate to checkout
+      if (gigUid) {
         setTimeout(() => {
           navigate(`/checkout/${gigUid}`, {
             state: {
@@ -553,19 +606,24 @@ setSelectedFile(null)
               order_id: orderId,
               from_chat: true,
             },
-          })
-        }, 1000)
-      
-    } catch (err: any) {
-      console.error("Error accepting order:", err)
-      toast.error(err.response?.data?.message || "Failed to accept order")
-
-      // Revert status if there was an error
-      setMessages((prev) => prev.map((msg) => (msg.id === message.id ? { ...msg, status: "pending" } : msg)))
-    } finally {
-      setAcceptingOrder(null)
+          });
+        }, 1000);
+      }
     }
+  } catch (err: any) {
+    console.error("Error accepting order:", err);
+    toast.error(err.message || "Failed to accept order");
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === message.id ? { ...msg, status: "pending" } : msg
+      )
+    );
+  } finally {
+    setAcceptingOrder(null);
   }
+};
+
+
 
   // Handle order rejection
   const handleRejectOrder = async (message: Message) => {
@@ -593,16 +651,20 @@ setSelectedFile(null)
   }
 
   // Utility functions for orders
-  const expiryOptions = [
-    { value: "30_min", label: "30 minutes" },
-    { value: "1_hour", label: "1 hour" },
-    { value: "5_hours", label: "5 hours" },
-    { value: "12_hours", label: "12 hours" },
-    { value: "1_day", label: "1 day" },
-    { value: "7_days", label: "7 days" },
-    { value: "14_days", label: "14 days" },
-    { value: "30_days", label: "30 days" },
-  ]
+ const expiryOptions = [
+  { value: "15_minutes", label: "15 minutes" },
+  { value: "30_minutes", label: "30 minutes" },
+  { value: "1_hour", label: "1 hour" },
+  { value: "2_hours", label: "2 hours" },
+  { value: "4_hours", label: "4 hours" },
+  { value: "6_hours", label: "6 hours" },
+  { value: "12_hours", label: "12 hours" },
+  { value: "1_day", label: "1 day" },
+  { value: "2_days", label: "2 days" },
+  { value: "3_days", label: "3 days" },
+  { value: "1_week", label: "1 week" }
+]
+
 
   const getExpiryDate = (expiryValue: string) => {
     const now = new Date()
@@ -914,6 +976,10 @@ setSelectedFile(null)
                   const canDelete = isOwn && !isDeleted && isMessageRecent(message.created_at)
                   const hasNote = message.message?.includes("Note:") || message.note
 
+                  const isExpired = message.status === "expired" || message.is_expired
+  const isAccepted = message.status === "accepted" || message.is_approved
+  const isRejected = message.status === "rejected" || message.is_rejected
+
                   return (
                     <div
                       key={`${message.id}-${message.created_at}`}
@@ -998,36 +1064,44 @@ setSelectedFile(null)
                                     </div>
                                   )}
                                 </div>
-                                {isBuyer &&
-                                  message.is_custom_order &&
-                                  message.receiver_id === currentUser?.id &&
-                                  //  message.status === "pending" && 
-                                  message.is_custom_order_accepted !==true && (
-                                  
-                                    <div className="flex gap-2 mt-3">
-                                      <button
-                                        onClick={() => handleAcceptOrder(message)}
-                                        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-                                        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                      >
-                                        {acceptingOrder === (message.order_id || message.chat_order_id) ? (
-                                          <>
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                            Processing...
-                                          </>
-                                        ) : (
-                                          <>✓ Accept & Pay</>
-                                        )}
-                                      </button>
-                                      <button
-                                        onClick={() => handleRejectOrder(message)}
-                                        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-                                        className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
-                                      >
-                                        ✗ Reject
-                                      </button>
-                                    </div>
-                                  )}
+
+
+{isBuyer &&
+  message.is_custom_order &&
+  message.receiver_id === currentUser?.id &&
+  !isAccepted &&
+  !isExpired &&
+  !isRejected && (
+    <div className="flex gap-2 mt-3">
+      <button
+        onClick={() => handleAcceptOrder(message)}
+        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {acceptingOrder === (message.order_id || message.chat_order_id) ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            Processing...
+          </>
+        ) : (
+          <>✓ Accept & Pay</>
+        )}
+      </button>
+      <button
+        onClick={() => handleRejectOrder(message)}
+        disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+        className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+      >
+        ✗ Reject
+      </button>
+    </div>
+)}
+
+
+
+
+
+
                                 {isSeller && message.status === "accepted" && (
                                   <div className="mt-2 text-xs text-green-600 font-medium">
                                     ✓ Order accepted - Awaiting payment

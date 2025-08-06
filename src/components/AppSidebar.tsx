@@ -12,6 +12,7 @@ import {
   Wallet,
   WorkflowIcon,
   Bookmark,
+  HelpCircle,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,6 +57,7 @@ export function AppSidebar() {
   const navigationItems = [
     { title: t('discover'), url: '/', icon: Navigation },
     { title: t('profile'), url: `/profile/${user?.uid}`, icon: User },
+    
   ];
 const handleSignOut = () => {
   Swal.fire({
@@ -66,12 +68,33 @@ const handleSignOut = () => {
     confirmButtonColor: '#d33',
     cancelButtonColor: '#aaa',
     confirmButtonText: 'Yes, sign out!',
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      navigate('/logout'); // ✅ Perform signout navigation
+      try {
+        const token = localStorage.getItem("token") // if auth token is stored
+        const response = await fetch(`${config.API_BASE_URL}/logout`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        })
+
+        if (response.ok) {
+          // clear local storage or auth state if needed
+          localStorage.removeItem("token")
+          navigate("/")   // redirect to home
+          window.location.reload()
+        } else {
+          Swal.fire("Error", "Failed to sign out. Please try again.", "error")
+        }
+      } catch (error) {
+        Swal.fire("Error", "Something went wrong. Please try again.", "error")
+        console.error("Logout error:", error)
+      }
     }
-  });
-};
+  })
+}
   const isActive = (path) =>
     path.startsWith('/profile')
       ? currentPath.startsWith('/profile')
@@ -262,6 +285,22 @@ const handleSignOut = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                          <Link
+                            to="/support"
+                            className={`
+                              flex items-center gap-3 p-3 rounded-xl text-gray-700
+                              hover:bg-red-100 hover:text-red-600
+                              ${isCollapsed ? "justify-center" : ""}
+                            `}
+                          >
+                            <HelpCircle className="h-4 w-4" />
+                            {!isCollapsed && <span className="font-medium">{t("support")}</span>}
+                          </Link>
+                        </SidebarMenuButton>
+                  </SidebarMenuItem>
+              <SidebarMenuItem>
+
                 <SidebarMenuButton asChild>
                   <button onClick={handleSignOut} className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 text-gray-700 hover:bg-red-50 hover:text-red-600 w-full text-left ${isCollapsed ? 'justify-center' : ''}`}>
                     <LogOut className="h-5 w-5" />

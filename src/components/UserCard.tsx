@@ -206,9 +206,9 @@ const previewItems = isJob
               <img
                 src={getImageUrl(item.image)}
                 alt={item.title}
-                className="w-full h-24 object-cover"
+                className="w-full h-fit max-h-44 object-cover"
               />
-              <div className="p-2">
+              {/* <div className="p-2">
                 <h4 className="text-sm font-semibold line-clamp-1">
                   {item.title}
                 </h4>
@@ -222,7 +222,7 @@ const previewItems = isJob
                     {item.description}
                   </p>
                 )}
-              </div>
+              </div> */}
             </div>
           ))}
         </div>

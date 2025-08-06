@@ -12,6 +12,8 @@ i18n
     resources: {
       en: {
         translation: {
+          all_priorities:"All Priorties",
+          all_statuses:"All Stuses",
   error_fetch_categories: "Failed to load categories. Please try again.",
   error_fetch_subcategories: "Failed to load subcategories. Please try again.",
   error_login_required: "You must be logged in to post a job.",
@@ -451,6 +453,70 @@ edit_profile: {
   save_changes: "Save Changes",
   loading: "Loading…"
 },
+landing: {
+    header: {
+      signin: "Sign In",
+      getStarted: "Get Started"
+    },
+    hero: {
+      title: "Connect with Top Creative Talent",
+      tabProject: "Start Your Project",
+      tabCreator: "Browse Creators",
+      projectTitle: "Kickstart Your Creative Journey",
+      projectDesc: "Easily post your project, describe your needs, and let top professionals come to you.",
+      creatorTitle: "Find the Perfect Creative Partner",
+      creatorDesc: "Browse through thousands of talented creators ready to bring your vision to life.",
+      completedProjects: "Completed Successfully"
+    },
+    categories: {
+      title: "Our Creative Services",
+      description: "Discover talented creators across various creative disciplines, ready to bring your vision to life with professional expertise.",
+      photography: {
+        title: "Photography",
+        desc: "Professional photographers for events, products, and portraits"
+      },
+      video: {
+        title: "Video Editing",
+        desc: "Expert video editors for all types of content"
+      },
+      voice: {
+        title: "Voice Acting",
+        desc: "Voice talent for commercials, animation, and more"
+      },
+      graphic: {
+        title: "Graphic Design",
+        desc: "Creative designers for all your visual needs"
+      }
+    },
+    cta: {
+      title: "Ready to Get Started?",
+      description: "Join thousands of businesses and creators who trust Sanee for their creative projects.",
+      button: "Find Talent"
+    },
+    stats: {
+      creators: "Active Creators",
+      projects: "Projects Completed",
+      satisfaction: "Client Satisfaction",
+      support: "Support Available"
+    },
+    footer: {
+      missionTitle: "Our Mission",
+      mission: "To democratize access to creative talent and empower businesses to bring their visions to life through seamless collaboration with skilled professionals.",
+      visionTitle: "Our Vision",
+      vision: "To become the world's leading platform where creativity meets opportunity, fostering innovation and excellence in every project.",
+      quickLinks: "Quick Links",
+      links: {
+        categories: "Browse Categories",
+        jobs: "Find Jobs",
+        creator: "Join as Creator",
+        job: "Post a Job",
+        help: "Help Center",
+        privacy: "Privacy Policy",
+        terms: "Terms of Service"
+      },
+      copy: "© 2024 Sanee. All rights reserved."
+    }
+  },
 payment_modal: {
   title: "Confirm Payment",
   description: "Set a payment amount and optional message for the seller.",
@@ -822,9 +888,108 @@ profile_pages: {
     comment: "Comment",
     placeholder: "Write your feedback for the",
     submit: "Submit Review"
+  },
+  // Support Center
+  support_center: "Support Center",
+  support_center_description: "Get help with your account, billing, and technical issues.",
+  your_tickets: "Your Tickets",
+  
+  // Stats
+  total_tickets: "Total Tickets",
+  open_tickets: "Open",
+  in_progress_tickets: "In Progress",
+  resolved_tickets: "Resolved",
+  
+  // Create Ticket
+  create_new_ticket: "Create New Ticket",
+  create_support_ticket: "Create Support Ticket",
+  subject: "Subject",
+  priority: "Priority",
+  select_priority: "Select priority",
+  brief_description: "Brief description of your issue",
+  detailed_information: "Provide detailed information about your issue...",
+  create_ticket: "Create Ticket",
+  creating: "Creating...",
+  
+  // Ticket List
+  no_tickets_found: "No tickets found",
+  create_first_ticket: "Create your first support ticket to get started.",
+  view: "View",
+  by: "By",
+  
+  // Status & Priority
+  open: "Open",
+  closed: "Closed",
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
+  
+  // Ticket Detail
+  back_to_tickets: "Back to Tickets",
+  created_by: "Created by",
+  close_ticket: "Close Ticket",
+  closing: "Closing...",
+  replies: "Replies",
+  add_reply: "Add Reply",
+  type_reply: "Type your reply here...",
+  send_reply: "Send Reply",
+  sending: "Sending...",
+  support:"Support",
+  
+  // Messages
+  ticket_created_success: "Ticket created successfully!",
+  ticket_create_error: "Failed to create ticket. Please try again.",
+  reply_added_success: "Reply added successfully!",
+  reply_add_error: "Failed to add reply. Please try again.",
+  ticket_closed_success: "Ticket closed successfully!",
+  ticket_close_error: "Failed to close ticket. Please try again.",
+
+  login: {
+    title: 'Welcome back',
+    subtitle: 'Sign in to your account',
+    email: 'Email address',
+    password: 'Password',
+    remember: 'Remember me',
+    forgot: 'Forgot your password?',
+    signin: 'Sign in',
+    noAccount: "Don't have an account?",
+    signup: 'Sign up',
+    errorFillAll: 'Please fill in all fields',
+    errorLoginFailed: 'Login failed'
+  },
+   signup: {
+    title: 'Create an account',
+    subtitle: 'Join our creative community',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    email: 'Email address',
+    username: 'Username',
+    password: 'Password',
+    accountType: 'Account type',
+    creator: 'Creator',
+    business: 'Business',
+    headline: 'Professional Headline',
+    summary: 'Professional Summary',
+    profileImage: 'Profile Image',
+    govCertificate: 'Government Certificate',
+    uploadProfileHint: 'Upload your profile image (image only, max 5MB)',
+    uploadCertHint: 'Upload your Government Certificate (PDF or image, max 5MB)',
+    createAccount: 'Create account',
+    alreadyHaveAccount: 'Already have an account?',
+    signin: 'Sign in',
+    errors: {
+      fillAll: 'Please fill in all required fields.',
+      certificateRequired: 'Government Certificate is required for seller accounts.',
+      fixFileErrors: 'Please fix the file errors before submitting.',
+      registrationFailed: 'Registration failed. Please try again.',
+      unexpected: 'An unexpected error occurred.',
+      imageInvalid: 'Please upload a valid image file',
+      imageTooBig: 'Image size should be less than 5MB',
+      certificateInvalid: 'Please upload a PDF or image file',
+      certificateTooBig: 'File size should be less than 5MB'
+    }
   }
-
-
 
 
 
@@ -1073,6 +1238,70 @@ categories_page: {
   creators: "صنّاع ",
   trending: "الهبّة"
 },
+landing: {
+    header: {
+      signin: "تسجيل الدخول",
+      getStarted: "ابدأ الآن"
+    },
+    hero: {
+      title: "تواصل مع أفضل المواهب الإبداعية",
+      tabProject: "ابدأ مشروعك",
+      tabCreator: "تصفح المبدعين",
+      projectTitle: "ابدأ رحلتك الإبداعية",
+      projectDesc: "انشر مشروعك بسهولة، وصف احتياجاتك ودع المحترفين يأتون إليك.",
+      creatorTitle: "اعثر على الشريك الإبداعي المثالي",
+      creatorDesc: "تصفح آلاف المبدعين الموهوبين المستعدين لتحقيق رؤيتك.",
+      completedProjects: "تمت بنجاح"
+    },
+    categories: {
+      title: "خدماتنا الإبداعية",
+      description: "اكتشف المبدعين الموهوبين في مختلف التخصصات الإبداعية، الجاهزين لتحقيق رؤيتك بخبرة احترافية.",
+      photography: {
+        title: "التصوير الفوتوغرافي",
+        desc: "مصورون محترفون للمناسبات والمنتجات والبورتريه"
+      },
+      video: {
+        title: "مونتاج الفيديو",
+        desc: "خبراء تحرير الفيديو لجميع أنواع المحتوى"
+      },
+      voice: {
+        title: "التمثيل الصوتي",
+        desc: "مواهب صوتية للإعلانات والرسوم المتحركة والمزيد"
+      },
+      graphic: {
+        title: "التصميم الجرافيكي",
+        desc: "مصممون مبدعون لتلبية جميع احتياجاتك البصرية"
+      }
+    },
+    cta: {
+      title: "هل أنت جاهز للبدء؟",
+      description: "انضم إلى آلاف الشركات والمبدعين الذين يثقون في Sanee لمشاريعهم الإبداعية.",
+      button: "ابحث عن المواهب"
+    },
+    stats: {
+      creators: "المبدعين النشطين",
+      projects: "المشاريع المنجزة",
+      satisfaction: "رضا العملاء",
+      support: "دعم متوفر 24/7"
+    },
+    footer: {
+      missionTitle: "مهمتنا",
+      mission: "إتاحة الوصول إلى المواهب الإبداعية وتمكين الشركات من تحقيق رؤيتها من خلال التعاون السلس مع المحترفين.",
+      visionTitle: "رؤيتنا",
+      vision: "أن نصبح المنصة الرائدة عالميًا حيث يلتقي الإبداع بالفرص، مما يعزز الابتكار والتميز في كل مشروع.",
+      quickLinks: "روابط سريعة",
+      links: {
+        categories: "تصفح الفئات",
+        jobs: "ابحث عن وظائف",
+        creator: "انضم كمبدع",
+        job: "انشر وظيفة",
+        help: "مركز المساعدة",
+        privacy: "سياسة الخصوصية",
+        terms: "شروط الخدمة"
+      },
+      copy: "© 2024 ساني. جميع الحقوق محفوظة."
+    }
+  },
 categorie: {
   photography: {
     title: "التصوير",
@@ -1637,7 +1866,108 @@ saved_gig: {
     comment: "التعليق",
     placeholder: "اكتب ملاحظاتك لـ",
     submit: "إرسال المراجعة"
-  }
+  },
+  // Support Center
+  support_center: "مركز الدعم",
+  support_center_description: "احصل على المساعدة في حسابك والفواتير والمشاكل التقنية.",
+  your_tickets: "تذاكرك",
+  
+  // Stats
+  total_tickets: "إجمالي التذاكر",
+  open_tickets: "مفتوح",
+  in_progress_tickets: "قيد التنفيذ",
+  resolved_tickets: "محلول",
+  
+  // Create Ticket
+  create_new_ticket: "إنشاء تذكرة جديدة",
+  create_support_ticket: "إنشاء تذكرة دعم",
+  subject: "الموضوع",
+  priority: "الأولوية",
+  select_priority: "اختر الأولوية",
+  brief_description: "وصف مختصر لمشكلتك",
+  detailed_information: "قدم معلومات مفصلة حول مشكلتك...",
+  create_ticket: "إنشاء تذكرة",
+  creating: "جاري الإنشاء...",
+  
+  // Ticket List
+  no_tickets_found: "لم يتم العثور على تذاكر",
+  create_first_ticket: "أنشئ أول تذكرة دعم للبدء.",
+  view: "عرض",
+  by: "بواسطة",
+  support:"مركز الدعم",
+  // Status & Priority
+  open: "مفتوح",
+  closed: "مغلق",
+  low: "منخفض",
+  medium: "متوسط",
+  high: "عالي",
+  urgent: "عاجل",
+  
+  // Ticket Detail
+  back_to_tickets: "العودة للتذاكر",
+  created_by: "أنشئت بواسطة",
+  close_ticket: "إغلاق التذكرة",
+  closing: "جاري الإغلاق...",
+  replies: "الردود",
+  add_reply: "إضافة رد",
+  type_reply: "اكتب ردك هنا...",
+  send_reply: "إرسال الرد",
+  sending: "جاري الإرسال...",
+  
+  // Messages
+  ticket_created_success: "تم إنشاء التذكرة بنجاح!",
+  ticket_create_error: "فشل في إنشاء التذكرة. يرجى المحاولة مرة أخرى.",
+  reply_added_success: "تم إضافة الرد بنجاح!",
+  reply_add_error: "فشل في إضافة الرد. يرجى المحاولة مرة أخرى.",
+  ticket_closed_success: "تم إغلاق التذكرة بنجاح!",
+  ticket_close_error: "فشل في إغلاق التذكرة. يرجى المحاولة مرة أخرى.",
+  login: {
+     title: 'مرحبًا بعودتك',
+    subtitle: 'سجل الدخول إلى حسابك',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    remember: 'تذكرني',
+    forgot: 'هل نسيت كلمة المرور؟',
+    signin: 'تسجيل الدخول',
+    noAccount: 'ليس لديك حساب؟',
+    signup: 'إنشاء حساب',
+    errorFillAll: 'يرجى ملء جميع الحقول',
+    errorLoginFailed: 'فشل تسجيل الدخول'
+  },
+  signup: {
+    title: 'إنشاء حساب',
+    subtitle: 'انضم إلى مجتمعنا الإبداعي',
+    firstName: 'الاسم الأول',
+    lastName: 'اسم العائلة',
+    email: 'البريد الإلكتروني',
+    username: 'اسم المستخدم',
+    password: 'كلمة المرور',
+    accountType: 'نوع الحساب',
+    creator: 'مبدع',
+    business: 'شركة',
+    headline: 'العنوان المهني',
+    summary: 'الملخص المهني',
+    profileImage: 'صورة الملف الشخصي',
+    govCertificate: 'شهادة حكومية',
+    uploadProfileHint: 'قم برفع صورة الملف الشخصي (صورة فقط، 5MB كحد أقصى)',
+    uploadCertHint: 'قم برفع الشهادة الحكومية (PDF أو صورة، 5MB كحد أقصى)',
+    createAccount: 'إنشاء حساب',
+    alreadyHaveAccount: 'هل لديك حساب بالفعل؟',
+    signin: 'تسجيل الدخول',
+    errors: {
+      fillAll: 'يرجى ملء جميع الحقول المطلوبة.',
+      certificateRequired: 'الشهادة الحكومية مطلوبة لحسابات البائع.',
+      fixFileErrors: 'يرجى إصلاح أخطاء الملفات قبل الإرسال.',
+      registrationFailed: 'فشل التسجيل. حاول مرة أخرى.',
+      unexpected: 'حدث خطأ غير متوقع.',
+      imageInvalid: 'يرجى تحميل ملف صورة صالح',
+      imageTooBig: 'يجب أن يكون حجم الصورة أقل من 5 ميغابايت',
+      certificateInvalid: 'يرجى تحميل ملف PDF أو صورة',
+      certificateTooBig: 'يجب أن يكون حجم الملف أقل من 5 ميغابايت'
+    }
+  },
+  all_priorities:"الأولوية",
+  all_statuses:"الأولوية"
 
 
 

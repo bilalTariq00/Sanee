@@ -25,6 +25,7 @@ export default function Discover() {
   const isRTL = i18n.language === "ar"
   const navigate = useNavigate()
   const { user: authUser } = useAuth()
+  
 const sellerTabs = [
   { id: "buyer",  label: t("seller")  || "All People"        },
   { id: "jobs", label: t("all_jobs") || "Job Posters"       },

@@ -234,6 +234,7 @@ return (
             )}
           </div>
           <DialogFooter>
+            {selectedProposal.status==="pending" &&
             <Button
               variant="secondary"
               onClick={() =>
@@ -242,6 +243,7 @@ return (
             >
               💰 {t("proposals.make_payment")}
             </Button>
+            }
             <Button onClick={() => setOpenDialog(false)}>{t("proposals.close")}</Button>
           </DialogFooter>
         </DialogContent>
