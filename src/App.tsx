@@ -91,6 +91,8 @@ function AppRoutes() {
       {/* –––––––––– Public –––––––––– */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+       <Route path="/reset-password" element={<ResetPasswordPage />} /> {/* <-- ADD HERE */}
+
 
       {/* –––––– Private (wrapped in AuthenticatedLayout + NotificationProvider) –––––– */}
       {/* If user is not logged in, show LandingPage */}
@@ -99,7 +101,7 @@ function AppRoutes() {
   element={user ? <AuthenticatedRoutes /> : <LandingPage />}
 >
 
-  <Route path="/reset-password" element={<ResetPasswordPage />} />
+  
 
         {/* dashboard & general */}
         <Route path="support" element={<SupportPage />} />
