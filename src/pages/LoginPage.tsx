@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import AuthLayout from '../components/auth/AuthLayout';
 import LoginForm from '../components/auth/LoginForm';
 import { Link } from 'react-router-dom';
-import { Globe2, Mail, MapPin, Phone,Instagram,
+import { Mail, MapPin, Phone,Instagram,
   Twitter,
   Facebook,
   Linkedin, } from 'lucide-react';

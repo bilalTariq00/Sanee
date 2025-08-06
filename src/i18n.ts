@@ -12,6 +12,15 @@ i18n
     resources: {
       en: {
         translation: {
+          reset: {
+    title: "Reset Password",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    submit: "Reset Password",
+    loading: "Resetting...",
+    invalidLink: "Invalid or expired reset link.",
+    verifying: "Verifying reset link..."
+  },
           all_priorities:"All Priorties",
           all_statuses:"All Stuses",
   error_fetch_categories: "Failed to load categories. Please try again.",
@@ -1967,7 +1976,16 @@ saved_gig: {
     }
   },
   all_priorities:"الأولوية",
-  all_statuses:"الأولوية"
+  all_statuses:"الأولوية",
+   reset: {
+    title: "إعادة تعيين كلمة المرور",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور",
+    submit: "إعادة تعيين",
+    loading: "جارٍ إعادة التعيين...",
+    invalidLink: "رابط إعادة التعيين غير صالح أو منتهي الصلاحية.",
+    verifying: "جارٍ التحقق من رابط إعادة التعيين..."
+  }
 
 
 
