@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useTranslation } from "react-i18next"
 import { useEffect } from "react"
 import "@fontsource/cairo" // Full family with Arabic support
-
+import ResetPasswordPage from "./pages/ResetPasswordPage"
 import { AuthProvider, useAuth } from "./contexts/AuthContext"
 import { NotificationProvider } from "./contexts/NotificationContext" // ⬅️ NEW IMPORT
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -98,6 +98,8 @@ function AppRoutes() {
   path="/"
   element={user ? <AuthenticatedRoutes /> : <LandingPage />}
 >
+
+  <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* dashboard & general */}
         <Route path="support" element={<SupportPage />} />
