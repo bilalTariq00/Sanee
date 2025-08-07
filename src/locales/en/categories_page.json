@@ -1,0 +1,54 @@
+{
+  "categories_page": {
+    "title": "All Categories",
+    "subtitle": "Explore all creative categories and find the perfect creator for your project",
+    "creators": "creators",
+    "trending": "Trending"
+  },
+  "categorie": {
+    "photography": {
+      "title": "Photography",
+      "description": "Professional photographers for events, products, and portraits"
+    },
+    "video_editing": {
+      "title": "Video Editing",
+      "description": "Expert video editors for all types of content"
+    },
+    "voice_acting": {
+      "title": "Voice Acting",
+      "description": "Voice talent for commercials, animation, and more"
+    },
+    "graphic_design": {
+      "title": "Graphic Design",
+      "description": "Creative designers for all your visual needs"
+    },
+    "brand_identity": {
+      "title": "Brand Identity",
+      "description": "Build and evolve your brand identity"
+    },
+    "music_production": {
+      "title": "Music Production",
+      "description": "Professional music producers and composers"
+    },
+    "content_creation": {
+      "title": "Content Creation",
+      "description": "Full-service content creation for all platforms"
+    },
+    "marketing_campaigns": {
+      "title": "Marketing Campaigns",
+      "description": "Strategic marketing campaign development"
+    }
+  },
+  "categoriee": {
+    "camera": "Photography",
+    "video": "Videography",
+    "mic": "Voiceover",
+    "palette": "Design",
+    "code": "Programming",
+    "music": "Music",
+    "badge": "Branding",
+    "film": "Filmmaking",
+    "target": "Marketing",
+    "creators": "creators"
+  }
+}

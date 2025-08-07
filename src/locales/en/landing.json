@@ -1,0 +1,66 @@
+{
+  "landing": {
+    "header": {
+      "signin": "Sign In",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "title": "Connect with Top Creative Talent",
+      "tabProject": "Start Your Project",
+      "tabCreator": "Browse Creators",
+      "projectTitle": "Kickstart Your Creative Journey",
+      "projectDesc": "Easily post your project, describe your needs, and let top professionals come to you.",
+      "creatorTitle": "Find the Perfect Creative Partner",
+      "creatorDesc": "Browse through thousands of talented creators ready to bring your vision to life.",
+      "completedProjects": "Completed Successfully"
+    },
+    "categories": {
+      "title": "Our Creative Services",
+      "description": "Discover talented creators across various creative disciplines, ready to bring your vision to life with professional expertise.",
+      "photography": {
+        "title": "Photography",
+        "desc": "Professional photographers for events, products, and portraits"
+      },
+      "video": {
+        "title": "Video Editing",
+        "desc": "Expert video editors for all types of content"
+      },
+      "voice": {
+        "title": "Voice Acting",
+        "desc": "Voice talent for commercials, animation, and more"
+      },
+      "graphic": {
+        "title": "Graphic Design",
+        "desc": "Creative designers for all your visual needs"
+      }
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Join thousands of businesses and creators who trust Sanee for their creative projects.",
+      "button": "Find Talent"
+    },
+    "stats": {
+      "creators": "Active Creators",
+      "projects": "Projects Completed",
+      "satisfaction": "Client Satisfaction",
+      "support": "Support Available"
+    },
+    "footer": {
+      "missionTitle": "Our Mission",
+      "mission": "To democratize access to creative talent and empower businesses to bring their visions to life through seamless collaboration with skilled professionals.",
+      "visionTitle": "Our Vision",
+      "vision": "To become the world's leading platform where creativity meets opportunity, fostering innovation and excellence in every project.",
+      "quickLinks": "Quick Links",
+      "links": {
+        "categories": "Browse Categories",
+        "jobs": "Find Jobs",
+        "creator": "Join as Creator",
+        "job": "Post a Job",
+        "help": "Help Center",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service"
+      },
+      "copy": "© 2024 Sanee. All rights reserved."
+    }
+  }
+}

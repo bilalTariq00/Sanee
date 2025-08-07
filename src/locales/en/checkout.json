@@ -1,0 +1,39 @@
+{
+  "checkout": {
+    "title": "Checkout",
+    "loading": "Loading checkout...",
+    "gig_details": "Service Details",
+    "custom_order_details": "Custom Order Details",
+    "price": "Price",
+    "delivery": "Delivery",
+    "days": "days",
+    "job_id": "Job ID",
+    "job_title": "Job Title",
+    "custom_order": "Custom Order",
+    "custom_order_note": "This is a custom order created by the seller.",
+    "your_info": "Your Info",
+    "name": "Name",
+    "email": "Email",
+    "message_placeholder": "Optional message for seller",
+    "payment_method": "Payment Method",
+    "method": "Method",
+    "bank_transfer": "Bank Transfer",
+    "payment_note": "Please transfer the amount to our bank account after placing this order.",
+    "confirm": "Confirm Order",
+    "placing": "Placing Order...",
+    "order_success": "Order placed successfully! Please transfer payment via bank.",
+    "order_error": "Something went wrong! Please try again."
+  },
+  "payment_modal": {
+    "title": "Confirm Payment",
+    "description": "Set a payment amount and optional message for the seller.",
+    "price_label": "Price ",
+    "price_placeholder": "Enter price",
+    "message_label": "Message (optional)",
+    "message_placeholder": "Add a message to the seller...",
+    "proceed": "Proceed to Checkout",
+    "cancel": "Cancel",
+    "invalid_price": "Please enter a valid price.",
+    "no_gig": "No service information found."
+  }
+}

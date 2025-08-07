@@ -61,13 +61,13 @@ export function AppSidebar() {
   ];
 const handleSignOut = () => {
   Swal.fire({
-    title: 'Are you sure?',
-    text: "You will be signed out!",
+    title: t('are_you_sure'),
+    text: t('signed_out_text'),
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#d33',
     cancelButtonColor: '#aaa',
-    confirmButtonText: 'Yes, sign out!',
+    confirmButtonText: t('yes_sign_out'),
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
@@ -86,10 +86,10 @@ const handleSignOut = () => {
           navigate("/")   // redirect to home
           window.location.reload()
         } else {
-          Swal.fire("Error", "Failed to sign out. Please try again.", "error")
+          Swal.fire(t('error'), t('sign_out_failed'), "error")
         }
       } catch (error) {
-        Swal.fire("Error", "Something went wrong. Please try again.", "error")
+        Swal.fire(t('error'), t('something_went_wrong'), "error")
         console.error("Logout error:", error)
       }
     }

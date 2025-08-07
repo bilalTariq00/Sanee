@@ -1,0 +1,27 @@
+{
+  "proposals": {
+    "loading": "جارٍ تحميل العروض...",
+    "title": "العروض للمشروع رقم #{{id}}",
+    "none": "لم يتم تقديم أي عروض بعد.",
+    "gig": "الصناعة",
+    "price": "السعر",
+    "after_commission": "بعد العمولة",
+    "duration": "المدة",
+    "deadline": "الموعد النهائي",
+    "status": "الحالة",
+    "cover": "التغطية",
+    "cover_letter": "خطاب التغطية",
+    "attachments": "المرفقات",
+    "download_file": "تحميل الملف {{index}}",
+    "seller": "الصانع",
+    "view": "عرض",
+    "reject": "رفض",
+    "make_payment": "إجراء الدفع",
+    "contract_started": "تم بدء العقد",
+    "full_details": "تفاصيل العرض الكامل",
+    "close": "إغلاق",
+    "status_pending": "قيد الانتظار",
+    "status_accepted": "تم القبول",
+    "status_rejected": "مرفوض"
+  }
+}

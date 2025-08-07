@@ -115,7 +115,10 @@ const ManageJobs = () => {
             <TableRow key={job.id}>
               <TableCell className="font-medium text-red-700">{job.title}</TableCell>
               <TableCell>{job.status}</TableCell>
-              <TableCell>${job.budget}</TableCell>
+              <TableCell>  <span className="flex items-center">
+                  <img src="/riyal.svg" className="h-4 w-4 mr-1" alt="Price" />
+                  {job.budget}
+                </span></TableCell>
               <TableCell>{job.experience_level}</TableCell>
               <TableCell className="flex flex-wrap gap-1">
                 <Link to={`/edit-job/${job.id}`}>

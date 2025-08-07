@@ -1,0 +1,33 @@
+{
+  "review_page": {
+    "title": "Review the ",
+    "gig": "Service",
+    "rating": "Rating",
+    "comment": "Comment",
+    "comment_placeholder": "Write your feedback for the ...",
+    "submit": "Submit Review",
+    "loading": "Loading...",
+    "contract_not_found": "Contract not found",
+    "error_direction": "Unable to determine review direction",
+    "success_message": "Review submitted successfully!",
+    "error_submission": "Failed to submit review",
+    "seller": "seller",
+    "buyer": "buyer"
+  },
+  "review": {
+    "contractLoadFailed": "Failed to load contract",
+    "unknownDirection": "Unable to determine review direction",
+    "success": "Review submitted successfully!",
+    "failed": "Failed to submit review",
+    "loading": "Loading...",
+    "contractNotFound": "Contract not found",
+    "seller": "seller",
+    "buyer": "buyer",
+    "reviewThe": "Review the",
+    "gig": "Gig",
+    "rating": "Rating",
+    "comment": "Comment",
+    "placeholder": "Write your feedback for the",
+    "submit": "Submit Review"
+  }
+}

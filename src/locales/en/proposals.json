@@ -1,0 +1,27 @@
+{
+  "proposals": {
+    "loading": "Loading proposals...",
+    "title": "Proposals for Job #{{id}}",
+    "none": "No proposals submitted yet.",
+    "gig": "Service",
+    "price": "Price",
+    "after_commission": "After Commission",
+    "duration": "Duration",
+    "deadline": "Deadline",
+    "status": "Status",
+    "cover": "Cover",
+    "cover_letter": "Cover Letter",
+    "attachments": "Attachments",
+    "download_file": "Download File {{index}}",
+    "seller": "Seller",
+    "view": "View Proposal",
+    "reject": "Reject",
+    "make_payment": "Make Payment",
+    "contract_started": "Contract Started",
+    "full_details": "Full Proposal Details",
+    "close": "Close",
+    "status_pending": "PENDING",
+    "status_accepted": "ACCEPTED",
+    "status_rejected": "REJECTED"
+  }
+}

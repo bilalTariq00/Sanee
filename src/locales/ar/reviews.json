@@ -1,0 +1,33 @@
+{
+  "review_page": {
+    "title": "مراجعة ",
+    "gig": "الصناعة",
+    "rating": "التقييم",
+    "comment": "التعليق",
+    "comment_placeholder": "اكتب ملاحظاتك لـ ...",
+    "submit": "إرسال التقييم",
+    "loading": "جارٍ التحميل...",
+    "contract_not_found": "العقد غير موجود",
+    "error_direction": "تعذر تحديد اتجاه المراجعة",
+    "success_message": "تم إرسال المراجعة بنجاح!",
+    "error_submission": "فشل في إرسال المراجعة",
+    "seller": "الصانِع",
+    "buyer": "راعي المشروع"
+  },
+  "review": {
+    "contractLoadFailed": "فشل تحميل العقد",
+    "unknownDirection": "تعذر تحديد اتجاه المراجعة",
+    "success": "تم إرسال المراجعة بنجاح!",
+    "failed": "فشل إرسال المراجعة",
+    "loading": "جاري التحميل...",
+    "contractNotFound": "العقد غير موجود",
+    "seller": "البائع",
+    "buyer": "المشتري",
+    "reviewThe": "مراجعة",
+    "gig": "الخدمة",
+    "rating": "التقييم",
+    "comment": "التعليق",
+    "placeholder": "اكتب ملاحظاتك لـ",
+    "submit": "إرسال المراجعة"
+  }
+}

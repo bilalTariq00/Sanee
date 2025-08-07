@@ -479,7 +479,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
         {activeTab === "jobs" && user.account_type === "buyer" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {loadingJobs ? (
-              <p className="text-gray-500">Loading jobs…</p>
+              <p className="text-gray-500">{t("profile_page.loading_jobs")}</p>
             ) : jobs.length > 0 ? (
               jobs.map((j) => (
                 <div key={j.id} className="bg-white rounded-lg shadow-sm p-6 space-y-2">
@@ -488,48 +488,57 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
                   <div className="flex items-center pt-2">
                     <span className="text-xl font-semibold">${j.budget}</span>
                   </div>
-                  <div className="text-sm text-gray-500">Status: {j.status}</div>
+                  <div className="text-sm text-gray-500">
+                    {t("profile_page.status")}: {j.status}
+                  </div>
                   {j.experience_level && (
-                    <div className="text-sm text-gray-500">Experience Level: {j.experience_level}</div>
+                    <div className="text-sm text-gray-500">
+                      {t("profile_page.experience_level")}: {j.experience_level}
+                    </div>
                   )}
-                  {j.location_type && <div className="text-sm text-gray-500">Location: {j.location_type}</div>}
-                  {j.visibility && <div className="text-sm text-gray-500">Visibility: {j.visibility}</div>}
+                  {j.location_type && (
+                    <div className="text-sm text-gray-500">
+                      {t("profile_page.location")}: {j.location_type}
+                    </div>
+                  )}
+                  {j.visibility && (
+                    <div className="text-sm text-gray-500">
+                      {t("profile_page.visibility")}: {j.visibility}
+                    </div>
+                  )}
                   {Array.isArray(j.skills) && j.skills.length > 0 && (
                     <div className="text-sm text-gray-500">
-                      Skills: <span className="text-gray-700">{j.skills.join(", ")}</span>
+                      {t("profile_page.skills")}: <span className="text-gray-700">{j.skills.join(", ")}</span>
+                    </div>
+                  )}
+                  {j.created_at && (
+                    <div className="text-xs text-gray-400">
+                      {t("profile_page.posted_on")}: {new Date(j.created_at).toLocaleDateString()}
                     </div>
                   )}
                   <div className="flex justify-between">
-                  {j.created_at && (
-                    <div className="text-xs text-gray-400">
-                      Posted on: {new Date(j.created_at).toLocaleDateString()}
-                    </div>
-                  )}
-                  
-                                                      {currentUser ? (
-         /* You own this gig — let you edit it */
-         <Link to={`/edit-job/${j.id}`}>
-           <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-             {t('edit_jobs') /* e.g. “Edit Gig” */}
-           </Button>
-         </Link>
-       ) : (
-         /* Not you — just let you view the public gig */
-          <Link
-                                          to={`/jobs/${j.id}`}
-                                          className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                        >
-                                          {t('view_details')}
-                                        </Link>
-       )}
-                                        </div>
+                    {currentUser ? (
+                      /* You own this job — let you edit it */
+                      <Link to={`/edit-job/${j.id}`}>
+                        <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                          {t("jobs.edit_jobs")}
+                        </Button>
+                      </Link>
+                    ) : (
+                      /* Not you — just let you view the public job */
+                      <Link to={`/jobs/${j.id}`} className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        {t("jobs.view_details")}
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No jobs posted.</p>
+              <p className="text-gray-500">{t("profile_pages.no_jobs_posted")}</p>
             )}
           </div>
         )}
+
 
         {/* Portfolio */}
           {activeTab === "portfolio" && user.account_type === "seller" && (
