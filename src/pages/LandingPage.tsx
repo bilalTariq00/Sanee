@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
+import Footer from "@/components/Footer";
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<"project" | "creator">("project");
@@ -173,49 +174,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="col-span-1 md:col-span-2">
-            <img src="/sanee.png" alt="logo" className="w-20 h-16" />
-            <p className="text-gray-300 mb-6 max-w-md">
-              {t("landing.footer.mission")}
-            </p>
-            <div className="flex space-x-4 mb-6">
-              {[Instagram, Twitter, Facebook, Linkedin].map((Icon, idx) => (
-                <a key={idx} href="#" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors">
-                  <Icon className="h-5 w-5" />
-                </a>
-              ))}
-            </div>
-            <div className="space-y-2 text-gray-300">
-              <div className="flex items-center"><Mail className="h-4 w-4 mr-2" /> <span>hello@sanee.com</span></div>
-              <div className="flex items-center"><Phone className="h-4 w-4 mr-2" /> <span>+971 50 123 4567</span></div>
-              <div className="flex items-center"><MapPin className="h-4 w-4 mr-2" /> <span>Dubai, UAE</span></div>
-            </div>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold mb-4">{t("landing.footer.missionTitle")}</h4>
-            <p className="text-gray-300 text-sm mb-6">{t("landing.footer.mission")}</p>
-            <h4 className="text-lg font-semibold mb-4">{t("landing.footer.visionTitle")}</h4>
-            <p className="text-gray-300 text-sm">{t("landing.footer.vision")}</p>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold mb-4">{t("landing.footer.quickLinks")}</h4>
-            <ul className="space-y-2 text-gray-300">
-              <li><Link to="/categories" className="hover:text-red-500">{t("landing.footer.links.categories")}</Link></li>
-              <li><Link to="/jobs" className="hover:text-red-500">{t("landing.footer.links.jobs")}</Link></li>
-              <li><Link to="/signup" className="hover:text-red-500">{t("landing.footer.links.creator")}</Link></li>
-              <li><Link to="/signup" className="hover:text-red-500">{t("landing.footer.links.job")}</Link></li>
-              <li><a href="#" className="hover:text-red-500">{t("landing.footer.links.help")}</a></li>
-              <li><a href="#" className="hover:text-red-500">{t("landing.footer.links.privacy")}</a></li>
-              <li><a href="#" className="hover:text-red-500">{t("landing.footer.links.terms")}</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>{t("landing.footer.copy")}</p>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

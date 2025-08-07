@@ -46,6 +46,8 @@ import "./App.css"
 import SavedGigsPage from "./pages/SavedGigsPage"
 import LandingPage from "./pages/LandingPage";  // ⬅️ ADD THIS
 import SupportPage from "./pages/support"
+import TermsPage from "./pages/TermsPage"
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage"
 
 /* --------------------------------------------------------------
    Wrapper component for authenticated routes with NotificationProvider
@@ -89,10 +91,21 @@ function AppRoutes() {
   return (
     <Routes>
       {/* –––––––––– Public –––––––––– */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
-       <Route path="/reset-password" element={<ResetPasswordPage />} /> {/* <-- ADD HERE */}
+      <Route
+  path="/login"
+  element={user ? <Navigate to="/" replace /> : <LoginPage />}
+/>
+<Route
+  path="/signup"
+  element={user ? <Navigate to="/" replace /> : <SignupPage />}
+/>
 
+      <Route
+  path="/reset-password"
+  element={user ? <Navigate to="/" replace /> : <ResetPasswordPage />}
+/>
+<Route path="/terms" element={<TermsPage />} />
+<Route path="/privacy" element={<PrivacyPolicyPage />} />
 
       {/* –––––– Private (wrapped in AuthenticatedLayout + NotificationProvider) –––––– */}
       {/* If user is not logged in, show LandingPage */}

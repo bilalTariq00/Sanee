@@ -91,5 +91,26 @@
   "sign_out_failed": "فشل تسجيل الخروج. يرجى المحاولة مرة أخرى.",
   "something_went_wrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   "job_poster": "ناشر وظائف",
-  "service_provider": "مقدم خدمات"
+  "service_provider": "مقدم خدمات",
+ "notifications": {
+    "title": "الإشعارات",
+    "login_required": "يجب تسجيل الدخول لعرض الإشعارات.",
+    "loading": "جارٍ تحميل الإشعارات...",
+    "no_notifications": "لا توجد إشعارات",
+    "no_new": "لا توجد إشعارات جديدة.",
+    "no_filtered": "لا توجد إشعارات تطابق الفلاتر المحددة.",
+    "test_sound": "اختبار الصوت",
+    "settings": "الإعدادات",
+    "filters": "فلاتر",
+    "mark_all_read": "تحديد الكل كمقروء",
+    "marking_all": "جارٍ التحديد...",
+    "type": "النوع",
+    "all_types": "كل الأنواع",
+    "show_only_unread": "عرض غير المقروء فقط",
+    "clear_filters": "مسح الفلاتر"
+  },
+  "type_job_application": "طلب وظيفة",
+  "type_payment": "دفعة",
+  "type_message": "رسالة",
+  "back": "رجوع"
 }

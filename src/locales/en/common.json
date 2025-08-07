@@ -92,5 +92,26 @@
   "sign_out_failed": "Failed to sign out. Please try again.",
   "something_went_wrong": "Something went wrong. Please try again.",
   "job_poster": "Job Poster",
-  "service_provider": "Service Provider"
+  "service_provider": "Service Provider",
+   "notifications": {
+    "title": "Notifications",
+    "login_required": "You must be logged in to view notifications.",
+    "loading": "Loading notifications...",
+    "no_notifications": "No notifications",
+    "no_new": "You have no new notifications.",
+    "no_filtered": "No notifications match the selected filters.",
+    "test_sound": "Test Sound",
+    "settings": "Settings",
+    "filters": "Filters",
+    "mark_all_read": "Mark All Read",
+    "marking_all": "Marking...",
+    "type": "Type",
+    "all_types": "All Types",
+    "show_only_unread": "Show only unread",
+    "clear_filters": "Clear Filters"
+  },
+  "type_job_application": "Job Application",
+  "type_payment": "Payment",
+  "type_message": "Message",
+  "back": "Back"
 }
