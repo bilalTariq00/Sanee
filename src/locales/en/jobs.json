@@ -53,7 +53,7 @@
   "post_job_title": "Post a New Job",
   "title_placeholder": "Job Title *",
   "description_placeholder": "Job Description *",
-  "budget_placeholder": "Budget (USD) *",
+  "budget_placeholder": "Budget (Riyal) *",
   "category_section": "Category",
   "select_category": "Select Category *",
   "select_sub_category": "Select Subcategory *",

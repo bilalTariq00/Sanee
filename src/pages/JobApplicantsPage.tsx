@@ -16,11 +16,12 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 export default function JobApplicantsPage() {
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
   const { jobId } = useParams();
   const navigate = useNavigate();
 
@@ -146,7 +147,7 @@ export default function JobApplicantsPage() {
         variant="ghost"
         className="flex items-center gap-2 mb-6 text-muted-foreground"
       >
-        <ArrowLeft className="w-4 h-4" />
+        {isArabic ?<ArrowRight className="w-4 h-4" />:<ArrowLeft className="w-4 h-4" />}
         {t('back')}
       </Button>
 
@@ -161,7 +162,7 @@ export default function JobApplicantsPage() {
         )}
 
         {!applied && (
-          <div className="space-y-4">
+          <div className={`${isArabic ? "text-right" : "text-left"} space-y-4 `}>
             {/* Cover Letter */}
             <div>
               <label className="block mb-1 text-sm font-medium">{t('cover_letter')}</label>
@@ -173,46 +174,58 @@ export default function JobApplicantsPage() {
             </div>
 
             {/* Deadline */}
-            <div>
-              <label className="block mb-1 text-sm font-medium">{t('deadline')}</label>
-              <Input
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
-            </div>
+          <div>
+  <label className="block mb-1 text-sm font-medium">{t('deadline')}</label>
+  <Input
+    type="date"
+    value={deadline}
+    onChange={(e) => setDeadline(e.target.value)}
+    dir={isArabic ? "rtl" : "ltr"} // flips the calendar icon + value side
+    className={isArabic ? "text-right justify-end" : "text-left justify-start"} // start/end effect
+  />
+</div>
+
+
 
             {/* Duration */}
             <div>
               <label className="block mb-1 text-sm font-medium">{t('project_duration')}</label>
-              <Select value={duration} onValueChange={setDuration}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('select_duration')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="less than 1 month">{t('less_than_1_month')}</SelectItem>
-                  <SelectItem value="1 to 3 months">{t('one_to_three_months')}</SelectItem>
-                  <SelectItem value="3 to 6 months">{t('three_to_six_months')}</SelectItem>
-                  <SelectItem value="more than 6 months">{t('more_than_six_months')}</SelectItem>
-                </SelectContent>
-              </Select>
+             <Select value={duration} onValueChange={setDuration}>
+  <SelectTrigger
+    dir={isArabic ? "rtl" : "ltr"}
+    className={isArabic ? "justify-between text-right" : "justify-between text-left"}
+  >
+    <SelectValue placeholder={t('select_duration')} />
+  </SelectTrigger>
+  <SelectContent dir={isArabic ? "rtl" : "ltr"}>
+    <SelectItem value="less than 1 month">{t('less_than_1_month')}</SelectItem>
+    <SelectItem value="1 to 3 months">{t('one_to_three_months')}</SelectItem>
+    <SelectItem value="3 to 6 months">{t('three_to_six_months')}</SelectItem>
+    <SelectItem value="more than 6 months">{t('more_than_six_months')}</SelectItem>
+  </SelectContent>
+</Select>
+
             </div>
 
             {/* Select Gig */}
             <div>
               <label className="block mb-1 text-sm font-medium">{t('select_gig')}</label>
-              <Select value={selectedGig} onValueChange={setSelectedGig}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('select_a_gig')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {gigs.map((gig) => (
-                    <SelectItem key={gig.id} value={String(gig.id)}>
-                      {gig.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+             <Select value={selectedGig} onValueChange={setSelectedGig}>
+  <SelectTrigger
+    dir={isArabic ? "rtl" : "ltr"}
+    className={`justify-between ${isArabic ? "text-right" : "text-left"}`}
+  >
+    <SelectValue placeholder={t('select_a_gig')} />
+  </SelectTrigger>
+  <SelectContent dir={isArabic ? "rtl" : "ltr"}>
+    {gigs.map((gig) => (
+      <SelectItem key={gig.id} value={String(gig.id)}>
+        {gig.title}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+
             </div>
 
             {/* Price */}

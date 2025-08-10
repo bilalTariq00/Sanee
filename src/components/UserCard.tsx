@@ -25,7 +25,8 @@ export default function UserCard({
   authUserType,
 }: UserCardProps) {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t ,i18n} = useTranslation()
+  const isRTL = i18n.language === "ar"
 
   // State to store the real rating and project data from the API
   const [userRating, setUserRating] = useState<number | null>(null)
@@ -125,27 +126,49 @@ const previewItems = isJob
         </div>
 
         {/* Rating & projects count */}
-        <div className="flex flex-col items-end gap-1">
-          <div className="flex items-center gap-1 text-sm">
-            <span className="text-yellow-500 text-base">★</span>
-            {loadingRating ? (
-              <span className="font-medium text-gray-400">...</span>
-            ) : ratingError ? (
-              <span className="font-medium text-gray-400">N/A</span>
-            ) : (
-              <span className="font-medium">
-                {userRating && userRating > 0
-                  ? userRating.toFixed(1)
-                  : "New"}
-              </span>
-            )}
-          </div>
-          <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800">
-            {loadingRating
-              ? "..."
-              : `${totalCompletedProjects || 0} ${t("projects")}`}
-          </Badge>
-        </div>
+      <div className={`flex flex-col gap-1 ${isRTL ? 'items-start' : 'items-end'}`}>
+  <div className={`flex items-center gap-1 text-sm ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+    {isRTL ? (
+      <>
+              <span className="text-yellow-500 text-base">★</span>
+        {loadingRating ? (
+          <span className="font-medium text-gray-400">...</span>
+        ) : ratingError ? (
+          <span className="font-medium text-gray-400">N/A</span>
+        ) : (
+          <span className="font-medium">
+            {userRating && userRating > 0
+              ? userRating.toFixed(1)
+              : "New"}
+          </span>
+        )}
+
+      </>
+    ) : (
+      <>
+        <span className="text-yellow-500 text-base">★</span>
+        {loadingRating ? (
+          <span className="font-medium text-gray-400">...</span>
+        ) : ratingError ? (
+          <span className="font-medium text-gray-400">N/A</span>
+        ) : (
+          <span className="font-medium">
+            {userRating && userRating > 0
+              ? userRating.toFixed(1)
+              : "New"}
+          </span>
+        )}
+      </>
+    )}
+  </div>
+
+  <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800">
+    {loadingRating
+      ? "..."
+      : `${totalCompletedProjects || 0} ${t("projects")}`}
+  </Badge>
+</div>
+
       </div>
 
       {/* — Basic Info — */}

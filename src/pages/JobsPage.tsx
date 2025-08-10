@@ -32,7 +32,7 @@ interface JobsPageProps {
 }
 
 export default function JobsPage({ searchQuery, activeCategory }: JobsPageProps) {
-  const { t } = useTranslation()
+  const { t,i18n } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const [allJobs, setAllJobs] = useState<Job[]>([])
@@ -73,7 +73,13 @@ export default function JobsPage({ searchQuery, activeCategory }: JobsPageProps)
 
         // Extract jobs array
         const jobsData: Job[] = Array.isArray(jobsRes.data?.data?.jobs) ? jobsRes.data.data.jobs : []
-        setAllJobs(jobsData)
+     const normalizedJobs = jobsData.map((job) => ({
+  ...job,
+  skills: Array.isArray(job.skills)
+    ? job.skills
+    : job.skills?.[i18n.language] || []
+}));
+        setAllJobs(normalizedJobs)
 
         // Extract saved job IDs
         const savedArr: any[] = Array.isArray(savedRes.data?.data?.saved_jobs) ? savedRes.data.data.saved_jobs : []

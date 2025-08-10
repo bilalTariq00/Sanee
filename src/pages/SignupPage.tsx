@@ -17,7 +17,7 @@ export default function SignupPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex justify-between items-center h-16">
                     <Link to="/">
-                    <img src="/sanee.png" alt="logo" className="w-14 h-10" />
+                   <img src='/sanee.png' className="h-16 w-fit" alt="Logo" />
                     </Link>
                     <div className="flex items-center space-x-4">
                       <Link to="/login" className="text-gray-700 hover:text-red-500 font-medium">

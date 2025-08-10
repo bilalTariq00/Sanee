@@ -95,10 +95,12 @@ const handleSignOut = () => {
     }
   })
 }
-  const isActive = (path) =>
-    path.startsWith('/profile')
-      ? currentPath.startsWith('/profile')
-      : currentPath === path;
+  const isActive = (path) => {
+  if (path === '/') return currentPath === '/';
+  return currentPath.startsWith(path);
+};
+
+
 
   // Fetch user status on component mount
   useEffect(() => {
@@ -179,11 +181,13 @@ const handleSignOut = () => {
                   <SidebarMenuButton asChild>
                     <Link
                       to={item.url}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
-                        isActive(item.url)
-                          ? 'bg-red-500 text-white shadow-md'
-                          : 'text-gray-700 hover:bg-red-100 hover:text-red-600'
-                      } ${isCollapsed ? 'justify-center' : ''}`}
+                         className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive(item.url)
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
                     >
                       <item.icon className="h-5 w-5" />
                       {!isCollapsed && <span className="font-medium">{item.title}</span>}
@@ -206,11 +210,14 @@ const handleSignOut = () => {
     <SidebarMenuButton asChild>
       <Link
         to={path}
-        className={`
-          flex items-center gap-3 p-3 rounded-xl transition-all duration-200
-          text-gray-700 hover:bg-red-100 hover:text-red-600
-          ${isCollapsed ? 'justify-center' : ''}
-        `}
+      className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive(path)
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+
       >
         {/* now use the capitalized Icon */}
         <Icon className="h-5 w-5" />
@@ -227,7 +234,14 @@ const handleSignOut = () => {
                 <>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link to="/post-job" className={`flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-red-100 hover:text-red-600 ${isCollapsed ? 'justify-center' : ''}`}>
+                      <Link to="/post-job" className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/post-job")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+>
                         <Paperclip className="h-4 w-4" />
                         {!isCollapsed && <span className="font-medium">{t('add_job')}</span>}
                       </Link>
@@ -235,7 +249,14 @@ const handleSignOut = () => {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link to="/gigs" className={`flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-red-100 hover:text-red-600 ${isCollapsed ? 'justify-center' : ''}`}>
+                      <Link to="/gigs" className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/gigs")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+>
                         <Laptop className="h-4 w-4" />
                         {!isCollapsed && <span className="font-medium">{t('all_gigs')}</span>}
                       </Link>
@@ -243,7 +264,14 @@ const handleSignOut = () => {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link to="/manage-jobs" className={`flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-red-100 hover:text-red-600 ${isCollapsed ? 'justify-center' : ''}`}>
+                      <Link to="/manage-jobs" className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/manage-jobs")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+>
                         <span className="h-5 w-5">🔧</span>
                         {!isCollapsed && <span className="font-medium">{t('manage_jobs')}</span>}
                       </Link>
@@ -251,7 +279,14 @@ const handleSignOut = () => {
                   </SidebarMenuItem>
                   <SidebarMenuItem>
                     <SidebarMenuButton asChild>
-                      <Link to="/contracts" className={`flex items-center gap-3 p-3 rounded-xl text-gray-700 hover:bg-red-100 hover:text-red-600 ${isCollapsed ? 'justify-center' : ''}`}>
+                      <Link to="/contracts" className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/contracts")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+>
                         <Notebook className="h-5 w-5" />
                         {!isCollapsed && <span className="font-medium">{t('buyer_contract')}</span>}
                       </Link>
@@ -261,11 +296,14 @@ const handleSignOut = () => {
                   <SidebarMenuButton asChild>
   <Link
     to="/saved-gigs"
-    className={`
-      flex items-center gap-3 p-3 rounded-xl text-gray-700
-      hover:bg-red-100 hover:text-red-600
-      ${isCollapsed ? "justify-center" : ""}
-    `}
+   className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/saved-gigs")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+
   >
     <Bookmark className="h-4 w-4" />
     {!isCollapsed && <span className="font-medium">{t("saved_gigs")}</span>}
@@ -288,11 +326,14 @@ const handleSignOut = () => {
                   <SidebarMenuButton asChild>
                           <Link
                             to="/support"
-                            className={`
-                              flex items-center gap-3 p-3 rounded-xl text-gray-700
-                              hover:bg-red-100 hover:text-red-600
-                              ${isCollapsed ? "justify-center" : ""}
-                            `}
+                           className={`
+  flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+  ${isActive("/support")
+    ? 'bg-red-500 text-white shadow-md'
+    : 'text-gray-700 hover:bg-red-100 hover:text-red-600'}
+  ${isCollapsed ? 'justify-center' : ''}
+`}
+
                           >
                             <HelpCircle className="h-4 w-4" />
                             {!isCollapsed && <span className="font-medium">{t("support")}</span>}

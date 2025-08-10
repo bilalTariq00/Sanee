@@ -287,12 +287,12 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   {/* header */}
   <div className="bg-red-500 text-white">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <button
+      {/* <button
         onClick={() => navigate(-1)}
         className="flex items-center text-white/90 hover:text-white mb-6"
       >
         <ArrowLeft className="w-5 h-5 mr-2" /> {t('profile_page.back')}
-      </button>
+      </button> */}
 
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-6">

@@ -112,5 +112,10 @@
   "type_job_application": "طلب وظيفة",
   "type_payment": "دفعة",
   "type_message": "رسالة",
-  "back": "رجوع"
+  "back": "رجوع",
+  "enter_price":"دفعة",
+ "search_jobs_services": "بحث عن الوظائف والخدمات",
+"search_services": "البحث عن الخدمات",
+ "remote": "عن بُعد",
+  "on_site": "في الموقع"
 }

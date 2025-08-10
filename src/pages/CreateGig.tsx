@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { ArrowLeft, Trash2, Upload } from "lucide-react"
+import { ArrowLeft, ArrowRight, Trash2, Upload } from "lucide-react"
 import axios from "axios"
 import config from "../config"
 import { useTranslation } from "react-i18next"
@@ -51,6 +51,7 @@ function CreateGig() {
   const { t, i18n } = useTranslation()
   const token = localStorage.getItem("token")
   const isRTL = i18n.language === "ar"
+ const lang = i18n.language || "en";
 
   useEffect(() => {
     fetchCategories()
@@ -59,11 +60,13 @@ function CreateGig() {
   // Using your working fetchCategories logic
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`${config.API_BASE_URL}/categories`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+     const res = await axios.get(`${config.API_BASE_URL}/categories`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Accept-Language': lang,
+  },
+});
+
 
       console.log("Categories API response:", res.data) // Debug log
 
@@ -108,7 +111,8 @@ function CreateGig() {
   try {
     const res = await axios.get(
       `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}`,
+    'Accept-Language': lang, } ,}
     )
 
     console.log("Subcategories API response:", res.data) // Debug log
@@ -254,7 +258,7 @@ function CreateGig() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900">
-            <ArrowLeft className="h-5 w-5 mr-2" /> {t("back") || "Back"}
+            {isRTL ?<ArrowRight className="w-4 h-4" />:<ArrowLeft className="w-4 h-4" />} {t("back") || "Back"}
           </button>
           <h1 className="text-2xl font-bold text-gray-900">{t("create_gigs.title") || "Create New Gig"}</h1>
         </div>
@@ -293,10 +297,10 @@ function CreateGig() {
             </h2>
             <div className="space-y-4">
               <Select value={form.category_id} onValueChange={(value) => handleSelectChange("category_id", value)}>
-                <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
+                <SelectTrigger dir={isRTL ? "rtl" : "ltr"} className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
                   <SelectValue placeholder={t("create_gigs.select_category") || "Select Category"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent dir={isRTL ? "justify-end" : "justify-start"}>
                   {Array.isArray(categories) && categories.length > 0 ? (
                     categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>
@@ -315,8 +319,9 @@ function CreateGig() {
                 <Select
                   value={form.subcategory_id}
                   onValueChange={(value) => handleSelectChange("subcategory_id", value)}
+                  dir={isRTL ? "rtl" : "ltr"}
                 >
-                  <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
+                  <SelectTrigger    className={`w-full border border-gray-300 focus:ring-2 focus:ring-red-500  `}>
                     <SelectValue placeholder={t("create_gigs.select_subcategory") || "Select Subcategory"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -348,7 +353,7 @@ function CreateGig() {
           <button
             type="button"
             onClick={() => handleRemoveSkill(skill.value)}
-            className="ml-2 text-red-500 hover:text-red-600"
+            className={`${isRTL?'mr-2':'ml-2'} text-red-500 hover:text-red-600`}
           >
             ×
           </button>
@@ -359,11 +364,11 @@ function CreateGig() {
     {/* Skills dropdown */}
     {skillsList.length > 0 ? (
       <div className="flex gap-2">
-        <Select value={newSkill} onValueChange={setNewSkill}>
+        <Select dir={isRTL ? "rtl" : "ltr"} value={newSkill} onValueChange={setNewSkill}>
           <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
             <SelectValue placeholder={t("create_gigs.choose_skill") || "Choose a skill"} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent dir={isRTL ? "justify-end" : "justify-start"}>
             {skillsList.map((skill) => (
               <SelectItem key={skill.value} value={skill.value}>
                 {skill.label}

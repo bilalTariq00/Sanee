@@ -24,12 +24,17 @@ interface SubCategory {
   id: string;
   name: string;
   skills: string[];
+  skills_en?: string[];
+  skills_ar?: string[];
+  skills_mapping?: { [key: string]: string };
 }
 
 export default function PostJobPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || "en";
+  const isRTL = i18n.language === "ar";
 
   const [formData, setFormData] = useState({
     title: '',
@@ -40,7 +45,10 @@ export default function PostJobPage() {
     location_type: 'remote',
     category_id: '',
     sub_category_id: '',
-    skills: [] as string[]
+    skills: [] as string[],
+    skills_en: [] as string[],
+    skills_ar: [] as string[],
+    skills_mapping: {} as { [key: string]: string }
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<SubCategory[]>([]);
@@ -63,7 +71,10 @@ export default function PostJobPage() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${config.API_BASE_URL}/categories`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Accept-Language': lang,
+        }
       });
       setCategories(response.data.data.categories);
     } catch {
@@ -75,9 +86,13 @@ export default function PostJobPage() {
     try {
       const response = await axios.get(
         `${config.API_BASE_URL}/categories/${categoryId}/subcategories`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+        { 
+          headers: { 
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Accept-Language': lang 
+          } 
+        }
       );
-      // assuming the shape is { success: true, data: { subcategories: SubCategory[] } }
       setSubcategories(response.data.data.subcategories);
     } catch {
       setError(t('error_fetch_subcategories'));
@@ -87,11 +102,87 @@ export default function PostJobPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === 'category_id') {
-      setFormData(prev => ({ ...prev, category_id: value, sub_category_id: '' }));
+      setFormData(prev => ({ 
+        ...prev, 
+        category_id: value, 
+        sub_category_id: '',
+        skills: [],
+        skills_en: [],
+        skills_ar: [],
+        skills_mapping: {}
+      }));
       fetchSubcategories(value);
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
+  };
+
+  const addSkill = (skillValue: string) => {
+    const selectedSubcategory = subcategories.find(s => String(s.id) === formData.sub_category_id);
+    
+    if (!selectedSubcategory || formData.skills.includes(skillValue)) return;
+
+    // Determine English and Arabic versions based on the subcategory's skills_mapping
+    let skillEn = skillValue;
+    let skillAr = skillValue;
+    
+    if (selectedSubcategory.skills_mapping) {
+      if (lang === 'ar') {
+        // If current language is Arabic, skillValue is Arabic
+        skillAr = skillValue;
+        // Find English equivalent by searching in mapping values
+        skillEn = Object.keys(selectedSubcategory.skills_mapping).find(
+          key => selectedSubcategory.skills_mapping![key] === skillValue
+        ) || skillValue;
+      } else {
+        // If current language is English, skillValue is English
+        skillEn = skillValue;
+        // Get Arabic equivalent from mapping (English -> Arabic)
+        skillAr = selectedSubcategory.skills_mapping[skillValue] || skillValue;
+      }
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      skills: [...prev.skills, skillValue], // Current display language skill
+      skills_en: [...prev.skills_en, skillEn],
+      skills_ar: [...prev.skills_ar, skillAr],
+      skills_mapping: {
+        ...prev.skills_mapping,
+        // Dynamic mapping based on current language
+        ...(lang === 'ar' ? 
+          { [skillAr]: skillEn } : // Arabic -> English when Arabic is active
+          { [skillEn]: skillAr }   // English -> Arabic when English is active
+        )
+      }
+    }));
+  };
+
+  const removeSkill = (skillToRemove: string) => {
+    const skillIndex = formData.skills.indexOf(skillToRemove);
+    if (skillIndex === -1) return;
+
+    const skillEn = formData.skills_en[skillIndex];
+    const skillAr = formData.skills_ar[skillIndex];
+
+    setFormData(prev => {
+      const newSkillsMapping = { ...prev.skills_mapping };
+      
+      // Remove the key based on current language
+      if (lang === 'ar') {
+        delete newSkillsMapping[skillAr]; // Remove Arabic key when Arabic is active
+      } else {
+        delete newSkillsMapping[skillEn]; // Remove English key when English is active
+      }
+
+      return {
+        ...prev,
+        skills: prev.skills.filter(s => s !== skillToRemove),
+        skills_en: prev.skills_en.filter((_, i) => i !== skillIndex),
+        skills_ar: prev.skills_ar.filter((_, i) => i !== skillIndex),
+        skills_mapping: newSkillsMapping
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,11 +199,23 @@ export default function PostJobPage() {
       }
 
       const data = new FormData();
+      
+      // Add basic form data
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'skills') {
+          // Send skills in current display language
           (value as string[]).forEach(skill => data.append('skills[]', skill.trim()));
-        } else {
-          data.append(key, value as string);
+        } else if (key === 'skills_en') {
+          // Send English skills
+          (value as string[]).forEach(skill => data.append('skills_en[]', skill.trim()));
+        } else if (key === 'skills_ar') {
+          // Send Arabic skills
+          (value as string[]).forEach(skill => data.append('skills_ar[]', skill.trim()));
+        } else if (key === 'skills_mapping') {
+          // Send skills mapping as JSON string
+          data.append('skills_mapping', JSON.stringify(value));
+        } else if (typeof value === 'string') {
+          data.append(key, value);
         }
       });
 
@@ -125,7 +228,20 @@ export default function PostJobPage() {
 
       if (response.data) {
         toast(t('job_posted_success'));
-        setFormData({ title: '', description: '', budget: '', experience_level: 'entry', visibility: 'public', location_type: 'remote', category_id: '', sub_category_id: '', skills: [] });
+        setFormData({
+          title: '', 
+          description: '', 
+          budget: '', 
+          experience_level: 'entry', 
+          visibility: 'public', 
+          location_type: 'remote', 
+          category_id: '', 
+          sub_category_id: '', 
+          skills: [],
+          skills_en: [],
+          skills_ar: [],
+          skills_mapping: {}
+        });
         navigate('/');
       }
     } catch (err: any) {
@@ -145,9 +261,6 @@ export default function PostJobPage() {
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900">
-            <ArrowLeft className="h-5 w-5 mr-2" /> {t('back') || 'Back'}
-          </button>
           <h1 className="text-2xl font-bold text-gray-900">{t('post_job_title')}</h1>
         </div>
 
@@ -192,7 +305,7 @@ export default function PostJobPage() {
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
-                  placeholder={t('budget_placeholder') || 'Budget (USD) *'}
+                  placeholder={t('budget_placeholder') || 'Budget (Riyal) *'}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   required
                 />
@@ -213,16 +326,20 @@ export default function PostJobPage() {
                     ...prev,
                     category_id: val,
                     sub_category_id: '',
-                    skills: []
+                    skills: [],
+                    skills_en: [],
+                    skills_ar: [],
+                    skills_mapping: {}
                   }));
                   fetchSubcategories(val);
                 }}
+                dir={isRTL ? "rtl" : "ltr"}
               >
                 <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
-                <SelectValue>
-                  {categories.find(c => String(c.id) === formData.category_id)?.name
-                  ?? t('select_category')}
-                 </SelectValue>
+                  <SelectValue>
+                    {categories.find(c => String(c.id) === formData.category_id)?.name
+                    ?? t('select_category')}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(cat => (
@@ -237,12 +354,22 @@ export default function PostJobPage() {
                 <Select
                   value={formData.sub_category_id}
                   onValueChange={(val) => {
-                    setFormData(prev => ({ ...prev, sub_category_id: val, skills: [] }));
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      sub_category_id: val, 
+                      skills: [],
+                      skills_en: [],
+                      skills_ar: [],
+                      skills_mapping: {}
+                    }));
                   }}
+                  dir={isRTL ? "rtl" : "ltr"}
                 >
                   <SelectTrigger className="w-full border border-gray-300 focus:ring-2 focus:ring-red-500">
-                 {subcategories.find(c => String(c.id) === formData.sub_category_id)?.name
-                  ?? t('select_sub_category')}
+                    <SelectValue>
+                      {subcategories.find(c => String(c.id) === formData.sub_category_id)?.name
+                      ?? t('select_sub_category')}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {subcategories.map(sub => (
@@ -266,21 +393,16 @@ export default function PostJobPage() {
                 {/* Selected skills display */}
                 {formData.skills.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {formData.skills.map(skill => (
+                    {formData.skills.map((skill, index) => (
                       <Badge
-                        key={skill}
+                        key={`${skill}-${index}`}
                         variant="secondary"
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-600"
                       >
                         {skill}
                         <button
                           type="button"
-                          onClick={() =>
-                            setFormData(prev => ({
-                              ...prev,
-                              skills: prev.skills.filter(s => s !== skill)
-                            }))
-                          }
+                          onClick={() => removeSkill(skill)}
                           className="ml-2 text-red-500 hover:text-red-600"
                         >
                           ×
@@ -294,111 +416,65 @@ export default function PostJobPage() {
                 <div className="flex gap-2">
                   <Select
                     value=""
-                    onValueChange={(val) => {
-                      if (val && !formData.skills.includes(val)) {
-                        setFormData(prev => ({
-                          ...prev,
-                          skills: [...prev.skills, val]
-                        }))
-                      }
-                    }}
+                    onValueChange={addSkill}
+                    dir={isRTL ? "rtl" : "ltr"}
                   >
                     <SelectTrigger className="flex-1 border border-gray-300 focus:ring-2 focus:ring-red-500">
                       <SelectValue placeholder={t('choose_skill') || 'Choose a skill'} />
                     </SelectTrigger>
                     <SelectContent>
                       {(() => {
-                        const chosen = subcategories.find(s => String(s.id) === formData.sub_category_id)
-                        return chosen
-                          ? chosen.skills.map(skill => (
-                              <SelectItem key={skill} value={skill}>
-                                {skill}
-                              </SelectItem>
-                            ))
-                          : null
+                        const chosen = subcategories.find(s => String(s.id) === formData.sub_category_id);
+                        if (!chosen) return null;
+                        
+                        // Show skills in current language
+                        const skillsToShow = lang === 'ar' ? 
+                          (chosen.skills_ar || chosen.skills) : 
+                          (chosen.skills_en || chosen.skills);
+                        
+                        return skillsToShow
+                          .filter(skill => !formData.skills.includes(skill))
+                          .map(skill => (
+                            <SelectItem key={skill} value={skill}>
+                              {skill}
+                            </SelectItem>
+                          ));
                       })()}
                     </SelectContent>
                   </Select>
-                
                 </div>
               </div>
             </div>
           )}
 
           {/* Job Details */}
-       <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
-  <h2 className="text-xl font-semibold text-gray-900 mb-4">
-    {t('job_details') || 'Job Details'}
-  </h2>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-    {/* Experience Level */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {t('experience_level') || 'Experience Level'}
-      </label>
-      <Select
-        value={formData.experience_level}
-        onValueChange={(val) =>
-          setFormData((p) => ({ ...p, experience_level: val }))
-        }
-      >
-        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-          <SelectValue placeholder={t('select_option')!} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="entry">{t('entry') || 'Entry Level'}</SelectItem>
-          <SelectItem value="intermediate">
-            {t('intermediate') || 'Intermediate'}
-          </SelectItem>
-          <SelectItem value="expert">{t('expert') || 'Expert'}</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-
-    {/* Visibility */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {t('visibility') || 'Visibility'}
-      </label>
-      <Select
-        value={formData.visibility}
-        onValueChange={(val) =>
-          setFormData((p) => ({ ...p, visibility: val }))
-        }
-      >
-        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-          <SelectValue placeholder={t('select_option')!} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="public">{t('public') || 'Public'}</SelectItem>
-          <SelectItem value="private">{t('private') || 'Private'}</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-
-    {/* Location Type */}
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {t('location_type') || 'Location Type'}
-      </label>
-      <Select
-        value={formData.location_type}
-        onValueChange={(val) =>
-          setFormData((p) => ({ ...p, location_type: val }))
-        }
-      >
-        <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
-          <SelectValue placeholder={t('select_option')!} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="remote">{t('remote') || 'Remote'}</SelectItem>
-          <SelectItem value="onsite">{t('onsite') || 'On-site'}</SelectItem>
-        </SelectContent>
-      </Select>
-    </div>
-  </div>
-</div>
-
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-red-100">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {t('job_details') || 'Job Details'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Location Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('location_type') || 'Location Type'}
+                </label>
+                <Select
+                  value={formData.location_type}
+                  onValueChange={(val) =>
+                    setFormData((p) => ({ ...p, location_type: val }))
+                  }
+                >
+                  <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
+                    <SelectValue placeholder={t('select_option')!} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="remote">{t('remote') || 'Remote'}</SelectItem>
+                    <SelectItem value="onsite">{t('onsite') || 'On-site'}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
 
           {/* Submit Button */}
           <div className="flex justify-end gap-3">

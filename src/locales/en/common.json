@@ -113,5 +113,10 @@
   "type_job_application": "Job Application",
   "type_payment": "Payment",
   "type_message": "Message",
-  "back": "Back"
+  "back": "Back",
+  "enter_price":"Price",
+  "search_jobs_services":"Search jobs and services...",
+  "search_services":"Search services...",
+  "remote": "Remote",
+  "on_site": "On-site"
 }

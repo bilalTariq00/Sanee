@@ -5,6 +5,7 @@ import {
   Star,
   DollarSign,
   Edit,
+  ArrowRight,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -54,7 +55,7 @@ interface UserProfile {
 export default function CreatorProfilePage() {
   const { creatorId } = useParams<{ creatorId: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
   const [tab, setTab] = useState<"services" | "portfolio" | "reviews">(
     "services"
   );
@@ -148,7 +149,7 @@ export default function CreatorProfilePage() {
             onClick={() => navigate(-1)}
             className="flex items-center text-white/90 hover:text-white mb-6"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
+            {isRTL ?<ArrowRight className="w-4 h-4" />:<ArrowLeft className="w-4 h-4" />} {t("back") || "Back"}
             Back
           </button>
 
