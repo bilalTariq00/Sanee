@@ -123,12 +123,12 @@ const handleSignOut = () => {
 
   return (
     <Sidebar
-      className={`border-gray-100 transition-all duration-300 fixed top-0 bottom-0 z-50 ${
+      className={`border-gray-100 transition-all duration-300 fixed top-0 bottom-0 z-50  ${
         isCollapsed ? 'w-fit' : 'w-fit'
-      } ${isRTL ? 'right-0 border-l' : 'left-0 border-r'}`}
+      } ${isRTL ? 'right-0 ' : 'left-0 '}`}
       collapsible="icon"
     >
-      <SidebarContent className="bg-white w-full">
+      <SidebarContent className="bg-white w-full border-none">
         {/* Logo */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           {!isCollapsed && (

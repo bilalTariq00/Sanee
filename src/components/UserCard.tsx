@@ -113,14 +113,15 @@ const previewItems = isJob
               {user.name}
             </h3>
             <p className="text-gray-600 text-sm mt-1 truncate max-w-[180px]">{user.location}</p>
-            <Badge
-              variant="outline"
-              className={`mt-1 text-xs ${
-                isJob ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"
-              }`}
-            >
-              {isJob ? "Job Poster" : "Service Provider"}
-            </Badge>
+           <Badge
+  variant="outline"
+  className={`mt-1 text-xs ${
+    isJob ? "bg-blue-50 text-blue-700" : "bg-green-50 text-green-700"
+  }`}
+>
+  {isJob ? t("job_poster") : t("service_provider")}
+</Badge>
+
           </div>
         </div>
 
@@ -173,13 +174,13 @@ const previewItems = isJob
       {/* — Basic Info — */}
       <div className="mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-          <span className="flex items-center">
+          <span className="flex items-center mr-1 ml-1">
             <img
               src="/riyal.svg"
-              className="h-5 w-5 mr-1"
+              className="h-5 w-5 mr-1 "
               alt="Price"
             />
-            {user.hourlyRate}+ &nbsp;|&nbsp; {user.experience}
+            {user.hourlyRate}+ &nbsp;|&nbsp; 
           </span>
           <span>
             {user.followers} {t("followers") || "followers"}
