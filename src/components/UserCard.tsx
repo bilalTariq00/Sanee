@@ -33,6 +33,7 @@ export default function UserCard({
   const [totalCompletedProjects, setTotalCompletedProjects] = useState<number | null>(null)
   const [loadingRating, setLoadingRating] = useState<boolean>(true)
   const [ratingError, setRatingError] = useState<string | null>(null)
+  
 
   // Fetch user rating and completed projects
   useEffect(() => {
@@ -127,40 +128,22 @@ const previewItems = isJob
 
         {/* Rating & projects count */}
       <div className={`flex flex-col gap-1 ${isRTL ? 'items-start' : 'items-end'}`}>
-  <div className={`flex flex-wrap items-center gap-1 text-sm ${isRTL ? 'flex-row-reverse' : 'flex-row'}'}`}>
-    {isRTL ? (
-      <>
-              <span className="text-yellow-500 text-base">★</span>
-        {loadingRating ? (
-          <span className="font-medium text-gray-400">...</span>
-        ) : ratingError ? (
-          <span className="font-medium text-gray-400">N/A</span>
-        ) : (
-          <span className="font-medium">
-            {userRating && userRating > 0
-              ? userRating.toFixed(1)
-              : "New"}
-          </span>
-        )}
-
-      </>
-    ) : (
-      <>
-        <span className="text-yellow-500 text-base">★</span>
-        {loadingRating ? (
-          <span className="font-medium text-gray-400">...</span>
-        ) : ratingError ? (
-          <span className="font-medium text-gray-400">N/A</span>
-        ) : (
-          <span className="font-medium">
-            {userRating && userRating > 0
-              ? userRating.toFixed(1)
-              : "New"}
-          </span>
-        )}
-      </>
-    )}
-  </div>
+     <div
+  className={`flex items-center min-w-0 ${
+    isRTL ? "flex-row-reverse space-x-reverse space-x-2" : "space-x-2"
+  }`}
+>
+  <span className="text-yellow-500 text-xl">★</span>
+  {loadingRating ? (
+    <span className="text-xl font-semibold text-gray-400">...</span>
+  ) : ratingError ? (
+    <span className="text-xl font-semibold text-gray-400">N/A</span>
+  ) : (
+    <span className="text-xl font-semibold">
+      {userRating && userRating > 0 ? userRating.toFixed(1) : "New"}
+    </span>
+  )}
+</div>
 
   <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800 max-w-full truncate">
     {loadingRating
@@ -173,19 +156,28 @@ const previewItems = isJob
 
       {/* — Basic Info — */}
       <div className="mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-          <span className="flex items-center mr-1 ml-1">
-            <img
-              src="/riyal.svg"
-              className="h-5 w-5 mr-1 "
-              alt="Price"
-            />
-            {user.hourlyRate}+ &nbsp;|&nbsp; 
-          </span>
-          <span>
-            {user.followers} {t("followers") || "followers"}
-          </span>
-        </div>
+       <div className="flex items-center text-sm text-gray-600 mb-3">
+  <span
+    className={`flex items-center mr-1 ml-1 ${
+      isRTL ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+    }`}
+  >
+    <img
+      src="/riyal.svg"
+      className="h-5 w-5"
+      alt="Price"
+    />
+    {user.hourlyRate}
+  </span>
+
+  {/* Separator */}
+  <span className="mx-2 h-4 w-px bg-gray-300" />
+
+  <span>
+    {user.followers} {t("followers") || "followers"}
+  </span>
+</div>
+
         <div className="flex flex-wrap gap-2 max-w-full">
           {user.skills.slice(0, 3).map((skill) => (
             <Badge

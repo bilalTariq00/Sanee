@@ -1,7 +1,7 @@
 // src/config.ts
 const config = {
-    API_BASE_URL: "https://male-device-climate-understanding.trycloudflare.com/api",
-    IMG_BASE_URL: "https://male-device-climate-understanding.trycloudflare.com",
+    API_BASE_URL: "https://supports-coated-available-pennsylvania.trycloudflare.com/api",
+    IMG_BASE_URL: "https://supports-coated-available-pennsylvania.trycloudflare.com",
     WS_URL: "wss://male-device-climate-understanding.trycloudflare.com/ws", // Add WebSocket URL
     menuItems: {
         buyer: [

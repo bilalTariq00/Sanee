@@ -20,7 +20,9 @@ interface UserProfileDialogProps {
 }
 
 export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: UserProfileDialogProps) {
-  const { t } = useTranslation()
+  const { t,i18n } = useTranslation()
+   const isRTL = i18n.language === "ar"
+
 
   // States for handling projects and rating
   const [userRating, setUserRating] = useState<number | null>(null)
@@ -110,21 +112,26 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
                   variant="outline"
                   className={`${isJob ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-green-50 text-green-700 border-green-200"}`}
                 >
-                  {isJob ? "Job Poster" : "Service Provider"}
+                   {isJob ? t("job_poster") : t("service_provider")}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2 min-w-0">
-                <span className="text-yellow-500 text-xl">★</span>
-                {loading ? (
-                  <span className="text-xl font-semibold text-gray-400">...</span>
-                ) : ratingError ? (
-                  <span className="text-xl font-semibold text-gray-400">N/A</span>
-                ) : (
-                  <span className="text-xl font-semibold">
-                    {userRating && userRating > 0 ? userRating.toFixed(1) : "New"}
-                  </span>
-                )}
-              </div>
+             <div
+  className={`flex items-center min-w-0 ${
+    isRTL ? "flex-row-reverse space-x-reverse space-x-2" : "space-x-2"
+  }`}
+>
+  <span className="text-yellow-500 text-xl">★</span>
+  {loading ? (
+    <span className="text-xl font-semibold text-gray-400">...</span>
+  ) : ratingError ? (
+    <span className="text-xl font-semibold text-gray-400">N/A</span>
+  ) : (
+    <span className="text-xl font-semibold">
+      {userRating && userRating > 0 ? userRating.toFixed(1) : "New"}
+    </span>
+  )}
+</div>
+
             </div>
 
             {user.location && <p className="text-gray-600 mb-2 break-words">{user.location}</p>}
@@ -137,10 +144,25 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 min-w-0">
               {user.hourlyRate !== undefined && (
-                <span className="flex items-center">
-                  <img src="/riyal.svg" className="h-4 w-4 mr-1" alt="Price" />
-                  {user.hourlyRate}+ {isJob ? t("budget") || "Budget" : `/${t("hour") || "hour"}`}
-                </span>
+                <div className="flex items-center text-sm text-gray-600 ">
+  <span
+    className={`flex items-center mr-1 ml-1 ${
+      isRTL ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+    }`}
+  >
+    <img
+      src="/riyal.svg"
+      className="h-5 w-5"
+      alt="Price"
+    />
+    {user.hourlyRate}
+  </span>
+
+  {/* Separator */}
+  <span className="mx-2 h-4 w-px bg-gray-300" />
+
+</div>
+
               )}
               {user.experience && <span>📊 {user.experience}</span>}
               {user.followers !== undefined && (
