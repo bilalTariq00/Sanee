@@ -33,6 +33,7 @@ interface JobsPageProps {
 
 export default function JobsPage({ searchQuery, activeCategory }: JobsPageProps) {
   const { t,i18n } = useTranslation()
+const isRTL = i18n.language === "ar"
   const { user } = useAuth()
   const navigate = useNavigate()
   const [allJobs, setAllJobs] = useState<Job[]>([])
@@ -168,11 +169,18 @@ export default function JobsPage({ searchQuery, activeCategory }: JobsPageProps)
                       <p className="mt-2 text-gray-600">{job.description}</p>
                       {/* Budget & Date */}
                       <div className="mt-4 flex flex-wrap gap-4 text-gray-500">
-                        <div className="flex items-center">
-                          <img src="/riyal.svg" className="h-5 w-5 mr-1" alt="" />
-                          {job.budget}
-                        </div>
-                        <div className="flex items-center">
+                       <div
+  className={`flex items-center text-gray-700 ${
+    isRTL ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+  }`}
+>
+  <img src="/riyal.svg" className="h-5 w-5" alt="Budget" />
+  <span className="font-medium">{job.budget}</span>
+</div>
+
+                        <div  className={`flex items-center text-gray-700 ${
+    isRTL ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+  }`}>
                           <Clock className="h-5 w-5 mr-1" />
                           {new Date(job.created_at).toLocaleDateString()}
                         </div>

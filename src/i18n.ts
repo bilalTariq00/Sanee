@@ -17,6 +17,7 @@ import enCheckout from '@/locales/en/checkout.json';
 import enProposals from '@/locales/en/proposals.json';
 import enReviews from '@/locales/en/reviews.json';
 import enSupport from '@/locales/en/support.json';
+import enMessage from '@/locales/en/message.json'
 
 // Import Arabic translations
 import arCommon from '@/locales/ar/common.json';
@@ -33,6 +34,7 @@ import arCheckout from '@/locales/ar/checkout.json';
 import arProposals from '@/locales/ar/proposals.json';
 import arReviews from '@/locales/ar/reviews.json';
 import arSupport from '@/locales/ar/support.json';
+import arMessage from '@/locales/ar/message.json'
 
 i18n
   .use(LanguageDetector)
@@ -59,6 +61,7 @@ i18n
           ...enProposals,
           ...enReviews,
           ...enSupport,
+          ...enMessage
         },
       },
       ar: {
@@ -77,6 +80,7 @@ i18n
           ...arProposals,
           ...arReviews,
           ...arSupport,
+          ...arMessage
         },
       },
     },

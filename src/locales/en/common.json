@@ -119,5 +119,8 @@
   "search_services":"Search services...",
   "remote": "Remote",
   "on_site": "On-site",
-   "projects": "Projects"
+   "projects": "Projects",
+   "loading_profile":"Loading Profile ...",
+   "save":"Save",
+   "unsave":"Un Save"
 }

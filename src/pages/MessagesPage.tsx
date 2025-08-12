@@ -6,6 +6,7 @@ import { Upload, User, Search, Send, Wifi, WifiOff, X, Smile, Trash2, Bell, Bell
 import { toast } from "sonner"
 import EmojiPicker from "emoji-picker-react"
 import config from "../config"
+import { useTranslation } from "react-i18next"
 
 interface Service {
   id: number
@@ -68,6 +69,9 @@ export default function Chat() {
   const lastMessageIdRef = useRef<number>(0)
   const chatBodyRef = useRef<HTMLDivElement>(null)
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null)
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language || "en"
+  const isRTL = i18n.language === "ar"
 
   // State
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null)
@@ -110,12 +114,12 @@ export default function Chat() {
       const permission = await Notification.requestPermission()
       setNotificationsEnabled(permission === "granted")
       if (permission === "granted") {
-        toast.success("Notifications enabled!")
+        toast.success(t("notifications.enabled"))
       } else {
-        toast.error("Notifications denied")
+        toast.error(t("notifications.denied"))
       }
     } else {
-      toast.error("Notifications not supported in this browser")
+      toast.error(t("notifications.notSupported"))
     }
   }
 
@@ -188,16 +192,16 @@ export default function Chat() {
             return {
               ...msg,
               is_deleted: true,
-              message: "This message was deleted",
+              message: t("messages.deleted"),
             }
           }
           return msg
         }),
       )
-      toast.success("Message deleted")
+      toast.success(t("messages.deleteSuccess"))
     } catch (err) {
       console.error("❌ Failed to delete message:", err)
-      toast.error("Failed to delete message")
+      toast.error(t("messages.deleteError"))
     }
   }
 
@@ -321,17 +325,17 @@ export default function Chat() {
               if (message.sender_id !== currentUser.id) {
                 const senderName = message.sender
                   ? `${message.sender.first_name} ${message.sender.last_name}`
-                  : "Someone"
+                  : t("common.someone")
 
                 let notificationBody = message.message
                 if (message.is_custom_order) {
-                  notificationBody = "📋 Sent you a custom order"
+                  notificationBody = t("notifications.customOrderSent")
                 } else if (message.attachment) {
-                  notificationBody = "📎 Sent an attachment"
+                  notificationBody = t("notifications.attachmentSent")
                 }
 
                 showNotification(
-                  `New message from ${senderName}`,
+                  t("notifications.newMessageFrom", { name: senderName }),
                   notificationBody,
                   message.sender?.image ? `${config.IMG_BASE_URL}/storage/${message.sender.image}` : undefined,
                 )
@@ -397,11 +401,11 @@ export default function Chat() {
       }
       setShowEmoji(false)
       scrollToBottom()
-      toast.success("Message sent!")
+      toast.success(t("messages.sendSuccess"))
       setConnected(true)
     } catch (error) {
       console.error("Failed to send message:", error)
-      toast.error("Failed to send message")
+      toast.error(t("messages.sendError"))
       setConnected(false)
     } finally {
       setSending(false)
@@ -426,13 +430,13 @@ export default function Chat() {
   // Handle custom order creation
   const handleCreateOrder = async () => {
     if (!selectedService || !orderAmount || !receiverUid) {
-      toast.error("Please fill in all required fields")
+      toast.error(t("orders.fillAllFields"))
       return
     }
 
     const selectedServiceData = myServices.find((s) => s.id === Number.parseInt(selectedService))
     if (!selectedServiceData) {
-      toast.error("Selected service not found")
+      toast.error(t("orders.serviceNotFound"))
       return
     }
 
@@ -455,9 +459,9 @@ export default function Chat() {
       // console.log("Sending expiry_date to API:", orderExpiry)
 
       const orderData = orderRes.data.data
-      const messageText = `Custom order created: ${selectedServiceData.title}\n\nPrice: ${orderAmount} Riyals\n\nExpires in: ${
+      const messageText = `${t("orders.customOrderCreated")}: ${selectedServiceData.title}\n\n${t("orders.price")}: ${orderAmount} ${t("common.currency")}\n\n${t("orders.expiresIn")}: ${
         expiryOptions.find((opt) => opt.value === orderExpiry)?.label
-      }${orderNote ? `\n\nNote: ${orderNote}` : ""}\n\nUID: ${orderData.service_uid || orderData.gig_uid}`
+      }${orderNote ? `\n\n${t("orders.note")}: ${orderNote}` : ""}\n\n${t("orders.uid")}: ${orderData.service_uid || orderData.gig_uid}`
 
       const messageFormData = new FormData()
       messageFormData.append("receiver_id", receiverUid)
@@ -506,10 +510,10 @@ export default function Chat() {
       setOrderExpiry("1_hour") // keep default
       setOrderNote("")
       scrollToBottom()
-      toast.success("Custom order created successfully!")
+      toast.success(t("orders.createSuccess"))
     } catch (err) {
       console.error("❌ Failed to create order:", err)
-      toast.error("Failed to create custom order")
+      toast.error(t("orders.createError"))
     }
   }
 
@@ -517,7 +521,7 @@ export default function Chat() {
   const handleAcceptOrder = async (message: Message) => {
     const orderId = message.order_id || message.chat_order_id
     if (!orderId) {
-      toast.error("Order ID not found")
+      toast.error(t("orders.orderIdNotFound"))
       return
     }
 
@@ -546,7 +550,7 @@ export default function Chat() {
               msg.id === message.id ? { ...msg, is_expired: false, is_approved: true, status: "accepted" } : msg,
             ),
           )
-          toast.info("Order was already accepted.")
+          toast.info(t("orders.alreadyAccepted"))
         } else if (msg.includes("expired")) {
           // Mark as expired
           setMessages((prev) =>
@@ -554,9 +558,9 @@ export default function Chat() {
               msg.id === message.id ? { ...msg, is_expired: true, is_approved: false, status: "expired" } : msg,
             ),
           )
-          toast.error("Order has expired.")
+          toast.error(t("orders.expired"))
         } else {
-          toast.error(result.message || "Failed to accept order")
+          toast.error(result.message || t("orders.acceptError"))
         }
         return
       }
@@ -582,7 +586,7 @@ export default function Chat() {
         ),
       )
 
-      toast.success(result.message || "Order accepted successfully!")
+      toast.success(result.message || t("orders.acceptSuccess"))
 
       // Redirect only if approved & not expired
       if (!result.data?.is_expired && result.data?.is_approved) {
@@ -608,7 +612,7 @@ export default function Chat() {
       }
     } catch (err: any) {
       console.error("Error accepting order:", err)
-      toast.error(err.message || "Failed to accept order")
+      toast.error(err.message || t("orders.acceptError"))
       setMessages((prev) => prev.map((msg) => (msg.id === message.id ? { ...msg, status: "pending" } : msg)))
     } finally {
       setAcceptingOrder(null)
@@ -620,7 +624,7 @@ export default function Chat() {
     try {
       const orderId = message.order_id || message.chat_order_id
       if (!orderId) {
-        throw new Error("Order ID not found")
+        throw new Error(t("orders.orderIdNotFound"))
       }
 
       await axios.post(
@@ -633,26 +637,26 @@ export default function Chat() {
       )
 
       setMessages((prev) => prev.map((msg) => (msg.id === message.id ? { ...msg, status: "rejected" } : msg)))
-      toast.success("Order rejected")
+      toast.success(t("orders.rejectSuccess"))
     } catch (error) {
       console.error("❌ Error rejecting order:", error)
-      toast.error("Failed to reject order")
+      toast.error(t("orders.rejectError"))
     }
   }
 
   // Utility functions for orders
   const expiryOptions = [
-    { value: "15_minutes", label: "15 minutes" },
-    { value: "30_minutes", label: "30 minutes" },
-    { value: "1_hour", label: "1 hour" },
-    { value: "2_hours", label: "2 hours" },
-    { value: "4_hours", label: "4 hours" },
-    { value: "6_hours", label: "6 hours" },
-    { value: "12_hours", label: "12 hours" },
-    { value: "1_day", label: "1 day" },
-    { value: "2_days", label: "2 days" },
-    { value: "3_days", label: "3 days" },
-    { value: "1_week", label: "1 week" },
+    { value: "15_minutes", label: t("time.15minutes") },
+    { value: "30_minutes", label: t("time.30minutes") },
+    { value: "1_hour", label: t("time.1hour") },
+    { value: "2_hours", label: t("time.2hours") },
+    { value: "4_hours", label: t("time.4hours") },
+    { value: "6_hours", label: t("time.6hours") },
+    { value: "12_hours", label: t("time.12hours") },
+    { value: "1_day", label: t("time.1day") },
+    { value: "2_days", label: t("time.2days") },
+    { value: "3_days", label: t("time.3days") },
+    { value: "1_week", label: t("time.1week") },
   ]
 
   const getExpiryDate = (expiryValue: string) => {
@@ -779,17 +783,17 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-100px)] bg-white rounded-[20px] overflow-hidden m-5">
+    <div className={`flex h-[calc(100vh-100px)] bg-white rounded-[20px] overflow-hidden m-5 ${isRTL ? "rtl" : "ltr"}`}>
       {/* Users Sidebar - Hidden on mobile when chat is open */}
       <div
         className={`w-full md:w-80 border-r border-gray-200 flex flex-col bg-slate-50 relative overflow-hidden ${
           showMobileChat ? "hidden md:flex" : "flex"
-        }`}
+        } ${isRTL ? "border-l border-r-0" : ""}`}
       >
         <div className="p-6 border-b border-gray-200 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative z-10">
           <div className="flex items-center justify-between">
             <h4 className="m-0 text-slate-800 font-semibold text-xl flex items-center gap-2 before:content-['💬'] before:text-2xl">
-              Messages
+              {t("chat.messages")}
             </h4>
             <button
               onClick={requestNotificationPermission}
@@ -798,7 +802,7 @@ export default function Chat() {
                   ? "bg-green-100 text-green-600 hover:bg-green-200"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
-              title={notificationsEnabled ? "Notifications enabled" : "Enable notifications"}
+              title={notificationsEnabled ? t("notifications.enabled") : t("notifications.enable")}
             >
               {notificationsEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
             </button>
@@ -807,13 +811,15 @@ export default function Chat() {
 
         <div className="p-4 bg-white border-b border-gray-200">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search
+              className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4`}
+            />
             <input
               type="text"
-              placeholder="Search messages..."
+              placeholder={t("chat.searchMessages")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl outline-none transition-all duration-300 text-sm bg-slate-50 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:bg-white"
+              className={`w-full ${isRTL ? "pr-10 pl-4" : "pl-10 pr-4"} py-3 border border-gray-300 rounded-xl outline-none transition-all duration-300 text-sm bg-slate-50 focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] focus:bg-white`}
             />
           </div>
         </div>
@@ -826,13 +832,13 @@ export default function Chat() {
                 <Link
                   key={user.uid}
                   to={`/messages/${user.uid}`}
-                  className={`group flex items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-3 gap-3 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.05)] border border-transparent relative overflow-hidden hover:bg-slate-100 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:translate-x-1 ${
+                  className={`group flex items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 mb-3 gap-3 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.05)] border border-transparent relative overflow-hidden hover:bg-slate-100 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] ${isRTL ? "hover:-translate-x-1" : "hover:translate-x-1"} ${
                     receiverUid === user.uid
-                      ? "bg-blue-50 border-l-4 border-l-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.12)]"
+                      ? `bg-blue-50 ${isRTL ? "border-r-4 border-r-blue-500" : "border-l-4 border-l-blue-500"} shadow-[0_4px_12px_rgba(59,130,246,0.12)]`
                       : ""
                   } ${
                     isUnread
-                      ? "bg-blue-50 border-l-4 border-l-blue-500 shadow-[0_4px_12px_rgba(59,130,246,0.12)] animate-pulse"
+                      ? `bg-blue-50 ${isRTL ? "border-r-4 border-r-blue-500" : "border-l-4 border-l-blue-500"} shadow-[0_4px_12px_rgba(59,130,246,0.12)] animate-pulse`
                       : ""
                   }`}
                   onClick={() => {
@@ -861,12 +867,14 @@ export default function Chat() {
                     </small>
                   </div>
                   {isUnread && (
-                    <span className="absolute top-1/2 right-4 -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded-xl text-xs font-semibold">
-                      New
+                    <span
+                      className={`absolute top-1/2 ${isRTL ? "left-4" : "right-4"} -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded-xl text-xs font-semibold`}
+                    >
+                      {t("common.new")}
                     </span>
                   )}
                   {user.last_message_time && (
-                    <span className="absolute top-4 right-4 text-xs text-slate-500">
+                    <span className={`absolute top-4 ${isRTL ? "left-4" : "right-4"} text-xs text-slate-500`}>
                       {new Date(user.last_message_time).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -879,8 +887,8 @@ export default function Chat() {
           ) : (
             <div className="text-center py-8 text-slate-500">
               <div className="text-3xl mb-2">🔍</div>
-              <p className="text-sm">No conversations found</p>
-              <p className="text-xs text-slate-400 mt-1">Try a different search term</p>
+              <p className="text-sm">{t("chat.noConversations")}</p>
+              <p className="text-xs text-slate-400 mt-1">{t("chat.tryDifferentSearch")}</p>
             </div>
           )}
         </div>
@@ -897,7 +905,7 @@ export default function Chat() {
                   onClick={handleMobileBack}
                   className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                  <ArrowLeft className={`w-5 h-5 text-gray-600 ${isRTL ? "rotate-180" : ""}`} />
                 </button>
                 <div className="relative">
                   <img
@@ -928,12 +936,12 @@ export default function Chat() {
                   {connected ? (
                     <>
                       <Wifi className="w-4 h-4" />
-                      <span className="hidden sm:inline">Connected</span>
+                      <span className="hidden sm:inline">{t("connection.connected")}</span>
                     </>
                   ) : (
                     <>
                       <WifiOff className="w-4 h-4" />
-                      <span className="hidden sm:inline">Disconnected</span>
+                      <span className="hidden sm:inline">{t("connection.disconnected")}</span>
                     </>
                   )}
                 </div>
@@ -943,7 +951,7 @@ export default function Chat() {
                       className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors hidden sm:block"
                       onClick={() => setShowOrderModal(true)}
                     >
-                      Create Custom Order
+                      {t("orders.createCustomOrder")}
                     </button>
                   )}
                   <Link
@@ -951,7 +959,7 @@ export default function Chat() {
                     className="px-4 py-2 border border-blue-500 text-blue-500 rounded-lg text-sm hover:bg-blue-50 transition-colors flex items-center gap-1"
                   >
                     <User className="w-4 h-4" />
-                    <span className="hidden sm:inline">View Profile</span>
+                    <span className="hidden sm:inline">{t("orders.viewProfile")}</span>
                   </Link>
                 </div>
               </div>
@@ -976,7 +984,7 @@ export default function Chat() {
                     minute: "2-digit",
                   })
                   const canDelete = isOwn && !isDeleted && isMessageRecent(message.created_at)
-                  const hasNote = message.message?.includes("Note:") || message.note
+                  const hasNote = message.message?.includes(t("orders.note")) || message.note
 
                   const order = message.chat_order || {}
                   const isAccepted = order.is_approved === true
@@ -992,7 +1000,7 @@ export default function Chat() {
                     >
                       <div className={`flex items-center gap-2 mb-1.5 ${isOwn ? "flex-row-reverse" : ""}`}>
                         <span className={`font-semibold text-sm ${isOwn ? "text-blue-600" : "text-slate-800"}`}>
-                          {isOwn ? "You" : selectedUser?.first_name}
+                          {isOwn ? t("common.you") : selectedUser?.first_name}
                         </span>
                         <span className={`text-xs ${isOwn ? "text-blue-600" : "text-slate-500"}`}>{messageTime}</span>
                       </div>
@@ -1009,46 +1017,58 @@ export default function Chat() {
                             {isCustomOrder ? (
                               <div className="bg-white border border-yellow-300 rounded-2xl p-5 mb-2 shadow-[0_4px_12px_rgba(252,211,77,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(252,211,77,0.15)]">
                                 <div className="flex  flex-col justify-between items-center mb-4 pb-3 border-b border-yellow-300">
-                                  <span className="font-semibold text-slate-800 text-lg">Custom Order</span>
+                                  <span className="font-semibold text-slate-800 text-lg">
+                                    {t("orders.customOrder")}
+                                  </span>
                                   <span className="flex justify-between items-center mb-4 pb-1 text-gray-500 text-xs">
                                     {message.message}
                                   </span>
                                 </div>
                                 <div className="mt-2 text-slate-800">
                                   {message.message.split("\n").map((line, index) => {
-                                    if (line.startsWith("Custom order created:")) {
+                                    if (line.startsWith(t("orders.customOrderCreated"))) {
                                       return (
                                         <div key={index} className="flex items-center gap-3 mb-3 text-sm">
-                                          <span className="font-medium text-slate-500 min-w-[80px]">Service:</span>
+                                          <span className="font-medium text-slate-500 min-w-[80px]">
+                                            {t("orders.service")}:
+                                          </span>
                                           <span className="text-slate-800">
-                                            {line.replace("Custom order created:", "").trim()}
+                                            {line.replace(`${t("orders.customOrderCreated")}:`, "").trim()}
                                           </span>
                                         </div>
                                       )
                                     }
-                                    if (line.startsWith("Price:")) {
+                                    if (line.startsWith(t("orders.price"))) {
                                       return (
                                         <div key={index} className="flex items-center gap-3 mb-3 text-sm">
-                                          <span className="font-medium text-slate-500 min-w-[80px]">Price:</span>
+                                          <span className="font-medium text-slate-500 min-w-[80px]">
+                                            {t("orders.price")}:
+                                          </span>
                                           <span className="text-slate-800">{line}</span>
                                         </div>
                                       )
                                     }
-                                    if (line.startsWith("Expires in:")) {
+                                    if (line.startsWith(t("orders.expiresIn"))) {
                                       return (
                                         <div key={index} className="flex items-center gap-3 mb-3 text-sm">
-                                          <span className="font-medium text-slate-500 min-w-[80px]">Expires:</span>
+                                          <span className="font-medium text-slate-500 min-w-[80px]">
+                                            {t("orders.expires")}:
+                                          </span>
                                           <span className="text-slate-800">
-                                            {line.replace("Expires in:", "").trim()}
+                                            {line.replace(`${t("orders.expiresIn")}:`, "").trim()}
                                           </span>
                                         </div>
                                       )
                                     }
-                                    if (line.startsWith("UID:")) {
+                                    if (line.startsWith(t("orders.uid"))) {
                                       return (
                                         <div key={index} className="flex items-center gap-3 mb-3 text-sm">
-                                          <span className="font-medium text-slate-500 min-w-[80px]">Order ID:</span>
-                                          <span className="text-slate-800">{line.replace("UID:", "").trim()}</span>
+                                          <span className="font-medium text-slate-500 min-w-[80px]">
+                                            {t("orders.orderId")}:
+                                          </span>
+                                          <span className="text-slate-800">
+                                            {line.replace(`${t("orders.uid")}:`, "").trim()}
+                                          </span>
                                         </div>
                                       )
                                     }
@@ -1059,8 +1079,8 @@ export default function Chat() {
                                       {message.note ||
                                         message.message
                                           .split("\n")
-                                          .find((line) => line.startsWith("Note:"))
-                                          ?.replace("Note:", "")
+                                          .find((line) => line.startsWith(`${t("orders.note")}:`))
+                                          ?.replace(`${t("orders.note")}:`, "")
                                           .trim()}
                                     </div>
                                   )}
@@ -1079,10 +1099,10 @@ export default function Chat() {
                                           {acceptingOrder === (message.order_id || message.chat_order_id) ? (
                                             <>
                                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                              Processing...
+                                              {t("orders.processing")}
                                             </>
                                           ) : (
-                                            <>✓ Accept & Pay</>
+                                            <>✓ {t("orders.acceptAndPay")}</>
                                           )}
                                         </button>
                                         <button
@@ -1090,7 +1110,7 @@ export default function Chat() {
                                           disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
                                           className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
                                         >
-                                          ✗ Reject
+                                          ✗ {t("orders.reject")}
                                         </button>
                                       </div>
                                     )}
@@ -1102,7 +1122,7 @@ export default function Chat() {
                                         disabled
                                         className="flex-1 mt-3 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm font-medium cursor-default"
                                       >
-                                        ✓ Order Accepted
+                                        ✓ {t("orders.orderAccepted")}
                                       </button>
                                     )}
                                     {isRejected && (
@@ -1111,7 +1131,7 @@ export default function Chat() {
                                         disabled
                                         className="flex-1 mt-3 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-medium cursor-default"
                                       >
-                                        ✗ Order Rejected
+                                        ✗ {t("orders.orderRejected")}
                                       </button>
                                     )}
                                     {isExpired && (
@@ -1120,7 +1140,7 @@ export default function Chat() {
                                         disabled
                                         className="flex-1 mt-3 px-4 py-2 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium cursor-default"
                                       >
-                                        ⏳ Order Expired
+                                        ⏳ {t("orders.orderExpired")}
                                       </button>
                                     )}
                                   </>
@@ -1128,11 +1148,13 @@ export default function Chat() {
 
                                 {isSeller && message.status === "accepted" && (
                                   <div className="mt-2 text-xs text-green-600 font-medium">
-                                    ✓ Order accepted - Awaiting payment
+                                    ✓ {t("orders.acceptedAwaitingPayment")}
                                   </div>
                                 )}
                                 {isSeller && message.status === "rejected" && (
-                                  <div className="mt-2 text-xs text-red-600 font-medium">✗ Order rejected</div>
+                                  <div className="mt-2 text-xs text-red-600 font-medium">
+                                    ✗ {t("orders.orderRejected")}
+                                  </div>
                                 )}
                               </div>
                             ) : (
@@ -1142,15 +1164,15 @@ export default function Chat() {
                                     <div className="p-4 bg-white border-b border-gray-300">
                                       {message.message
                                         .split("\n")
-                                        .filter((line) => !line.startsWith("Note:"))
+                                        .filter((line) => !line.startsWith(`${t("orders.note")}:`))
                                         .join("\n")}
                                     </div>
                                     <div className="p-3 bg-slate-100 text-slate-600 text-sm flex items-start gap-2 before:content-['📝'] before:text-base">
                                       {message.note ||
                                         message.message
                                           .split("\n")
-                                          .find((line) => line.startsWith("Note:"))
-                                          ?.replace("Note:", "")
+                                          .find((line) => line.startsWith(`${t("orders.note")}:`))
+                                          ?.replace(`${t("orders.note")}:`, "")
                                           .trim()}
                                     </div>
                                   </>
@@ -1171,22 +1193,24 @@ export default function Chat() {
                               className="text-inherit no-underline flex items-center gap-2 hover:underline"
                             >
                               <span className="text-xl">📎</span>
-                              Download Attachment
+                              {t("messages.downloadAttachment")}
                             </a>
                           </div>
                         )}
                       </div>
 
                       {canDelete && (
-                        <div className="absolute -right-9 top-1/2 -translate-y-1/2 opacity-0 invisible transition-all duration-200 z-10 group-hover:opacity-100 group-hover:visible">
+                        <div
+                          className={`absolute ${isRTL ? "-left-9" : "-right-9"} top-1/2 -translate-y-1/2 opacity-0 invisible transition-all duration-200 z-10 group-hover:opacity-100 group-hover:visible`}
+                        >
                           <button
                             className="bg-white border-none cursor-pointer w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 shadow-[0_2px_5px_rgba(0,0,0,0.1)] hover:bg-red-50 hover:scale-110"
                             onClick={() => {
-                              if (window.confirm("Are you sure you want to delete this message?")) {
+                              if (window.confirm(t("messages.confirmDelete"))) {
                                 deleteMessage(message.id)
                               }
                             }}
-                            title="Delete message"
+                            title={t("messages.deleteMessage")}
                           >
                             <Trash2 className="w-4 h-4 text-slate-600 hover:text-red-500" />
                           </button>
@@ -1231,7 +1255,9 @@ export default function Chat() {
                   <Smile className="w-5 h-5" />
                 </button>
                 {showEmoji && (
-                  <div className="absolute bottom-[calc(100%+8px)] left-0 z-[1000] bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-gray-300 overflow-hidden">
+                  <div
+                    className={`absolute bottom-[calc(100%+8px)] ${isRTL ? "right-0" : "left-0"} z-[1000] bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] border border-gray-300 overflow-hidden`}
+                  >
                     <EmojiPicker
                       height={300}
                       width={250}
@@ -1255,7 +1281,7 @@ export default function Chat() {
                     sendMessage()
                   }
                 }}
-                placeholder="Type a message..."
+                placeholder={t("chat.typeMessage")}
                 className="flex-1 p-3 border border-gray-300 rounded-lg outline-none transition-all duration-200 text-sm bg-slate-100 min-h-[40px] max-h-[120px] resize-none focus:border-green-500 focus:shadow-[0_0_0_2px_rgba(29,191,115,0.1)] focus:bg-white"
                 rows={1}
               />
@@ -1290,12 +1316,12 @@ export default function Chat() {
                 {sending ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white sm:mr-2"></div>
-                    <span className="hidden sm:inline">Sending...</span>
+                    <span className="hidden sm:inline">{t("messages.sending")}</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Send</span>
+                    <span className="hidden sm:inline">{t("messages.send")}</span>
                   </>
                 )}
               </button>
@@ -1304,7 +1330,7 @@ export default function Chat() {
         ) : (
           <div className="flex flex-col items-center justify-center p-8 text-center text-slate-500">
             <div className="text-5xl mb-4 text-slate-300">💬</div>
-            <div className="text-sm leading-relaxed">Select a conversation to start chatting</div>
+            <div className="text-sm leading-relaxed">{t("chat.selectConversation")}</div>
           </div>
         )}
       </div>
@@ -1315,7 +1341,7 @@ export default function Chat() {
           <div className="fixed inset-0 bg-black/50 animate-[backdropFadeIn_0.3s_ease-out]"></div>
           <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h5 className="text-lg font-semibold">Create Custom Order</h5>
+              <h5 className="text-lg font-semibold">{t("orders.createCustomOrder")}</h5>
               <button
                 type="button"
                 className="text-slate-400 hover:text-slate-600 transition-colors text-2xl leading-none"
@@ -1332,7 +1358,7 @@ export default function Chat() {
                 }}
               >
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Select Service</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">{t("orders.selectService")}</label>
                   <select
                     className="w-full p-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     value={selectedService}
@@ -1345,23 +1371,25 @@ export default function Chat() {
                     }}
                     required
                   >
-                    <option value="">Select a service</option>
+                    <option value="">{t("orders.selectAService")}</option>
                     {myServices && myServices.length > 0 ? (
                       myServices.map((service) => (
                         <option key={service.id} value={service.id}>
-                          {service.title} - {service.price} Riyals
+                          {service.title} - {service.price} {t("common.currency")}
                         </option>
                       ))
                     ) : (
                       <option value="" disabled>
-                        No services available
+                        {t("orders.noServicesAvailable")}
                       </option>
                     )}
                   </select>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Amount (Riyals)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {t("orders.amount")} ({t("common.currency")})
+                  </label>
                   <input
                     type="number"
                     className="w-full p-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
@@ -1374,7 +1402,7 @@ export default function Chat() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Expiry Time</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">{t("orders.expiryTime")}</label>
                   <select
                     className="w-full p-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
                     value={orderExpiry}
@@ -1390,13 +1418,13 @@ export default function Chat() {
                 </div>
 
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Note (Optional)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">{t("orders.noteOptional")}</label>
                   <textarea
                     className="w-full p-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none resize-none"
                     value={orderNote}
                     onChange={(e) => setOrderNote(e.target.value)}
                     rows={3}
-                    placeholder="Add any additional details..."
+                    placeholder={t("orders.addAdditionalDetails")}
                   />
                 </div>
 
@@ -1406,13 +1434,13 @@ export default function Chat() {
                     className="h-10 rounded-lg border border-gray-300 bg-white text-slate-600 inline-flex items-center justify-center cursor-pointer transition-all duration-200 text-sm px-5 min-w-[80px] font-medium shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:border-green-500 hover:text-green-500 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
                     onClick={() => setShowOrderModal(false)}
                   >
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                   <button
                     type="submit"
                     className="h-10 rounded-lg border-none bg-green-500 text-white inline-flex items-center justify-center cursor-pointer transition-all duration-200 text-sm px-5 min-w-[80px] font-medium shadow-[0_2px_4px_rgba(29,191,115,0.15)] hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(29,191,115,0.2)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(29,191,115,0.15)]"
                   >
-                    Create Order
+                    {t("orders.createOrder")}
                   </button>
                 </div>
               </form>

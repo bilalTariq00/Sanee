@@ -118,5 +118,9 @@
 "search_services": "البحث عن الخدمات",
  "remote": "عن بُعد",
   "on_site": "في الموقع",
-  "projects": "المشاريع"
+  "projects": "المشاريع",
+  "loading_profile": "جارٍ التحميل" ,
+  "save": "حفظ",
+"unsave": "إلغاء الحفظ"
+
 }

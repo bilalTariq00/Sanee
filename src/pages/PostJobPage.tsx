@@ -480,7 +480,7 @@ export default function PostJobPage() {
           <div className="flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => navigate('/jobs')}
+              onClick={() => navigate('/')}
               className="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
             >
               {t('cancel') || 'Cancel'}
