@@ -29,7 +29,8 @@ const ManageJobs = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
 
   useEffect(() => {
     fetchJobs();
@@ -74,7 +75,8 @@ const ManageJobs = () => {
   };
 
   return (
-  <div className="p-4 bg-white min-h-screen">
+<div className={`p-4 bg-white min-h-screen ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
+
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-2xl font-bold text-red-700">{t("manage_job.title")}</h2>
       <div className="flex gap-2">
@@ -100,14 +102,15 @@ const ManageJobs = () => {
     </div>
 
     {view === "list" ? (
-      <Table>
+     <Table dir={isRTL ? "rtl" : "ltr"}>
         <TableHeader>
           <TableRow className="bg-red-100 text-red-800">
-            <TableHead>{t("manage_job.title_label")}</TableHead>
-            <TableHead>{t("manage_job.status")}</TableHead>
-            <TableHead>{t("manage_job.budget")}</TableHead>
-            <TableHead>{t("manage_job.experience")}</TableHead>
-            <TableHead>{t("manage_job.actions")}</TableHead>
+         <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.title_label")}</TableHead>
+<TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.status")}</TableHead>
+<TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.budget")}</TableHead>
+<TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.experience")}</TableHead>
+<TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.actions")}</TableHead>
+
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -123,7 +126,7 @@ const ManageJobs = () => {
               <TableCell className="flex flex-wrap gap-1">
                 <Link to={`/edit-job/${job.id}`}>
                   <Button size="sm" variant="outline">
-                    <Edit className="mr-1" /> {t("manage_job.edit")}
+                    <Edit className={isRTL ? "ml-1" : "mr-1"} />{t("manage_job.edit")}
                   </Button>
                 </Link>
                 <Button
@@ -131,7 +134,7 @@ const ManageJobs = () => {
                   variant="destructive"
                   onClick={() => handleDelete(job.id)}
                 >
-                  <Trash className="mr-1" /> {t("manage_job.delete")}
+                  <Trash className={isRTL ? "ml-1" : "mr-1"} /> {t("manage_job.delete")}
                 </Button>
                 <Link to={`/job/${job.id}/proposals`}>
                   <Button size="sm" variant="secondary">

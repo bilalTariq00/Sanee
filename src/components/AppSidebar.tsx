@@ -128,7 +128,7 @@ const handleSignOut = () => {
       } ${isRTL ? 'right-0 border-l' : 'left-0 border-r'}`}
       collapsible="icon"
     >
-      <SidebarContent className="bg-white w-fit">
+      <SidebarContent className="bg-white w-full">
         {/* Logo */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           {!isCollapsed && (

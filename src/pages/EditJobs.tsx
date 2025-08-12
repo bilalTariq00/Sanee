@@ -152,7 +152,7 @@ const { t } = useTranslation();
   };
 
   return (
-  <div className="max-w-4xl mx-auto py-6 px-4">
+  <div className="max-w-7xl mx-auto py-6 px-4">
     <Card>
       <CardHeader>
         <CardTitle>{t("edit_job.title")}</CardTitle>

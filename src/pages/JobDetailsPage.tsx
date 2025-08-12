@@ -85,7 +85,7 @@ const isSaved = Boolean(job?.is_saved)
   if (error || !job) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">{t('job_not_found')}</h2>
             <p className="mt-2 text-gray-600">{t('job_not_found_subtext')}</p>
@@ -103,7 +103,7 @@ const isSaved = Boolean(job?.is_saved)
   }
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-6"

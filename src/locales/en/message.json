@@ -1,0 +1,36 @@
+{
+  "chat": {
+    "title": "Messages",
+    "search": "Search messages...",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline",
+    "back": "Back",
+    "attachFile": "Attach file",
+    "addEmoji": "Add emoji",
+    "customOrder": "Custom Order",
+    "orderDetails": "Order Details",
+    "quantity": "Quantity",
+    "price": "Price",
+    "total": "Total",
+    "addToOrder": "Add to Order",
+    "sendOrder": "Send Order",
+    "cancel": "Cancel",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "lastSeen": "Last seen",
+    "typing": "typing...",
+    "deliveredAt": "Delivered at",
+    "readAt": "Read at"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "close": "Close",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

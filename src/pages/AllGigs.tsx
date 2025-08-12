@@ -161,7 +161,7 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
   }
 
   return (
-    <div className={`p-6 max-w-7xl mx-auto ${isRTL ? "text-right" : "text-left"}`}>
+    <div className={`p-6 max-w-full mx-auto ${isRTL ? "text-right" : "text-left"}`}>
       {/* Header & toggles */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 sm:gap-0">
         <h2 className="text-2xl font-semibold">{t("all_gigs")}</h2>

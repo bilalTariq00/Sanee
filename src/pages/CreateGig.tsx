@@ -255,7 +255,7 @@ function CreateGig() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <button onClick={() => navigate(-1)} className="flex items-center text-gray-600 hover:text-gray-900">
             {isRTL ?<ArrowRight className="w-4 h-4" />:<ArrowLeft className="w-4 h-4" />} {t("back") || "Back"}

@@ -285,7 +285,7 @@ const fetchSubcategories = async (categoryId: string | number) => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow space-y-6">
+      <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow space-y-6">
         <h2 className="text-2xl font-bold text-gray-900">{t("edit_gig.title")}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>

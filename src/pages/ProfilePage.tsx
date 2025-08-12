@@ -286,7 +286,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
   <div className="min-h-screen bg-gray-50">
   {/* header */}
   <div className="bg-red-500 text-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* <button
         onClick={() => navigate(-1)}
         className="flex items-center text-white/90 hover:text-white mb-6"
@@ -409,7 +409,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
 
       {/* tabs */}
       <div className="border-b bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-8">
           {tabOrder.map((tab) => (
             <button
@@ -428,7 +428,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
     </div>
 
       {/* content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
   {/* SELLER – Services = gigs */}
   {activeTab === "services" && user.account_type === "seller" && (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

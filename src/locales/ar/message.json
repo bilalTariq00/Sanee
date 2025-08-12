@@ -1,0 +1,36 @@
+{
+  "chat": {
+    "title": "الرسائل",
+    "search": "البحث في الرسائل...",
+    "typeMessage": "اكتب رسالة...",
+    "send": "إرسال",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "back": "رجوع",
+    "attachFile": "إرفاق ملف",
+    "addEmoji": "إضافة رمز تعبيري",
+    "customOrder": "طلب مخصص",
+    "orderDetails": "تفاصيل الطلب",
+    "quantity": "الكمية",
+    "price": "السعر",
+    "total": "المجموع",
+    "addToOrder": "إضافة للطلب",
+    "sendOrder": "إرسال الطلب",
+    "cancel": "إلغاء",
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "lastSeen": "آخر ظهور",
+    "typing": "يكتب...",
+    "deliveredAt": "تم التسليم في",
+    "readAt": "تم القراءة في"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "retry": "إعادة المحاولة",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل"
+  }
+}

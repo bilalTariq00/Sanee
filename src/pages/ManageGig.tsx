@@ -14,7 +14,8 @@ import { useTranslation } from "react-i18next";
 
 function ManageGigs() {
   const [gigs, setGigs] = useState<any[]>([]);
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
+  const isRTL = i18n.language === "ar";
 
   useEffect(() => {
     fetchGigs();
@@ -59,7 +60,7 @@ function ManageGigs() {
   };
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10 bg-white min-h-screen">
+    <main className={`p-4 bg-white min-h-screen ${isRTL ? "text-right" : "text-left"}`} dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <h1 className="text-3xl font-bold text-red-600">
           {t("manage_gigs.title")}
