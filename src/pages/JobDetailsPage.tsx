@@ -72,6 +72,15 @@ const isSaved = Boolean(job?.is_saved)
       </div>
     );
   }
+    const goBack = () => {
+  if (window.history.length > 1) {
+    navigate(-1)
+  } else {
+    // fallback route when no history to go back
+    navigate("/")
+  }
+}
+
 
   if (error || !job) {
     return (
@@ -81,7 +90,7 @@ const isSaved = Boolean(job?.is_saved)
             <h2 className="text-2xl font-bold text-gray-900">{t('job_not_found')}</h2>
             <p className="mt-2 text-gray-600">{t('job_not_found_subtext')}</p>
             <button
-              onClick={() => navigate(-1)}
+             onClick={goBack}
               className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600"
             >
              {isArabic ?<ArrowRight className="w-4 h-4" />:<ArrowLeft className="w-4 h-4" />}

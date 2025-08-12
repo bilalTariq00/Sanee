@@ -92,10 +92,9 @@ const previewItems = isJob
   return (
     <Card
       onClick={goToProfile}
-      className="p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 rounded-2xl bg-white flex flex-col h-full"
-    >
+     className="p-4 sm:p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 rounded-2xl bg-white flex flex-col h-full max-w-full" >
       {/* — Header — */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start justify-between mb-6 gap-4">
         <div className="flex items-center gap-4">
           <img
             src={user.avatar || "/placeholder.svg"}
@@ -109,11 +108,11 @@ const previewItems = isJob
           <div>
             <h3
               onClick={goToProfile}
-              className="font-semibold text-lg text-gray-900 hover:underline"
+              className="font-semibold text-lg text-gray-900 hover:underline truncate max-w-[200px] sm:max-w-none whitespace-pre-wrap"
             >
               {user.name}
             </h3>
-            <p className="text-gray-600 text-sm mt-1">{user.location}</p>
+            <p className="text-gray-600 text-sm mt-1 truncate max-w-[180px]">{user.location}</p>
             <Badge
               variant="outline"
               className={`mt-1 text-xs ${
@@ -127,7 +126,7 @@ const previewItems = isJob
 
         {/* Rating & projects count */}
       <div className={`flex flex-col gap-1 ${isRTL ? 'items-start' : 'items-end'}`}>
-  <div className={`flex items-center gap-1 text-sm ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+  <div className={`flex flex-wrap items-center gap-1 text-sm ${isRTL ? 'flex-row-reverse' : 'flex-row'}'}`}>
     {isRTL ? (
       <>
               <span className="text-yellow-500 text-base">★</span>
@@ -162,7 +161,7 @@ const previewItems = isJob
     )}
   </div>
 
-  <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800">
+  <Badge className="mb-2 whitespace-nowrap bg-blue-100 text-blue-800 max-w-full truncate">
     {loadingRating
       ? "..."
       : `${totalCompletedProjects || 0} ${t("projects")}`}
@@ -172,7 +171,7 @@ const previewItems = isJob
       </div>
 
       {/* — Basic Info — */}
-      <div className="mb-5">
+      <div className="mb-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
           <span className="flex items-center">
             <img
@@ -186,7 +185,7 @@ const previewItems = isJob
             {user.followers} {t("followers") || "followers"}
           </span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 max-w-full">
           {user.skills.slice(0, 3).map((skill) => (
             <Badge
               key={skill}
@@ -210,7 +209,7 @@ const previewItems = isJob
       {/* — All Services/Projects Preview — */}
       {/* — Preview Grid — */}
       {previewItems.length > 0 && (
-        <div className="grid  gap-3 mb-6">
+        <div className="grid grid-cols-1 mb-6">
           {previewItems.map((item, idx) => (
             <div
               key={idx}
@@ -229,7 +228,7 @@ const previewItems = isJob
               <img
                 src={getImageUrl(item.image)}
                 alt={item.title}
-                className="w-full h-fit max-h-44 object-cover"
+                className="w-full h-40 sm:h-44 object-cover rounded-lg"
               />
               {/* <div className="p-2">
                 <h4 className="text-sm font-semibold line-clamp-1">
@@ -252,14 +251,14 @@ const previewItems = isJob
       )}
 
       {/* — Footer Actions — */}
-      <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+      <div className="mt-auto flex flex-col sm:flex-row items-center justify-between gap-3 pt-4">
         <Button
           variant="outline"
           onClick={(e) => {
             e.stopPropagation()
             onUserClick?.(user)
           }}
-          className="flex-1 rounded-full"
+          className="flex-1 rounded-full w-full sm:w-auto"
         >
           {t("view_profile") || "View Profile"}
         </Button>
@@ -268,7 +267,7 @@ const previewItems = isJob
         {!(authUserType === "buyer" && isJob) && (
           <Button
             onClick={goToChat}
-            className="px-6 bg-red-500 text-white hover:bg-red-800 rounded-full"
+            className="px-6 bg-red-500 text-white hover:bg-red-800 rounded-full w-full sm:w-auto"
           >
             { t("get_in_touch") || "Get in Touch"}
           </Button>

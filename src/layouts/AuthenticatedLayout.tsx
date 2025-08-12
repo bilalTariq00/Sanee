@@ -12,7 +12,7 @@ export default function AuthenticatedLayout() {
         <AppSidebar />
         <div className="flex-1 flex flex-col ">
           <Header />
-          <main className="flex-1 p-4 overflow-y-auto">
+          <main className="flex-1  overflow-y-auto">
             <Outlet />
           </main>
         </div>

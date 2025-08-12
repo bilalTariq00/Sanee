@@ -86,13 +86,13 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">{t("profile_details")}</DialogTitle>
         </DialogHeader>
 
         {/* -------- Header -------- */}
-        <div className="flex items-start space-x-6">
+        <div className="flex flex-col sm:flex-row items-start sm:space-x-6 space-y-4 sm:space-y-0">
           <img
             src={user.avatar || fallbackAvatar}
             alt={user.name}
@@ -101,10 +101,10 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
               ;(e.target as HTMLImageElement).src = fallbackAvatar
             }}
           />
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <h2 className="text-3xl font-bold text-gray-900">{user.name ?? t("unknown")}</h2>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2 sm:gap-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-3xl font-bold text-gray-900 truncate max-w-full sm:max-w-none">{user.name ?? t("unknown")}</h2>
                 {/* Show badge to indicate if it's a job or gig */}
                 <Badge
                   variant="outline"
@@ -113,7 +113,7 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
                   {isJob ? "Job Poster" : "Service Provider"}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 min-w-0">
                 <span className="text-yellow-500 text-xl">★</span>
                 {loading ? (
                   <span className="text-xl font-semibold text-gray-400">...</span>
@@ -127,15 +127,15 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
               </div>
             </div>
 
-            {user.location && <p className="text-gray-600 mb-2">{user.location}</p>}
+            {user.location && <p className="text-gray-600 mb-2 break-words">{user.location}</p>}
 
             {!loading && (
-              <Badge className="mb-4 bg-blue-100 text-blue-800">
+              <Badge className="mb-4 bg-blue-100 text-blue-800 truncate max-w-full">
                 {totalCompletedProjects || 0} {t("projects") || "projects"}
               </Badge>
             )}
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 min-w-0">
               {user.hourlyRate !== undefined && (
                 <span className="flex items-center">
                   <img src="/riyal.svg" className="h-4 w-4 mr-1" alt="Price" />
@@ -190,7 +190,7 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
            {isGig ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(user.portfolios || []).map((portfolio, idx) => (
-                  <article key={idx} className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <article key={idx} className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow p-2 sm:p-4">
                      {portfolio.image && (
                         <img
                           src={getImageUrl(portfolio.image)}
@@ -246,7 +246,7 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
                     </div>
 
                     {/* Job Requirements */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 w-full">
                       <div className="bg-white rounded-lg p-3">
                         <div className="text-sm font-medium text-gray-600">Experience Level</div>
                         <div className="text-gray-900">{user.experience}</div>
@@ -282,11 +282,11 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
         ) : null}
 
         {/* -------- Contact -------- */}
-        <div className="flex space-x-3 pt-6 border-t">
-          <Button className="flex-1 bg-red-500 text-white hover:bg-red-600" onClick={gotoChat}>
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 pt-6 border-t">
+          <Button className="flex-1 w-full sm:w-auto bg-red-500 text-white hover:bg-red-600" onClick={gotoChat}>
             {t("get_in_touch") || "Get in Touch"}
           </Button>
-          <Button variant="outline" className="flex-1 bg-transparent">
+          <Button variant="outline" className="flex-1 w-full sm:w-auto bg-transparent">
             {isJob ? t("save_job") || "Save Job" : t("follow") || "Follow"}
           </Button>
         </div>

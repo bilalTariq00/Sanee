@@ -163,61 +163,64 @@ const isRTL = i18n.dir() === "rtl";
 
 return (
   <div className="min-h-screen bg-gray-50">
-    <main className="max-w-3xl mx-auto px-4 py-8">
+    <main className="max-w-3xl mx-auto sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          {isRTL ? (
-            <ArrowRight className="h-5 w-5 ml-2" />
-          ) : (
-            <ArrowLeft className="h-5 w-5 mr-2" />
-          )}
-          {t("edit_profile.back")}
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900">{t("edit_profile.title")}</h1>
-      </div>
+    <div className="flex flex-wrap items-center justify-between mb-6 gap-2 w-[90%] ">
+  <button
+    onClick={() => navigate(-1)}
+    className="flex items-center text-gray-600 hover:text-gray-900 mb-2 sm:mb-0 whitespace-nowrap"
+  >
+    {isRTL ? (
+      <ArrowRight className="h-5 w-5 ml-2" />
+    ) : (
+      <ArrowLeft className="h-5 w-5 mr-2" />
+    )}
+    {t("edit_profile.back")}
+  </button>
+  <h1 className="text-2xl font-bold text-gray-900 truncate max-w-full">
+    {t("edit_profile.title")}
+  </h1>
+</div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+
+      <form onSubmit={handleSubmit} className="space-y-6 w-[90%]">
         {/* Basic Info */}
         <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">{t("edit_profile.basic_info")}</h2>
           <div className="space-y-4">
             <input
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.first_name")}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
             <input
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.last_name")}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
             <input
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.username")}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
             <input
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.headline")}
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
             />
             <textarea
               rows={3}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.summary")}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
             />
             <input
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg text-base sm:text-lg"
               placeholder={t("edit_profile.country")}
               type="number"
               value={countryId}
@@ -238,21 +241,21 @@ return (
         <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">{t("edit_profile.password_section")}</h2>
           <input
-            className="w-full p-3 border rounded-lg mb-4"
+            className="w-full p-3 border rounded-lg text-base sm:text-lg mb-4"
             type="password"
             placeholder={t("edit_profile.current_password")}
             value={currentPw}
             onChange={(e) => setCurrentPw(e.target.value)}
           />
           <input
-            className="w-full p-3 border rounded-lg mb-4"
+            className="w-full p-3 border rounded-lg text-base sm:text-lg mb-4"
             type="password"
             placeholder={t("edit_profile.new_password")}
             value={newPw}
             onChange={(e) => setNewPw(e.target.value)}
           />
           <input
-            className="w-full p-3 border rounded-lg"
+            className="w-full p-3 border rounded-lg text-base sm:text-lg"
             type="password"
             placeholder={t("edit_profile.confirm_password")}
             value={confirmPw}
@@ -265,7 +268,7 @@ return (
         <section className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">{t("edit_profile.portfolio_section")}</h2>
           {portfolios.map((p, i) => (
-            <div key={i} className="border rounded-lg p-4 mb-4 space-y-2">
+            <div key={i} className="border rounded-lg p-3 sm:p-4 mb-4 space-y-2">
               <input
                 className="w-full p-2 border rounded"
                 placeholder={t("edit_profile.portfolio_title")}
@@ -337,7 +340,7 @@ return (
         <div className="flex justify-end">
           <button
             type="submit"
-            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            className="px-6 py-3 sm:py-4 bg-red-500 text-white rounded-lg hover:bg-red-600"
           >
             {t("edit_profile.save_changes")}
           </button>

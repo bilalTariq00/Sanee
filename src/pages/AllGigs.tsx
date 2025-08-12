@@ -163,9 +163,9 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
   return (
     <div className={`p-6 max-w-7xl mx-auto ${isRTL ? "text-right" : "text-left"}`}>
       {/* Header & toggles */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 sm:gap-0">
         <h2 className="text-2xl font-semibold">{t("all_gigs")}</h2>
-        <div className={`flex gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+        <div className={`flex gap-2 flex-wrap ${isRTL ? "flex-row-reverse" : ""}`}>
           <Button
             variant={view === "list" ? "default" : "outline"}
             onClick={() => setView("list")}
@@ -191,14 +191,14 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
               ? `${config.IMG_BASE_URL}/storage/${gig.images[0].image_path}`
               : "https://via.placeholder.com/400x200"
             return (
-              <Card key={gig.gig_uid} className="flex justify-between items-center px-4 py-3">
+              <Card key={gig.gig_uid} className="flex flex-col sm:flex-row justify-between items-center px-4 py-3 gap-4">
                 <div className="flex items-center gap-4">
                   <img
                     src={imageUrl || "/placeholder.svg"}
                     alt={gig.title}
-                    className="w-20 h-20 object-cover rounded-md"
+                    className="w-full sm:w-20 h-40 sm:h-20 object-cover rounded-md"
                   />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-semibold">{gig.title}</h3>
                     <p className="text-sm text-muted-foreground">{gig.category?.name}</p>
                     <Badge className="mt-1 bg-red-500 flex">
@@ -207,7 +207,7 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
                     </Badge>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 justify-end min-w-0">
                   <Button
                     size="sm"
                     variant={isSaved ? "outline" : "default"}
@@ -240,36 +240,36 @@ export default function AllGigs({ searchQuery, activeCategory }: AllGigsProps) {
               ? `${config.IMG_BASE_URL}/storage/${gig.images[0].image_path}`
               : "https://via.placeholder.com/400x200"
             return (
-              <Card key={gig.gig_uid} className="overflow-hidden">
-                <img src={imageUrl || "/placeholder.svg"} alt={gig.title} className="w-full h-[200px] object-cover" />
+              <Card key={gig.gig_uid} className="overflow-hidden rounded-lg shadow-sm">
+                <img src={imageUrl || "/placeholder.svg"} alt={gig.title} className="w-full h-48 sm:h-40 object-cover" />
                 <CardHeader>
                   <CardTitle>{gig.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">{gig.category?.name}</p>
                   <p className="text-sm text-muted-foreground">{gig.subcategory?.name}</p>
                 </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex flex-col items-center gap-2">
-                    <Badge className="bg-red-500">
+                <CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
+                    <Badge className="bg-red-500 ">
                       <img src="/riyal-dark.svg" className="h-3 w-3 mr-1" />
                       {gig.price}
                     </Badge>
                     <Button
                       size="sm"
                       variant={isSaved ? "outline" : "default"}
-                      className={isSaved ? "border-red-500 text-red-500 px-8 mt-2" : "bg-red-600 text-white px-8"}
+                      className={isSaved ? "border-red-500 text-red-500 px-8 mt-2 w-full sm:w-auto" : "bg-red-600 text-white px-8 w-full sm:w-auto"}
                       onClick={() => handleToggleSave(gig.gig_uid)}
                     >
                       {isSaved ? t("unsave") || "Unsave" : t("save") || "Save"}
                     </Button>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 w-full sm:w-auto">
                     <Link to={`/profile/${gig.user?.uid}`}>
-                      <Button variant="outline" size="sm" className="bg-red-500 text-white">
+                      <Button variant="outline" size="sm" className="bg-red-500 text-white w-full sm:w-auto">
                         <User className="mr-2" /> {t("view_profile")}
                       </Button>
                     </Link>
                     <Link to={`/gig/${gig.gig_uid}`}>
-                      <Button size="sm" className="bg-red-500 text-white px-7">
+                      <Button size="sm" className="bg-red-500 text-white px-7 w-full sm:w-auto">
                         {t("view_details")}
                       </Button>
                     </Link>

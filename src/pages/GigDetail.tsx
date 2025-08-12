@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Clock, MessageCircle, User } from "lucide-react"
+import { ArrowLeft, ArrowRight, Clock, MessageCircle, User } from "lucide-react"
 import { HireModal } from "@/components/HireModal"
 import { ImageCarousel } from "@/components/ImageCarousel"
 import config from "@/config"
@@ -39,7 +39,8 @@ interface Gig {
 }
 
 export default function GigDetail() {
-  const { t } = useTranslation()
+  const { t,i18n } = useTranslation()
+   const isArabic = i18n.language === 'ar';
   const { slug } = useParams<{ slug: string }>()
   const [gig, setGig] = useState<Gig | null>(null)
   const [loading, setLoading] = useState(true)
@@ -92,12 +93,24 @@ export default function GigDetail() {
       </div>
     )
   }
+  const goBack = () => {
+  if (window.history.length > 1) {
+    navigate(-1)
+  } else {
+    // fallback route when no history to go back
+    navigate("/")
+  }
+}
 
   return (
     <>
-      <Link to="/" className="top-0">
-        <ArrowLeft />
-      </Link>
+     <button
+  onClick={goBack}
+  className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600"
+>
+  {isArabic ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+  {t("go_back")}
+</button>
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Image Carousel */}

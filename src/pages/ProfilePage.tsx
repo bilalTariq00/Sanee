@@ -295,14 +295,14 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
       </button> */}
 
       <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-6">
-        <div className="relative">
+        <div className="flex flex-col md:flex-row md:items-start md:space-x-6">
+        <div className="relative mb-6 md:mb-0 w-fit">
     <img
       src={avatar || DEFAULT_AVATAR}
       alt={fullName}
-      className={`w-24 h-24 border-4 border-white object-cover ${
-        user.account_type === "buyer" ? "rounded-md" : "rounded-full"
-      }`}
+      className={`w-24 h-24 md:w-28 md:h-28 border-4 border-white object-cover ${
+  user.account_type === "buyer" ? "rounded-md" : "rounded-full"
+}`}
       onError={e => {
         e.currentTarget.onerror = null
         e.currentTarget.src = DEFAULT_AVATAR
@@ -311,12 +311,13 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
 
     {/* only render when profileStatus is loaded */}
     {profileStatus && (
-      <span
-        className="absolute bottom-2 right-3 block h-3 w-3 rounded-full border-2 border-white"
-        style={{ backgroundColor: profileStatus.color }}
-        title={profileStatus.status === 'online' ? 'Online' : 'Offline'}
-      />
-    )}
+  <span
+    className="absolute bottom-2 right-3 block h-3 w-3 rounded-full border-2 border-white z-10"
+    style={{ backgroundColor: profileStatus.color }}
+    title={profileStatus.status === 'online' ? 'Online' : 'Offline'}
+  />
+)}
+
   </div>
 
           <div>
@@ -347,7 +348,7 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
           </div>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
           {currentUser && user.account_type === "seller" && (
             <button
               onClick={() => navigate("/wallet")}
@@ -369,13 +370,13 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
         </div>
       </div>
 
-      <div className="flex items-center space-x-12 mt-8">
+      <div className="flex flex-wrap justify-between gap-x-12 gap-y-8 mt-8 text-center md:text-left">
         {jssData && (
-                  <div
-                  >                    
-                    <span className="text-3xl font-bold ">{jssData.score}%</span>
-                     <div className="text-white/90">{t('profile_page.jobs_completed')}</div>
-                  </div>
+                 <div className="flex flex-col items-center md:items-start">
+  <span className="text-3xl font-bold ">{jssData.score}%</span>
+  <div className="text-white/90">{t('profile_page.jobs_completed')}</div>
+</div>
+
                 )}
         <div>
           <div className="text-3xl font-bold">{jssData?.breakdown.total_completed_projects}</div>

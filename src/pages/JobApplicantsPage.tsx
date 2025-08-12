@@ -24,7 +24,7 @@ export default function JobApplicantsPage() {
   const isArabic = i18n.language === 'ar';
   const { jobId } = useParams();
   const navigate = useNavigate();
-
+const lang = i18n.language || "en";
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [gigs, setGigs] = useState<any[]>([]);
@@ -113,6 +113,7 @@ export default function JobApplicantsPage() {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
+            "Accept-Language":lang,
           },
         }
       );
@@ -198,10 +199,10 @@ export default function JobApplicantsPage() {
     <SelectValue placeholder={t('select_duration')} />
   </SelectTrigger>
   <SelectContent dir={isArabic ? "rtl" : "ltr"}>
-    <SelectItem value="less than 1 month">{t('less_than_1_month')}</SelectItem>
-    <SelectItem value="1 to 3 months">{t('one_to_three_months')}</SelectItem>
-    <SelectItem value="3 to 6 months">{t('three_to_six_months')}</SelectItem>
-    <SelectItem value="more than 6 months">{t('more_than_six_months')}</SelectItem>
+    <SelectItem value={t('less_than_1_month')}>{t('less_than_1_month')}</SelectItem>
+    <SelectItem value={t('one_to_three_months')}>{t('one_to_three_months')}</SelectItem>
+    <SelectItem value={t('three_to_six_months')}>{t('three_to_six_months')}</SelectItem>
+    <SelectItem value={t('more_than_six_months')}>{t('more_than_six_months')}</SelectItem>
   </SelectContent>
 </Select>
 
