@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import axios from "axios"
-import { Upload, User, Search, Send, Wifi, WifiOff, X, Smile, Trash2, Bell, BellOff } from "lucide-react"
+import { Upload, User, Search, Send, Wifi, WifiOff, X, Smile, Trash2, Bell, BellOff, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import EmojiPicker from "emoji-picker-react"
 import config from "../config"
@@ -92,7 +92,9 @@ export default function Chat() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [acceptingOrder, setAcceptingOrder] = useState<number | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
+  const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
+
+  const [showMobileChat, setShowMobileChat] = useState(false)
 
   const isBuyer = currentUser?.account_type === "buyer"
 
@@ -359,18 +361,18 @@ const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
     setSending(true)
     try {
       const formData = new FormData()
-      formData.append("receiver_id", receiverUid);
-    if (file) {
-      formData.append("type", "file");
-      // make sure to include the filename
-      formData.append("attachment", file, file.name);
-    } else {
-      formData.append("type", "text");
-      formData.append("message", newMessage.trim());
-    }
-setSelectedFile(null)
-  setFilePreviewUrl(null)
-  if (fileInputRef.current) fileInputRef.current.value = ""
+      formData.append("receiver_id", receiverUid)
+      if (file) {
+        formData.append("type", "file")
+        // make sure to include the filename
+        formData.append("attachment", file, file.name)
+      } else {
+        formData.append("type", "text")
+        formData.append("message", newMessage.trim())
+      }
+      setSelectedFile(null)
+      setFilePreviewUrl(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
       const res = await axios.post(`${config.API_BASE_URL}/chat/send`, formData, {
         headers: {
           ...getAuthHeaders(),
@@ -501,7 +503,7 @@ setSelectedFile(null)
       setShowOrderModal(false)
       setSelectedService("")
       setOrderAmount("")
-      setOrderExpiry("1_hour")  // keep default
+      setOrderExpiry("1_hour") // keep default
       setOrderNote("")
       scrollToBottom()
       toast.success("Custom order created successfully!")
@@ -512,118 +514,106 @@ setSelectedFile(null)
   }
 
   // Handle order acceptance - ENHANCED
-const handleAcceptOrder = async (message: Message) => {
-  const orderId = message.order_id || message.chat_order_id;
-  if (!orderId) {
-    toast.error("Order ID not found");
-    return;
-  }
-
-  setAcceptingOrder(orderId);
-
-  try {
-    const response = await fetch(`${config.API_BASE_URL}/buyer/chat/order/accept/${orderId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    const result = await response.json();
-    console.log("API Response result:", result);
-
-    // Handle common failure cases explicitly
-    if (!response.ok || !result.success) {
-      const msg = result.message?.toLowerCase() || "";
-
-      if (msg.includes("already been accepted")) {
-        // Mark as accepted
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === message.id
-              ? { ...msg, is_expired: false, is_approved: true, status: "accepted" }
-              : msg
-          )
-        );
-        toast.info("Order was already accepted.");
-      } else if (msg.includes("expired")) {
-        // Mark as expired
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === message.id
-              ? { ...msg, is_expired: true, is_approved: false, status: "expired" }
-              : msg
-          )
-        );
-        toast.error("Order has expired.");
-      } else {
-        toast.error(result.message || "Failed to accept order");
-      }
-      return;
+  const handleAcceptOrder = async (message: Message) => {
+    const orderId = message.order_id || message.chat_order_id
+    if (!orderId) {
+      toast.error("Order ID not found")
+      return
     }
 
-    // Success: update the message flags from API response
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === message.id
-          ? {
-              ...msg,
-              is_expired: result.data?.is_expired ?? false,
-              is_approved: result.data?.is_approved ?? false,
-              is_rejected: result.data?.is_rejected ?? false,
-              status: result.data?.is_approved
-                ? "accepted"
-                : result.data?.is_expired
-                ? "expired"
-                : result.data?.is_rejected
-                ? "rejected"
-                : "pending",
-            }
-          : msg
+    setAcceptingOrder(orderId)
+
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/buyer/chat/order/accept/${orderId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+
+      const result = await response.json()
+      console.log("API Response result:", result)
+
+      // Handle common failure cases explicitly
+      if (!response.ok || !result.success) {
+        const msg = result.message?.toLowerCase() || ""
+
+        if (msg.includes("already been accepted")) {
+          // Mark as accepted
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === message.id ? { ...msg, is_expired: false, is_approved: true, status: "accepted" } : msg,
+            ),
+          )
+          toast.info("Order was already accepted.")
+        } else if (msg.includes("expired")) {
+          // Mark as expired
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === message.id ? { ...msg, is_expired: true, is_approved: false, status: "expired" } : msg,
+            ),
+          )
+          toast.error("Order has expired.")
+        } else {
+          toast.error(result.message || "Failed to accept order")
+        }
+        return
+      }
+
+      // Success: update the message flags from API response
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === message.id
+            ? {
+                ...msg,
+                is_expired: result.data?.is_expired ?? false,
+                is_approved: result.data?.is_approved ?? false,
+                is_rejected: result.data?.is_rejected ?? false,
+                status: result.data?.is_approved
+                  ? "accepted"
+                  : result.data?.is_expired
+                    ? "expired"
+                    : result.data?.is_rejected
+                      ? "rejected"
+                      : "pending",
+              }
+            : msg,
+        ),
       )
-    );
 
-    toast.success(result.message || "Order accepted successfully!");
+      toast.success(result.message || "Order accepted successfully!")
 
-    // Redirect only if approved & not expired
-    if (!result.data?.is_expired && result.data?.is_approved) {
-      let gigUid = message.gig_uid || message.service_uid;
-      if (!gigUid) {
-        const uidLine = message.message
-          .split("\n")
-          .find((line) => line.includes("UID:"));
-        gigUid = uidLine?.split("UID:")[1]?.trim();
+      // Redirect only if approved & not expired
+      if (!result.data?.is_expired && result.data?.is_approved) {
+        let gigUid = message.gig_uid || message.service_uid
+        if (!gigUid) {
+          const uidLine = message.message.split("\n").find((line) => line.includes("UID:"))
+          gigUid = uidLine?.split("UID:")[1]?.trim()
+        }
+
+        if (gigUid) {
+          setTimeout(() => {
+            navigate(`/checkout/${gigUid}`, {
+              state: {
+                message: message.note || "",
+                price: message.amount,
+                is_custom_order: true,
+                order_id: orderId,
+                from_chat: true,
+              },
+            })
+          }, 1000)
+        }
       }
-
-      if (gigUid) {
-        setTimeout(() => {
-          navigate(`/checkout/${gigUid}`, {
-            state: {
-              message: message.note || "",
-              price: message.amount,
-              is_custom_order: true,
-              order_id: orderId,
-              from_chat: true,
-            },
-          });
-        }, 1000);
-      }
+    } catch (err: any) {
+      console.error("Error accepting order:", err)
+      toast.error(err.message || "Failed to accept order")
+      setMessages((prev) => prev.map((msg) => (msg.id === message.id ? { ...msg, status: "pending" } : msg)))
+    } finally {
+      setAcceptingOrder(null)
     }
-  } catch (err: any) {
-    console.error("Error accepting order:", err);
-    toast.error(err.message || "Failed to accept order");
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.id === message.id ? { ...msg, status: "pending" } : msg
-      )
-    );
-  } finally {
-    setAcceptingOrder(null);
   }
-};
-
-
 
   // Handle order rejection
   const handleRejectOrder = async (message: Message) => {
@@ -651,20 +641,19 @@ const handleAcceptOrder = async (message: Message) => {
   }
 
   // Utility functions for orders
- const expiryOptions = [
-  { value: "15_minutes", label: "15 minutes" },
-  { value: "30_minutes", label: "30 minutes" },
-  { value: "1_hour", label: "1 hour" },
-  { value: "2_hours", label: "2 hours" },
-  { value: "4_hours", label: "4 hours" },
-  { value: "6_hours", label: "6 hours" },
-  { value: "12_hours", label: "12 hours" },
-  { value: "1_day", label: "1 day" },
-  { value: "2_days", label: "2 days" },
-  { value: "3_days", label: "3 days" },
-  { value: "1_week", label: "1 week" }
-]
-
+  const expiryOptions = [
+    { value: "15_minutes", label: "15 minutes" },
+    { value: "30_minutes", label: "30 minutes" },
+    { value: "1_hour", label: "1 hour" },
+    { value: "2_hours", label: "2 hours" },
+    { value: "4_hours", label: "4 hours" },
+    { value: "6_hours", label: "6 hours" },
+    { value: "12_hours", label: "12 hours" },
+    { value: "1_day", label: "1 day" },
+    { value: "2_days", label: "2 days" },
+    { value: "3_days", label: "3 days" },
+    { value: "1_week", label: "1 week" },
+  ]
 
   const getExpiryDate = (expiryValue: string) => {
     const now = new Date()
@@ -778,12 +767,25 @@ const handleAcceptOrder = async (message: Message) => {
 
   const selectedUser = users.find((u) => u.uid === receiverUid)
 
-  
+  useEffect(() => {
+    if (receiverUid) {
+      setShowMobileChat(true)
+    }
+  }, [receiverUid])
+
+  const handleMobileBack = () => {
+    setShowMobileChat(false)
+    navigate("/messages")
+  }
 
   return (
     <div className="flex h-[calc(100vh-100px)] bg-white rounded-[20px] overflow-hidden m-5">
-      {/* Users Sidebar */}
-      <div className="w-80 border-r border-gray-200 flex flex-col bg-slate-50 relative overflow-hidden">
+      {/* Users Sidebar - Hidden on mobile when chat is open */}
+      <div
+        className={`w-full md:w-80 border-r border-gray-200 flex flex-col bg-slate-50 relative overflow-hidden ${
+          showMobileChat ? "hidden md:flex" : "flex"
+        }`}
+      >
         <div className="p-6 border-b border-gray-200 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.02)] relative z-10">
           <div className="flex items-center justify-between">
             <h4 className="m-0 text-slate-800 font-semibold text-xl flex items-center gap-2 before:content-['💬'] before:text-2xl">
@@ -837,15 +839,12 @@ const handleAcceptOrder = async (message: Message) => {
                     if (isUnread) {
                       setUnread((prev) => ({ ...prev, [user.uid]: false }))
                     }
+                    setShowMobileChat(true)
                   }}
                 >
                   <div className="relative">
                     <img
-                      src={
-                        user.image
-                          ? `${user.image}`
-                          : "/placeholder.svg?height=48&width=48"
-                      }
+                      src={user.image ? `${user.image}` : "/placeholder.svg?height=48&width=48"}
                       alt={user.first_name}
                       className="w-12 h-12 rounded-full bg-slate-100 flex-shrink-0 shadow-[0_2px_4px_rgba(0,0,0,0.05)] border-2 border-white transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_4px_8px_rgba(0,0,0,0.1)]"
                     />
@@ -887,21 +886,23 @@ const handleAcceptOrder = async (message: Message) => {
         </div>
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
+      {/* Chat Area - Full width on mobile when chat is open */}
+      <div className={`flex-1 flex flex-col bg-white ${!showMobileChat ? "hidden md:flex" : "flex"}`}>
         {receiverUid ? (
           <>
             {/* Chat Header */}
             <div className="flex flex-row items-center justify-between p-5 border-b border-gray-200 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
               <div className="flex items-center gap-4">
+                <button
+                  onClick={handleMobileBack}
+                  className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                </button>
                 <div className="relative">
                   <img
                     className="h-12 w-12 rounded-full"
-                    src={
-                      selectedUser?.image
-                        ? `${selectedUser.image}`
-                        : "/placeholder.svg?height=48&width=48"
-                    }
+                    src={selectedUser?.image ? `${selectedUser.image}` : "/placeholder.svg?height=48&width=48"}
                     alt={selectedUser?.first_name}
                   />
                   {selectedUser?.is_online && (
@@ -927,19 +928,19 @@ const handleAcceptOrder = async (message: Message) => {
                   {connected ? (
                     <>
                       <Wifi className="w-4 h-4" />
-                      Connected
+                      <span className="hidden sm:inline">Connected</span>
                     </>
                   ) : (
                     <>
                       <WifiOff className="w-4 h-4" />
-                      Disconnected
+                      <span className="hidden sm:inline">Disconnected</span>
                     </>
                   )}
                 </div>
                 <div className="flex gap-2">
                   {isSeller && (
                     <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors"
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors hidden sm:block"
                       onClick={() => setShowOrderModal(true)}
                     >
                       Create Custom Order
@@ -949,7 +950,8 @@ const handleAcceptOrder = async (message: Message) => {
                     to={`/profile/${receiverUid}`}
                     className="px-4 py-2 border border-blue-500 text-blue-500 rounded-lg text-sm hover:bg-blue-50 transition-colors flex items-center gap-1"
                   >
-                    <User className="w-4 h-4" /> View Profile
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">View Profile</span>
                   </Link>
                 </div>
               </div>
@@ -976,11 +978,10 @@ const handleAcceptOrder = async (message: Message) => {
                   const canDelete = isOwn && !isDeleted && isMessageRecent(message.created_at)
                   const hasNote = message.message?.includes("Note:") || message.note
 
-                const order = message.chat_order || {};
-const isAccepted = order.is_approved === true;
-const isRejected = order.is_rejected === true;
-const isExpired = order.is_expired === true || order.is_past_expiry === true;
-
+                  const order = message.chat_order || {}
+                  const isAccepted = order.is_approved === true
+                  const isRejected = order.is_rejected === true
+                  const isExpired = order.is_expired === true || order.is_past_expiry === true
 
                   return (
                     <div
@@ -1003,15 +1004,13 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
                             : "bg-white border border-gray-300 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)]"
                         } ${isDeleted ? "p-2 italic" : ""}`}
                       >
-                        
                         {message.message && (
                           <div>
                             {isCustomOrder ? (
                               <div className="bg-white border border-yellow-300 rounded-2xl p-5 mb-2 shadow-[0_4px_12px_rgba(252,211,77,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(252,211,77,0.15)]">
                                 <div className="flex  flex-col justify-between items-center mb-4 pb-3 border-b border-yellow-300">
                                   <span className="font-semibold text-slate-800 text-lg">Custom Order</span>
-                                  <span className="flex justify-between items-center mb-4 pb-1 text-gray-500 text-xs"
-                                  >
+                                  <span className="flex justify-between items-center mb-4 pb-1 text-gray-500 text-xs">
                                     {message.message}
                                   </span>
                                 </div>
@@ -1067,71 +1066,65 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
                                   )}
                                 </div>
 
+                                {isBuyer && message.is_custom_order && message.receiver_id === currentUser?.id && (
+                                  <>
+                                    {/* Show Accept & Reject only when order is pending */}
+                                    {!isAccepted && !isRejected && !isExpired && (
+                                      <div className="flex gap-2 mt-3">
+                                        <button
+                                          onClick={() => handleAcceptOrder(message)}
+                                          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+                                          className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                          {acceptingOrder === (message.order_id || message.chat_order_id) ? (
+                                            <>
+                                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                              Processing...
+                                            </>
+                                          ) : (
+                                            <>✓ Accept & Pay</>
+                                          )}
+                                        </button>
+                                        <button
+                                          onClick={() => handleRejectOrder(message)}
+                                          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
+                                          className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
+                                        >
+                                          ✗ Reject
+                                        </button>
+                                      </div>
+                                    )}
 
-{isBuyer && message.is_custom_order && message.receiver_id === currentUser?.id && (
-  <>
-    {/* Show Accept & Reject only when order is pending */}
-    {!isAccepted && !isRejected && !isExpired && (
-      <div className="flex gap-2 mt-3">
-        <button
-          onClick={() => handleAcceptOrder(message)}
-          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-          className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {acceptingOrder === (message.order_id || message.chat_order_id) ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Processing...
-            </>
-          ) : (
-            <>✓ Accept & Pay</>
-          )}
-        </button>
-        <button
-          onClick={() => handleRejectOrder(message)}
-          disabled={acceptingOrder === (message.order_id || message.chat_order_id)}
-          className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
-        >
-          ✗ Reject
-        </button>
-      </div>
-    )}
-
-    {/* Show final status as styled buttons */}
-    {isAccepted && (
-      <button
-        type="button"
-        disabled
-        className="flex-1 mt-3 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm font-medium cursor-default"
-      >
-        ✓ Order Accepted
-      </button>
-    )}
-    {isRejected && (
-      <button
-        type="button"
-        disabled
-        className="flex-1 mt-3 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-medium cursor-default"
-      >
-        ✗ Order Rejected
-      </button>
-    )}
-    {isExpired && (
-      <button
-        type="button"
-        disabled
-        className="flex-1 mt-3 px-4 py-2 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium cursor-default"
-      >
-        ⏳ Order Expired
-      </button>
-    )}
-  </>
-)}
-
-
-
-
-
+                                    {/* Show final status as styled buttons */}
+                                    {isAccepted && (
+                                      <button
+                                        type="button"
+                                        disabled
+                                        className="flex-1 mt-3 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm font-medium cursor-default"
+                                      >
+                                        ✓ Order Accepted
+                                      </button>
+                                    )}
+                                    {isRejected && (
+                                      <button
+                                        type="button"
+                                        disabled
+                                        className="flex-1 mt-3 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg text-sm font-medium cursor-default"
+                                      >
+                                        ✗ Order Rejected
+                                      </button>
+                                    )}
+                                    {isExpired && (
+                                      <button
+                                        type="button"
+                                        disabled
+                                        className="flex-1 mt-3 px-4 py-2 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded-lg text-sm font-medium cursor-default"
+                                      >
+                                        ⏳ Order Expired
+                                      </button>
+                                    )}
+                                  </>
+                                )}
 
                                 {isSeller && message.status === "accepted" && (
                                   <div className="mt-2 text-xs text-green-600 font-medium">
@@ -1207,34 +1200,29 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
             </div>
 
             {/* Chat Input */}
- {filePreviewUrl && (
-  <div className="p-2 bg-slate-100 rounded-lg mb-2 max-h-24 overflow-hidden">
-    {selectedFile?.type.startsWith("image/") ? (
-      <img
-        src={filePreviewUrl}
-        alt="preview"
-        className="max-h-20 rounded-md"
-      />
-    ) : (
-      <div className="flex items-center gap-2 text-sm text-slate-700">
-        <span className="text-xl">📎</span>
-        {selectedFile?.name}
-      </div>
-    )}
-    <button
-      className="absolute top-1 right-1 text-slate-500 hover:text-slate-800"
-      onClick={() => {
-        setSelectedFile(null)
-        setFilePreviewUrl(null)
-        if (fileInputRef.current) fileInputRef.current.value = ""
-      }}
-    >
-      <X className="w-4 h-4"/>
-    </button>
-  </div>
-)}
+            {filePreviewUrl && (
+              <div className="p-2 bg-slate-100 rounded-lg mb-2 max-h-24 overflow-hidden">
+                {selectedFile?.type.startsWith("image/") ? (
+                  <img src={filePreviewUrl || "/placeholder.svg"} alt="preview" className="max-h-20 rounded-md" />
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-slate-700">
+                    <span className="text-xl">📎</span>
+                    {selectedFile?.name}
+                  </div>
+                )}
+                <button
+                  className="absolute top-1 right-1 text-slate-500 hover:text-slate-800"
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setFilePreviewUrl(null)
+                    if (fileInputRef.current) fileInputRef.current.value = ""
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
             <div className="p-4 bg-white border-t border-gray-300 flex gap-3 items-center relative">
-           
               <div className="relative">
                 <button
                   className="w-10 h-10 border border-gray-300 rounded-lg bg-white flex items-center justify-center cursor-pointer transition-all duration-200 text-xl text-slate-600 p-0 min-w-[40px] shadow-[0_2px_4px_rgba(0,0,0,0.05)] hover:bg-slate-50 hover:border-green-500 hover:text-green-500 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(0,0,0,0.08)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(0,0,0,0.05)]"
@@ -1257,7 +1245,7 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
                   </div>
                 )}
               </div>
-  
+
               <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
@@ -1273,19 +1261,19 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
               />
 
               <input
-                   type="file"
-                   ref={fileInputRef}
-                   className="hidden"
-                   onChange={(e) => {
-                     const file = e.target.files?.[0] ?? null
-                     setSelectedFile(file)
-                     if (file) {
-                       setFilePreviewUrl(URL.createObjectURL(file))
-                     } else {
-                       setFilePreviewUrl(null)
-                     }
-                   }}
-                 />
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null
+                  setSelectedFile(file)
+                  if (file) {
+                    setFilePreviewUrl(URL.createObjectURL(file))
+                  } else {
+                    setFilePreviewUrl(null)
+                  }
+                }}
+              />
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="w-[40px] h-[40px] p-2 border border-gray-300 rounded bg-white text-sm cursor-pointer text-slate-600 hover:border-green-500 hover:text-green-500 flex items-center justify-center transition-colors"
@@ -1295,19 +1283,19 @@ const isExpired = order.is_expired === true || order.is_past_expiry === true;
               </button>
 
               <button
-                className="h-10 rounded-lg border-none bg-green-500 text-white inline-flex items-center justify-center cursor-pointer transition-all duration-200 text-sm px-5 min-w-[80px] font-medium shadow-[0_2px_4px_rgba(29,191,115,0.15)] hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(29,191,115,0.2)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(29,191,115,0.15)] disabled:bg-slate-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none disabled:opacity-70"
+                className="h-10 rounded-lg border-none bg-green-500 text-white inline-flex items-center justify-center cursor-pointer transition-all duration-200 text-sm px-3 sm:px-5 min-w-[60px] sm:min-w-[80px] font-medium shadow-[0_2px_4px_rgba(29,191,115,0.15)] hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(29,191,115,0.2)] active:translate-y-0 active:shadow-[0_2px_4px_rgba(29,191,115,0.15)] disabled:bg-slate-500 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none disabled:opacity-70"
                 onClick={sendMessage}
                 disabled={sending || (!newMessage.trim() && !fileInputRef.current?.files?.[0])}
               >
                 {sending ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Sending...
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white sm:mr-2"></div>
+                    <span className="hidden sm:inline">Sending...</span>
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4 mr-2" />
-                    Send
+                    <Send className="w-4 h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Send</span>
                   </>
                 )}
               </button>
