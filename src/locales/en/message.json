@@ -37,7 +37,8 @@
     "send": "Send",
     "downloadAttachment": "Download Attachment",
     "confirmDelete": "Are you sure you want to delete this message?",
-    "deleteMessage": "Delete message"
+    "deleteMessage": "Delete message",
+    "messages":"Messages"
   },
   "orders": {
     "fillAllFields": "Please fill in all required fields",

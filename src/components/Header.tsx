@@ -176,7 +176,7 @@ const handleSignOut = () => {
                       onClick={() => user?.uid && navigate(`/messages/${user.uid}`)}
                       className={`flex w-full text-left items-center px-4 py-2 ${isActiveRoute('/messages') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}
                     >
-                      <Mail className="h-4 w-4 mr-2" /> {t("messages")}
+                      <Mail className="h-4 w-4 mr-2" /> {t("messages.messages")}
                     </button>
                     <Link to="/wallet" className={`flex items-center px-4 py-2 ${isActiveRoute('/balance') ? 'text-red-500 bg-red-50' : 'text-gray-700 hover:bg-gray-100'}`}>
                       <Wallet className="h-4 w-4 mr-2" /> {t("Wallet")}

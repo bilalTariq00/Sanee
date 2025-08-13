@@ -37,7 +37,8 @@
     "send": "إرسال",
     "downloadAttachment": "تحميل المرفق",
     "confirmDelete": "هل أنت متأكد من حذف هذه الرسالة؟",
-    "deleteMessage": "حذف الرسالة"
+    "deleteMessage": "حذف الرسالة",
+    "messages":"الرسائل"
   },
   "orders": {
     "fillAllFields": "يرجى ملء جميع الحقول المطلوبة",
