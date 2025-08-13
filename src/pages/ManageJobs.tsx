@@ -108,7 +108,7 @@ const ManageJobs = () => {
          <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.title_label")}</TableHead>
 <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.status")}</TableHead>
 <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.budget")}</TableHead>
-<TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.experience")}</TableHead>
+{/* <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.experience")}</TableHead> */}
 <TableHead className={isRTL ? "text-right" : "text-left"}>{t("manage_job.actions")}</TableHead>
 
           </TableRow>
@@ -122,7 +122,7 @@ const ManageJobs = () => {
                   <img src="/riyal.svg" className="h-4 w-4 mr-1" alt="Price" />
                   {job.budget}
                 </span></TableCell>
-              <TableCell>{job.experience_level}</TableCell>
+              {/* <TableCell>{job.experience_level}</TableCell> */}
               <TableCell className="flex flex-wrap gap-1">
                 <Link to={`/edit-job/${job.id}`}>
                   <Button size="sm" variant="outline">

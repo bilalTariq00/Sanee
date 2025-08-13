@@ -158,7 +158,7 @@ export default function TicketList({ onViewTicket, refreshTrigger }: TicketListP
             onChange={(e) => setStatusFilter(e.target.value)}
             className="border border-gray-300 rounded px-3 py-2"
           >
-            <option value="all">{t("all_statuses") || "All Statuses"}</option>
+            <option value="all">{t("all_statuses") || "All Status"}</option>
             <option value="open">{t("open") || "Open"}</option>
             <option value="in_progress">{t("in_progress") || "In Progress"}</option>
             <option value="closed">{t("closed") || "Closed"}</option>

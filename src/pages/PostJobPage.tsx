@@ -463,6 +463,7 @@ export default function PostJobPage() {
                   onValueChange={(val) =>
                     setFormData((p) => ({ ...p, location_type: val }))
                   }
+                   dir={isRTL ? "rtl" : "ltr"}
                 >
                   <SelectTrigger className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500">
                     <SelectValue placeholder={t('select_option')!} />

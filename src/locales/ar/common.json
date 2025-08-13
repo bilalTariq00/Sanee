@@ -81,6 +81,7 @@
   "daily_limit_message": "يمكنك تقديم 3 عروض فقط يوميًا.",
   "all_priorities": "الأولوية",
   "all_statuses": "الأولوية",
+  "attachment":"الأولوية",
   "seller_buyer": "بائع – مشتري",
   "navigation": "القائمة",
   "sign_out": "تسجيل الخروج",
@@ -121,6 +122,10 @@
   "projects": "المشاريع",
   "loading_profile": "جارٍ التحميل" ,
   "save": "حفظ",
-"unsave": "إلغاء الحفظ"
+"unsave": "إلغاء الحفظ",
+"choose_file": "اختر ملف",
+"location": "الموقع",
+ "budget": "الميزانية"
+
 
 }

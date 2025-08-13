@@ -246,59 +246,71 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
               </div>
             ) : (
               // For jobs, show job details in a different format
-              <div className="space-y-4">
-                {user.projects.slice(0, 1).map((project, idx) => (
-                  <article key={idx} className="border rounded-lg p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-xl mb-2 text-blue-900">{project.title}</h4>
-                        {project.description && (
-                          <p className="text-gray-700 mb-4 leading-relaxed">{project.description}</p>
-                        )}
-                      </div>
-                      <div className="ml-4 text-right">
-                        <div className="bg-white rounded-lg p-3 shadow-sm">
-                          <div className="text-sm text-gray-600">Budget</div>
-                          <div className="text-lg font-bold text-green-600 flex items-center">
-                            <img src="/riyal.svg" className="h-4 w-4 mr-1" alt="Price" />
-                            {user.hourlyRate}+
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+           <div className="space-y-4">
+  {user.projects.slice(0, 1).map((project, idx) => (
+    <article
+      key={idx}
+      className="border rounded-lg p-6 bg-gradient-to-r from-blue-50 to-indigo-50"
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex-1">
+          <h4 className="font-semibold text-xl mb-2 text-blue-900">
+            {project.title}
+          </h4>
+          {project.description && (
+            <p className="text-gray-700 mb-4 leading-relaxed">
+              {project.description}
+            </p>
+          )}
+        </div>
+        <div className="ml-4 text-right">
+          <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="text-sm text-gray-600">{t("budget")}</div>
+            <div className="text-lg font-bold text-green-600 flex items-center">
+              <img src="/riyal.svg" className="h-4 w-4 mr-1" alt={t("price")} />
+              {user.hourlyRate}+
+            </div>
+          </div>
+        </div>
+      </div>
 
-                    {/* Job Requirements */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 w-full">
-                      <div className="bg-white rounded-lg p-3">
-                        <div className="text-sm font-medium text-gray-600">Experience Level</div>
-                        <div className="text-gray-900">{user.experience}</div>
-                      </div>
-                      <div className="bg-white rounded-lg p-3">
-                        <div className="text-sm font-medium text-gray-600">Location</div>
-                        <div className="text-gray-900">{user.location}</div>
-                      </div>
-                      <div className="bg-white rounded-lg p-3">
-                        <div className="text-sm font-medium text-gray-600">Posted by</div>
-                        <div className="text-gray-900">{user.name}</div>
-                      </div>
-                    </div>
+      {/* Job Requirements */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 w-full">
+        <div className="bg-white rounded-lg p-3">
+          <div className="text-sm font-medium text-gray-600">
+            {t("experience_level")}
+          </div>
+          <div className="text-gray-900">{user.experience}</div>
+        </div>
+        <div className="bg-white rounded-lg p-3">
+          <div className="text-sm font-medium text-gray-600">{t("location")}</div>
+          <div className="text-gray-900">{user.location}</div>
+        </div>
+        <div className="bg-white rounded-lg p-3">
+          <div className="text-sm font-medium text-gray-600">{t("posted_by")}</div>
+          <div className="text-gray-900">{user.name}</div>
+        </div>
+      </div>
 
-                    {/* Required Skills */}
-                    {project.tags?.length && (
-                      <div>
-                        <div className="text-sm font-medium text-gray-600 mb-2">Required Skills</div>
-                        <div className="flex flex-wrap gap-2">
-                          {project.tags.map((tag) => (
-                            <Badge key={tag} className="bg-blue-100 text-blue-800">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </article>
-                ))}
-              </div>
+      {/* Required Skills */}
+      {project.tags?.length > 0 && (
+        <div>
+          <div className="text-sm font-medium text-gray-600 mb-2">
+            {t("required_skills")}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <Badge key={tag} className="bg-blue-100 text-blue-800">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+    </article>
+  ))}
+</div>
+
             )}
           </section>
         ) : null}
@@ -308,9 +320,9 @@ export default function UserProfileDialog({ user, gotoChat, isOpen, onClose }: U
           <Button className="flex-1 w-full sm:w-auto bg-red-500 text-white hover:bg-red-600" onClick={gotoChat}>
             {t("get_in_touch") || "Get in Touch"}
           </Button>
-          <Button variant="outline" className="flex-1 w-full sm:w-auto bg-transparent">
+          {/* <Button variant="outline" className="flex-1 w-full sm:w-auto bg-transparent">
             {isJob ? t("save_job") || "Save Job" : t("follow") || "Follow"}
-          </Button>
+          </Button> */}
         </div>
       </DialogContent>
     </Dialog>

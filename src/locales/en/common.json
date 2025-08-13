@@ -81,7 +81,8 @@
   "limit_reached": "Limit Reached",
   "daily_limit_message": "You can only submit 3 proposals per day.",
   "all_priorities": "All Priorties",
-  "all_statuses": "All Stuses",
+  "all_statuses": "All Status",
+  "attachment":"Attachment",
   "seller_buyer": "Seller – Buyer",
   "navigation": "Navigation",
   "sign_out": "Sign Out",
@@ -122,5 +123,8 @@
    "projects": "Projects",
    "loading_profile":"Loading Profile ...",
    "save":"Save",
-   "unsave":"Un Save"
+   "unsave":"Un Save",
+   "choose_file": "Choose File",
+   "location": "Location",
+    "budget": "Budget"
 }

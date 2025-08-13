@@ -215,7 +215,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">{c.title}</h3>
               <p className="text-gray-600 mb-4">{c.description}</p>
-              <p className="text-sm font-medium text-red-500">{c.count}</p>
+              {/* <p className="text-sm font-medium text-red-500">{c.count}</p> */}
             </div>
           ))}
         </div>

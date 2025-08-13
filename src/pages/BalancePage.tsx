@@ -182,10 +182,10 @@ const { t } = useTranslation()
     <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between h-16">
         <div className="flex items-center">
-          <Button variant="ghost" size="sm" className="mr-4">
+          {/* <Button variant="ghost" size="sm" className="mr-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t("balances.back")}
-          </Button>
+          </Button> */}
           <h1 className="text-2xl font-semibold text-gray-900">{t("balances.my_balances")}</h1>
         </div>
         {/* <Button
@@ -203,8 +203,8 @@ const { t } = useTranslation()
   <main className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
     {walletData && (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+        <div className="grid grid-cols-1  gap-6 mb-8">
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">{t("balances.available_for_withdrawal")}</CardTitle>
               <img src="/riyal.svg" className="h-5 w-5 mr-1" />
@@ -216,9 +216,9 @@ const { t } = useTranslation()
               </div>
               <p className="text-xs text-gray-500 mt-1">{t("balances.ready_to_withdraw")}</p>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card>
+          {/* <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">{t("balances.work_in_progress")}</CardTitle>
               <Clock className="h-4 w-4 text-orange-500" />
@@ -234,7 +234,7 @@ const { t } = useTranslation()
               </div>
               <p className="text-xs text-gray-500 mt-1">{t("balances.pending_completion")}</p>
             </CardContent>
-          </Card>
+          </Card> */}
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -252,7 +252,7 @@ const { t } = useTranslation()
         </div>
 
             {/* Commission and Withdrawn Summary */}
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+           {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
   <Card>
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle className="text-sm font-medium text-gray-600">
@@ -282,7 +282,7 @@ const { t } = useTranslation()
       </div>
     </CardContent>
   </Card>
-</div>
+</div> */}
             {/* Transaction History */}
            <Card>
   <CardHeader>
@@ -296,12 +296,12 @@ const { t } = useTranslation()
   </CardHeader>
   <CardContent>
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="grid w-full grid-cols-1">
         <TabsTrigger value="in_work">{t("balances.in_work")}</TabsTrigger>
-        <TabsTrigger value="in_review">{t("balances.in_review")}</TabsTrigger>
+        {/* <TabsTrigger value="in_review">{t("balances.in_review")}</TabsTrigger>
         <TabsTrigger value="pending">{t("balances.pending")}</TabsTrigger>
         <TabsTrigger value="available">{t("balances.available")}</TabsTrigger>
-        <TabsTrigger value="withdrawn">{t("balances.withdrawn")}</TabsTrigger>
+        <TabsTrigger value="withdrawn">{t("balances.withdrawn")}</TabsTrigger> */}
       </TabsList>
 
       {["in_work", "in_review", "pending", "available", "withdrawn"].map((tabType) => (
@@ -393,19 +393,19 @@ const { t } = useTranslation()
     </CardHeader>
     <CardContent>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-        <div className="flex">
+        {/* <div className="flex">
           <span className="text-gray-500">{t("balances.commission_rate")}:</span>
           <span className="font-medium ml-1">{walletData.config.commission_rate}%</span>
         </div>
         <div className="flex">
           <span className="text-gray-500">{t("balances.available_days")}:</span>
           <span className="font-medium ml-1">{walletData.config.available_days} {t("balances.days")}</span>
-        </div>
+        </div> */}
         <div className="flex">
           <span className="text-gray-500">{t("balances.currency")}:</span>
-          <span className="font-medium ml-1">{walletData.config.currency}</span>
+          <span className="font-medium ml-1">Riyal</span>
         </div>
-        <div className="flex">
+        {/* <div className="flex">
           <span className="text-gray-500 whitespace-nowrap">{t("balances.withdrawal_limits")}:</span>
           <span className="font-medium flex items-center space-x-1 ml-1">
             <div className="flex items-center mr-2">
@@ -418,19 +418,14 @@ const { t } = useTranslation()
               {walletData.config.max_withdrawal}
             </div>
           </span>
-        </div>
+        </div> */}
       </div>
     </CardContent>
   </Card>
 )}
 
           </>
-        ) }: (
-        <div className="flex items-center justify-center py-12">
-  <p className="text-gray-500">{t("balances.unable_to_load")}</p>
-</div>
-
-        )
+        ) }
       </main>
 
       {/* Withdraw Modal */}

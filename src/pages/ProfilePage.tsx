@@ -522,13 +522,13 @@ const DEFAULT_AVATAR = "https://placehold.co/256x256?text=Avatar";
                       /* You own this job — let you edit it */
                       <Link to={`/edit-job/${j.id}`}>
                         <Button size="sm" className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                          {t("jobs.edit_jobs")}
+                          {t("edit_jobs")}
                         </Button>
                       </Link>
                     ) : (
                       /* Not you — just let you view the public job */
                       <Link to={`/jobs/${j.id}`} className="px-4 py-2  bg-red-500 text-white rounded-lg hover:bg-red-600">
-                        {t("jobs.view_details")}
+                        {t("view_details")}
                       </Link>
                     )}
                   </div>

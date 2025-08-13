@@ -217,12 +217,21 @@ export default function CreateTicketForm({ onTicketCreated }: CreateTicketFormPr
         {/* Attachment */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">{t("attachment") || "Attachment"}</label>
-          <input
+          <label className="max-w-40 inline-block px-4 py-2 bg-red-600 text-white text-sm font-medium rounded cursor-pointer hover:bg-red-700">
+  {t("choose_file")}
+  <input
+    type="file"
+    accept="image/*"
+    className="hidden"
+  onChange={(e) => setAttachment(e.target.files?.[0] || null)}
+  />
+</label>
+          {/* <input
             type="file"
             accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
             onChange={(e) => setAttachment(e.target.files?.[0] || null)}
             className="w-full"
-          />
+          /> */}
           {attachment && <p className="text-sm text-gray-500 mt-1">{attachment.name}</p>}
         </div>
 

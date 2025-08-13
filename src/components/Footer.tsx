@@ -9,6 +9,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import config from "../config";
@@ -44,20 +45,21 @@ export default function Footer() {
           <p className="text-gray-300 mb-6 max-w-md">{website?.description}</p>
           <div className="flex space-x-4 mb-6">
             {social?.instagram && (
-              <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href={social.instagram} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors ml-4">
+
+                <Instagram className="h-5 w-5 " />
               </a>
             )}
             {social?.twitter && (
               <a href={social.twitter} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors">
-                <Twitter className="h-5 w-5" />
+                <X className="h-5 w-5" />
               </a>
             )}
-            {social?.facebook && (
+            {/* {social?.facebook && (
               <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
-            )}
+            )} */}
             {social?.linkedin && (
               <a href={social.linkedin} target="_blank" rel="noopener noreferrer" className="bg-gray-800 p-3 rounded-full hover:bg-red-500 transition-colors">
                 <Linkedin className="h-5 w-5" />
@@ -71,7 +73,7 @@ export default function Footer() {
                 <span>{contact.email}</span>
               </div>
             )}
-            {contact?.phone && (
+            {/* {contact?.phone && (
               <div className="flex items-center">
                 <Phone className="h-4 w-4 mr-2" />
                 <span>{contact.phone}</span>
@@ -82,7 +84,7 @@ export default function Footer() {
                 <MapPin className="h-4 w-4 mr-2" />
                 <span>{contact.address}</span>
               </div>
-            )}
+            )} */}
           </div>
         </div>
 

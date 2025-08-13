@@ -228,11 +228,26 @@ return (
             />
             <div className="flex flex-col space-y-4">
             <label htmlFor="" className="font-bold">Update your image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-            />
+            
+            {/* Show chosen file preview if available */}
+{imageFile && (
+  <img
+    src={URL.createObjectURL(imageFile)}
+    alt=""
+    className="w-fit h-40 object-cover rounded mb-2"
+  />
+)}
+
+<label className="max-w-40 inline-block px-4 py-2 bg-red-600 text-white text-sm font-medium rounded cursor-pointer hover:bg-red-700">
+  {t("choose_file")}
+  <input
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+  />
+</label>
+
             </div>
           </div>
         </section>
@@ -303,27 +318,45 @@ return (
                   })
                 }
               />
-              {p.existing_url && !p.image && (
-                <img
-                  src={
-                    p.existing_url.startsWith("http")
-                      ? p.existing_url
-                      : `${config.IMG_BASE_URL}/${p.existing_url}`
-                  }
-                  alt=""
-                  className="w-full h-40 object-cover rounded"
-                />
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setPortfolios((arr) => {
-                    arr[i].image = e.target.files?.[0] || null;
-                    return [...arr];
-                  })
-                }
-              />
+          {/* Preview existing image if no new file is chosen */}
+{p.existing_url && !p.image && (
+  <img
+    src={
+      p.existing_url.startsWith("http")
+        ? p.existing_url
+        : `${config.IMG_BASE_URL}/${p.existing_url}`
+    }
+    alt=""
+    className="w-full h-40 object-cover rounded mb-2"
+  />
+)}
+
+{/* Preview newly chosen file instantly */}
+{p.image && (
+  <img
+    src={URL.createObjectURL(p.image)}
+    alt=""
+    className="w-fit h-40 object-cover rounded mb-2"
+  />
+)}
+
+<label className="inline-block px-4 py-2 bg-red-600 text-white text-sm font-medium rounded cursor-pointer hover:bg-red-700">
+  {t("choose_file")}
+  <input
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={(e) =>
+      setPortfolios((arr) => {
+        arr[i].image = e.target.files?.[0] || null;
+        return [...arr];
+      })
+    }
+  />
+</label>
+
+
+
             </div>
           ))}
           <button

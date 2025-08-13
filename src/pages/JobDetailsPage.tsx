@@ -138,14 +138,21 @@ const isSaved = Boolean(job?.is_saved)
               <p className="mt-4 text-gray-600">{job.description}</p>
 
               <div className="mt-6 flex flex-wrap gap-4">
-                <div className="flex items-center text-gray-500">
-                 <img src='/riyal.svg' className="h-5 w-5 mr-1" />
-                  {job.budget}
-                </div>
-                <div className="flex items-center text-gray-500">
-                  <Clock className="h-5 w-5 mr-1" />
-                  {new Date(job.created_at).toLocaleDateString()}
-                </div>
+    <div
+  className={`flex items-center text-gray-700 ${
+    isArabic ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+  }`}
+>
+  <img src="/riyal.svg" className="h-5 w-5" alt="Budget" />
+  <span className="font-medium">{job.budget}</span>
+</div>
+
+                        <div  className={`flex items-center text-gray-700 ${
+    isArabic ? "flex-row-reverse space-x-reverse space-x-1" : "space-x-1"
+  }`}>
+                          <Clock className="h-5 w-5 mr-1" />
+                          {new Date(job.created_at).toLocaleDateString()}
+                        </div>
                 {/* <div className="flex items-center text-gray-500">
                   <Briefcase className="h-5 w-5 mr-1" />
                   {job.experience_level || t('not_specified')}
