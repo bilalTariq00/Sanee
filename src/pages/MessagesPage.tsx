@@ -899,7 +899,7 @@ export default function Chat() {
         {receiverUid ? (
           <>
             {/* Chat Header */}
-            <div className="flex flex-row items-center justify-between p-5 border-b border-gray-200 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+            <div className="flex flex-row items-center justify-between md:p-5 border-b border-gray-200 bg-white shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
               <div className="flex items-center gap-4">
                 <button
                   onClick={handleMobileBack}
@@ -946,14 +946,23 @@ export default function Chat() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  {isSeller && (
-                    <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors hidden sm:block"
-                      onClick={() => setShowOrderModal(true)}
-                    >
-                      {t("orders.createCustomOrder")}
-                    </button>
-                  )}
+                 {isSeller && (
+  <button
+    className="px-4 py-2 bg-blue-500 text-white rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors"
+    onClick={() => setShowOrderModal(true)}
+  >
+    {/* Icon (visible on small screens only) */}
+    <span className="block md:hidden">
+      📦 {/* You can replace this with any icon component */}
+    </span>
+
+    {/* Text (hidden on small screens) */}
+    <span className="hidden md:inline">
+      {t("orders.createCustomOrder")}
+    </span>
+  </button>
+)}
+
                   <Link
                     to={`/profile/${receiverUid}`}
                     className="px-4 py-2 border border-blue-500 text-blue-500 rounded-lg text-sm hover:bg-blue-50 transition-colors flex items-center gap-1"

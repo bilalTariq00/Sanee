@@ -69,7 +69,7 @@ setSavedGigs(res.data.data.saved_gigs);
              : "https://via.placeholder.com/400x200";
 
           return (
-            <Card key={savedId} className="flex">
+            <Card key={savedId} className="flex flex-col sm:flex-row overflow-hidden">
               <img
                 src={imageUrl}
                 alt={gig.title}

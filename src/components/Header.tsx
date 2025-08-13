@@ -1,6 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Bell, Mail, Menu, Search, X, Settings, LogOut, Wallet, Globe2
+  Bell, Mail, Menu, Search, X, Settings, LogOut, Wallet, Globe2,
+  HelpCircle,
+  Bookmark,
+  Notebook,
+  Laptop,
+  Paperclip,
+  FileIcon,
+  FileX2Icon,
+  Workflow,
+  WorkflowIcon,
+  User,
+  Navigation
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSidebar } from './ui/sidebar';
@@ -124,7 +135,7 @@ const handleSignOut = () => {
             </div> */}
           </nav>
 
-          <div className={`hidden md:flex items-center ${isRTL ? 'space-x-reverse space-x-5' : 'space-x-5'}`}>
+          <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-5' : 'space-x-5'}`}>
             <button
               onClick={toggleLanguage}
               className="text-gray-700 hover:text-red-500 flex items-center gap-2"
@@ -199,28 +210,105 @@ const handleSignOut = () => {
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-t shadow-sm">
-          <div className="px-4 py-4 space-y-2 text-sm">
-            <Link to="/" className={`block px-3 py-2 rounded-md ${isActiveRoute('/') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}>
-              {t("home")}
-            </Link>
-            <Link to="/my-projects" className={`block px-3 py-2 rounded-md ${isActiveRoute('/my-projects') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}>
-              {t("my_projects")}
-            </Link>
-            <Link to="/jobs" className={`block px-3 py-2 rounded-md ${isActiveRoute('/jobs') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}>
-              {t("jobs")}
-            </Link>
-            
-            <button
-              onClick={() => user?.uid && navigate(`/messages/${user.uid}`)}
-              className={`w-full text-left block px-3 py-2 rounded-md ${isActiveRoute('/messages') ? 'text-red-500 bg-red-50' : 'text-gray-700'} hover:text-red-500`}
-            >
-              {t("messages")}
-            </button>
-          </div>
-        </div>
+{isMenuOpen && (
+  <div className="md:hidden bg-white border-t shadow-sm">
+    <div className="px-4 py-4 space-y-2 text-sm">
+      {/* Common Navigation */}
+
+  
+
+      
+
+      {user?.uid && (
+        <Link
+          to={`/messages/${user.uid}`}
+          className={`flex items-center gap-3 px-3 py-2 rounded-md ${
+            isActiveRoute("/messages") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"
+          }`}
+        >
+          <Paperclip className="h-5 w-5" />
+          {t("messages.messages")}
+        </Link>
       )}
+
+      <Link
+        to="/"
+        className={`flex items-center gap-3 px-3 py-2 rounded-md ${
+          isActiveRoute("/") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"
+        }`}
+      >
+        <Navigation className="h-5 w-5" />
+        {t("discover")}
+      </Link>
+
+      <Link
+        to={`/profile/${user?.uid}`}
+        className={`flex items-center gap-3 px-3 py-2 rounded-md ${
+          isActiveRoute(`/profile/${user?.uid}`) ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"
+        }`}
+      >
+        <User className="h-5 w-5" />
+        {t("profile")}
+      </Link>
+
+      {/* Seller Routes */}
+      {user?.account_type === "seller" && (
+        <>
+          <Link to="/create-gig" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/create-gig") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <FileIcon className="h-5 w-5" /> {t("create_gig")}
+          </Link>
+          <Link to="/manage-gigs" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/manage-gigs") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <FileX2Icon className="h-5 w-5" /> {t("manage_gig")}
+          </Link>
+          <Link to="/seller/contracts" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/seller/contracts") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Workflow className="h-5 w-5" /> {t("seller_contract")}
+          </Link>
+          <Link to="/wallet" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/wallet") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Wallet className="h-5 w-5" /> {t("Wallet")}
+          </Link>
+          <Link to="/save-jobs" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/save-jobs") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <WorkflowIcon className="h-5 w-5" /> {t("save_job")}
+          </Link>
+        </>
+      )}
+
+      {/* Buyer Routes */}
+      {user?.account_type === "buyer" && (
+        <>
+          <Link to="/post-job" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/post-job") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Paperclip className="h-5 w-5" /> {t("add_job")}
+          </Link>
+          <Link to="/gigs" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/gigs") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Laptop className="h-5 w-5" /> {t("all_gigs")}
+          </Link>
+          <Link to="/manage-jobs" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/manage-jobs") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <span className="h-5 w-5">🔧</span> {t("manage_jobs")}
+          </Link>
+          <Link to="/contracts" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/contracts") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Notebook className="h-5 w-5" /> {t("buyer_contract")}
+          </Link>
+          <Link to="/saved-gigs" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/saved-gigs") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+            <Bookmark className="h-5 w-5" /> {t("saved_gigs")}
+          </Link>
+        </>
+      )}
+
+      {/* Support */}
+      <Link to="/support" className={`flex items-center gap-3 px-3 py-2 rounded-md ${isActiveRoute("/support") ? "bg-red-500 text-white shadow-md" : "text-gray-700 hover:bg-red-100 hover:text-red-600"}`}>
+        <HelpCircle className="h-5 w-5" /> {t("support")}
+      </Link>
+
+      {/* Sign Out */}
+      <button
+        onClick={handleSignOut}
+        className="flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-red-50 hover:text-red-600 w-full text-left"
+      >
+        <LogOut className="h-5 w-5" /> {t("sign_out")}
+      </button>
+    </div>
+  </div>
+)}
+
     </header>
   );
 }
